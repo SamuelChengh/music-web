@@ -115,11 +115,11 @@ const downloadSong = async () => {
         </button>
         
         <button
-          class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-hover transition-default"
+          class="text-primary hover:text-primary-hover transition-default"
           @click="playerStore.toggle()"
         >
-          <Pause v-if="playerStore.isPlaying" theme="filled" size="20" />
-          <Play v-else theme="filled" size="20" />
+          <Pause v-if="playerStore.isPlaying" theme="filled" size="28" />
+          <Play v-else theme="filled" size="28" />
         </button>
         
         <button class="text-secondary hover-text transition-default" @click="playerStore.next()">
@@ -157,7 +157,7 @@ const downloadSong = async () => {
       
       <button
         v-if="playerStore.currentSong"
-        class="text-secondary hover-text transition-default hidden lg:flex"
+        class="text-secondary hover-text transition-default"
         @click="downloadSong"
         title="下载"
       >

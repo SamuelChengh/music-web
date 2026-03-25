@@ -30,7 +30,7 @@ watch(() => playerStore.showPlaylist, (show) => {
     <Transition name="slide">
       <div 
         v-if="playerStore.showPlaylist"
-        class="fixed right-0 top-0 bottom-player w-80 bg-view border-l border-default flex flex-col z-50 shadow-lg"
+        class="fixed right-0 top-0 bottom-0 w-80 bg-view border-l border-default flex flex-col z-50 shadow-lg"
       >
         <div class="h-12 flex items-center justify-between px-md border-b border-default">
           <span class="text-sm text-main font-medium">播放列表 ({{ playerStore.playlist.length }})</span>
@@ -59,11 +59,11 @@ watch(() => playerStore.showPlaylist, (show) => {
           <div
             v-for="(song, index) in playerStore.playlist"
             :key="song.rid"
-            class="flex items-center px-4 py-2 hover:bg-tertiary cursor-pointer group"
+            class="flex items-center px-sm py-sm gap-sm hover:bg-tertiary cursor-pointer group"
             :class="{ 'bg-active': playerStore.currentIndex === index }"
             @click="playSong(index)"
           >
-            <div class="w-8 h-8 rounded overflow-hidden flex-shrink-0">
+            <div class="w-12 h-12 rounded overflow-hidden flex-shrink-0">
               <img :src="song.pic" class="w-full h-full object-cover" />
             </div>
             <div class="ml-3 flex-1 min-w-0">

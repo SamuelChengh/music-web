@@ -36,9 +36,9 @@ const isActive = (path: string) => {
 
 <template>
   <aside class="w-(--width-sidebar) h-full bg-sidebar flex flex-col">
-    <div class="flex items-center h-14 px-md">
+    <div class="flex items-center h-14 px-sm">
       <Music theme="filled" size="22" class="text-primary mr-2" />
-      <span class="text-xl text-main font-semibold">TheH音乐</span>
+      <span class="text-xl text-main font-semibold px-sm">TheH音乐</span>
     </div>
     
     <nav class="flex-1 overflow-y-auto py-md">
@@ -57,9 +57,10 @@ const isActive = (path: string) => {
       </div>
     </nav>
     
-    <div class="p-md">
-      <div class="text-xs text-description text-center">
-        ⚠️ 仅供学习使用
+    <div class="flex items-center justify-center p-md h-24">
+      <div class="text-xs text-description text-center flex flex-col gap-1">
+        <span>⚠️ 本项目仅供学习使用</span>
+        <span>请支持正版音乐</span>
       </div>
     </div>
   </aside>

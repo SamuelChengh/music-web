@@ -207,7 +207,8 @@ onUnmounted(() => {
       </div>
       
       <button
-        class="text-secondary hover-text transition-default"
+        class="hover-text transition-default"
+        :class="playerStore.showLyric ? 'text-primary' : 'text-secondary'"
         @click="playerStore.showLyric = !playerStore.showLyric"
         title="歌词"
       >
@@ -215,7 +216,8 @@ onUnmounted(() => {
       </button>
       
       <button
-        class="text-secondary hover-text transition-default"
+        class="hover-text transition-default"
+        :class="playerStore.showPlaylist ? 'text-primary' : 'text-secondary'"
         @click="playerStore.togglePlaylist"
         title="播放列表"
       >

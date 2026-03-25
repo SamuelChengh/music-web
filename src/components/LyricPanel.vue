@@ -20,7 +20,7 @@ watch(() => playerStore.currentLyricIndex, async (index) => {
     <Transition name="slide">
       <div 
         v-if="playerStore.showLyric"
-        class="fixed right-0 top-0 bottom-0 w-80 bg-view border-l border-default flex flex-col z-40"
+        class="fixed right-0 top-14 bottom-24 w-80 bg-view border-l border-default flex flex-col z-40"
       >
         <div class="h-12 flex items-center justify-between px-md border-b border-default">
           <span class="text-sm text-main font-medium">歌词</span>

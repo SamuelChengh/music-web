@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { usePlayerStore } from '../../stores';
 import { getSongUrl, getLyric } from '../../api';
 import { 
@@ -11,16 +11,29 @@ import LyricPanel from '../LyricPanel.vue';
 const playerStore = usePlayerStore();
 const audioRef = ref<HTMLAudioElement | null>(null);
 const showQualityMenu = ref(false);
+const qualityMenuRef = ref<HTMLElement | null>(null);
+
 const qualities = [
-  { label: '标准 (128K)', value: 'standard' as const },
-  { label: '高音质 (320K)', value: 'exhigh' as const },
-  { label: '无损 (FLAC)', value: 'lossless' as const },
-  { label: 'HiRes', value: 'hires' as const },
+  { label: '标准', value: 'standard' as const, bitrate: '128K', icon: '128', color: 'text-gray-400' },
+  { label: '高音质', value: 'exhigh' as const, bitrate: '320K', icon: 'HQ', color: 'text-blue-400' },
+  { label: '无损', value: 'lossless' as const, bitrate: 'FLAC', icon: 'SQ', color: 'text-yellow-500' },
+  { label: 'HiRes', value: 'hires' as const, bitrate: 'FLAC', icon: 'Hi-Res', color: 'text-purple-400' },
 ];
 
 const currentQualityLabel = computed(() => {
   return qualities.find(q => q.value === playerStore.quality)?.label || '高音质';
 });
+
+const closeQualityMenu = (e: MouseEvent) => {
+  if (qualityMenuRef.value && !qualityMenuRef.value.contains(e.target as Node)) {
+    showQualityMenu.value = false;
+  }
+};
+
+const selectQuality = (q: typeof qualities[0]) => {
+  playerStore.setQuality(q.value);
+  showQualityMenu.value = false;
+};
 
 const formatTime = (seconds: number) => {
   if (!seconds || isNaN(seconds)) return '0:00';
@@ -82,6 +95,14 @@ const downloadSong = async () => {
   const downloadUrl = `/download?url=${encodeURIComponent(`https://kw-api.cenguigui.cn/?id=${playerStore.currentSong.rid}&type=song&level=${playerStore.quality}&format=mp3`)}&filename=${encodeURIComponent(filename)}`;
   window.location.href = downloadUrl;
 };
+
+onMounted(() => {
+  document.addEventListener('click', closeQualityMenu);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', closeQualityMenu);
+});
 </script>
 
 <template>
@@ -149,25 +170,40 @@ const downloadSong = async () => {
       </div>
     </div>
 
-    <div class="flex items-center gap-3 w-64 justify-end">
-      <div class="relative">
+    <div class="flex items-center gap-md w-64 justify-end" @click.self="showQualityMenu = !showQualityMenu">
+      <div class="relative" ref="qualityMenuRef">
         <button
-          class="text-xs px-2 py-1 rounded border border-default text-secondary hover:text-primary hover:border-primary transition-colors"
+          class="text-xs px-sm py-1.5 rounded-full border border-default text-secondary hover:text-primary hover:border-primary transition-colors flex items-center gap-1.5"
           @click="showQualityMenu = !showQualityMenu"
         >
+          <span :class="qualities.find(q => q.value === playerStore.quality)?.color" class="text-[10px] font-bold">
+            {{ qualities.find(q => q.value === playerStore.quality)?.icon }}
+          </span>
           {{ currentQualityLabel }}
         </button>
-        <div v-if="showQualityMenu" class="absolute bottom-full mb-2 right-0 bg-view border border-default rounded-lg shadow-lg p-2 min-w-28 z-50">
-          <div
-            v-for="q in qualities"
-            :key="q.value"
-            class="px-3 py-2 cursor-pointer hover:bg-tertiary rounded text-sm whitespace-nowrap"
-            :class="playerStore.quality === q.value ? 'text-primary font-medium' : 'text-secondary'"
-            @click.stop="playerStore.setQuality(q.value); showQualityMenu = false"
-          >
-            {{ q.label }}
+        <Transition name="fade-scale">
+          <div v-if="showQualityMenu" class="absolute bottom-full mb-2 right-0 bg-view border border-default rounded-xl shadow-xl p-2 px-sm py-sm min-w-quality-menu min-h-quality-menu z-50">
+            <div class="text-xs text-secondary px-3 py-2 font-bold mb-sm">音质选择</div>
+            <div
+              v-for="(q, index) in qualities"
+              :key="q.value"
+              class="flex items-center gap-3 px-3 py-4 cursor-pointer hover:bg-tertiary rounded-lg transition-colors group mb-sm"
+              :class="{ 'bg-tertiary/50': playerStore.quality === q.value }"
+              @click="selectQuality(q)"
+            >
+              <span :class="q.color" class="text-xs font-bold min-w-[40px]">{{ q.icon }}</span>
+              <span class="flex-1 text-sm font-bold" :class="playerStore.quality === q.value ? 'text-primary' : 'text-secondary group-hover:text-main'">
+                {{ q.label }}
+              </span>
+              <span class="text-xs text-tertiary">{{ q.bitrate }}</span>
+              <span v-if="playerStore.quality === q.value" class="text-primary">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                </svg>
+              </span>
+            </div>
           </div>
-        </div>
+        </Transition>
       </div>
       
       <button
@@ -199,3 +235,16 @@ const downloadSong = async () => {
     <LyricPanel v-if="playerStore.showLyric" />
   </div>
 </template>
+
+<style scoped>
+.fade-scale-enter-active,
+.fade-scale-leave-active {
+  transition: all 0.2s ease;
+}
+
+.fade-scale-enter-from,
+.fade-scale-leave-to {
+  opacity: 0;
+  transform: scale(0.95) translateY(8px);
+}
+</style>

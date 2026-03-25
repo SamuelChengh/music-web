@@ -2,6 +2,8 @@
 
 @theme {
   --width-sidebar: 180px;
+  --min-width-quality-menu: 240px;
+  --min-height-quality-menu: 180px;
 }
 
 :root {

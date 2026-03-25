@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getArtistSongs, getArtistInfo } from '../api';
 import { usePlayerStore } from '../stores';
@@ -43,28 +43,24 @@ const loadData = async () => {
 
 onMounted(loadData);
 
+watch(() => route.params.id, (newId) => {
+  artistId.value = Number(newId);
+  loadData();
+});
+
 const playSong = (song: Song) => {
   playerStore.setSong(song);
-};
-
-const goBack = () => {
-  router.back();
 };
 </script>
 
 <template>
   <div class="h-full overflow-y-auto bg-view px-lg py-md">
-    <button v-if="artistInfo" class="mb-md text-sm text-secondary hover-text flex items-center gap-sm transition-colors" @click="goBack">
-      <span>←</span>
-      <span>返回</span>
-    </button>
-    
     <div v-if="loading" class="text-center py-xl text-secondary">
       加载中...
     </div>
 
     <div v-else-if="artistInfo">
-      <div class="flex flex-col sm:flex-row items-center sm:items-start gap-lg mb-xl">
+      <div class="flex flex-col sm:flex-row items-center sm:items-start gap-lg mb-sm">
         <img :src="artistInfo.pic" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover shadow-lg" />
         <div class="text-center sm:text-left">
           <h1 class="text-xl md:text-3xl font-bold text-primary">{{ artistInfo.name }}</h1>
@@ -72,7 +68,7 @@ const goBack = () => {
         </div>
       </div>
 
-      <h2 class="text-lg font-semibold mb-md text-main border-b-2 border-primary pb-sm">热门歌曲</h2>
+      <h2 class="text-lg font-semibold mb-sm text-main border-primary pb-sm">热门歌曲</h2>
       <div class="flex flex-col">
         <div
           v-for="(song, index) in songs"

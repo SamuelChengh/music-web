@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@theme {
+  --width-sidebar: 180px;
+}
+
 :root {
   --color-primary: #34d399;
   --color-primary-hover: #10b981;
@@ -25,7 +29,7 @@
   --color-active-bg: rgba(52, 211, 153, 0.15);
   --color-active-text: #34d399;
   
-  --sidebar-width: 360px;
+  --sidebar-width: 420px;
   --header-height: 56px;
   --player-height: 80px;
   

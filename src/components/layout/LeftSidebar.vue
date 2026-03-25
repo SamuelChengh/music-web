@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import { Home, ChartHistogram, People, Like, Videocamera, Broadcast } from '@icon-park/vue-next';
+import { Home, ChartHistogram, People, Like, Videocamera, Broadcast, Music } from '@icon-park/vue-next';
 
 const route = useRoute();
 
@@ -35,9 +35,10 @@ const isActive = (path: string) => {
 </script>
 
 <template>
-  <aside class="w-sidebar h-full bg-sidebar flex flex-col">
-    <div class="flex items-center justify-center h-14 px-md">
-      <span class="text-xl text-main font-semibold">Music</span>
+  <aside class="w-(--width-sidebar) h-full bg-sidebar flex flex-col">
+    <div class="flex items-center h-14 px-md">
+      <Music theme="filled" size="22" class="text-primary mr-2" />
+      <span class="text-xl text-main font-semibold">TheH音乐</span>
     </div>
     
     <nav class="flex-1 overflow-y-auto py-md">

@@ -1,8 +1,18 @@
 <script setup lang="ts">
+import { ref, watch, nextTick } from 'vue';
 import { usePlayerStore } from '../stores';
 import { Close } from '@icon-park/vue-next';
 
 const playerStore = usePlayerStore();
+const lyricRefs = ref<HTMLElement[]>([]);
+
+watch(() => playerStore.currentLyricIndex, async (index) => {
+  await nextTick();
+  const el = lyricRefs.value[index];
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+});
 </script>
 
 <template>
@@ -30,6 +40,7 @@ const playerStore = usePlayerStore();
             <div
               v-for="(item, index) in playerStore.lyric"
               :key="index"
+              :ref="(el) => { if (el) lyricRefs[index] = el as HTMLElement }"
               class="transition-all duration-300 py-sm"
               :class="index === playerStore.currentLyricIndex ? 'text-primary font-medium text-lg' : 'text-secondary text-sm'"
             >

@@ -86,7 +86,7 @@ getHotSearch().then(res => {
           v-model="searchKeyword"
           type="text"
           placeholder="搜索音乐、歌手、歌词..."
-          class="flex-1 h-11 bg-transparent text-base text-main placeholder-secondary focus:outline-none transition-default ml-3"
+          class="flex-1 h-11 bg-transparent text-base text-main placeholder-secondary focus:outline-none transition-default ml-3 px-sm"
           @focus="showDropdown = true"
           @blur="hideDropdown"
           @keyup.enter="goToSearch"

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 export interface Song {
   rid: number;
@@ -58,6 +58,32 @@ export const usePlayerStore = defineStore('player', () => {
 
   const setCurrentTime = (time: number) => {
     currentTime.value = time;
+    updateCurrentLyricIndex(time);
+  };
+
+  const parseLyricTime = (timeStr: string): number => {
+    const match = timeStr.match(/(\d+):(\d+)\.?(\d*)/);
+    if (match) {
+      const minutes = parseInt(match[1]) || 0;
+      const seconds = parseFloat(match[2] + '.' + (match[3] || '0'));
+      return minutes * 60 + seconds;
+    }
+    return 0;
+  };
+
+  const updateCurrentLyricIndex = (time: number) => {
+    if (lyric.value.length === 0) {
+      currentLyricIndex.value = 0;
+      return;
+    }
+    for (let i = lyric.value.length - 1; i >= 0; i--) {
+      const lyricTime = parseLyricTime(lyric.value[i].time);
+      if (time >= lyricTime) {
+        currentLyricIndex.value = i;
+        return;
+      }
+    }
+    currentLyricIndex.value = 0;
   };
 
   const setDuration = (dur: number) => {

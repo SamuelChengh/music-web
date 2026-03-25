@@ -20,7 +20,7 @@ onMounted(() => {
     <div class="flex-1 flex flex-col min-w-0">
       <AppHeader />
       
-      <main class="flex-1 overflow-hidden">
+      <main class="flex-1 overflow-y-auto">
         <router-view v-slot="{ Component }">
           <keep-alive>
             <component :is="Component" />

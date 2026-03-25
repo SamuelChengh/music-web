@@ -60,8 +60,8 @@ const playSong = (song: Song) => {
 
 <template>
   <div class="h-full overflow-y-auto bg-view">
-    <div class="px-lg py-lg">
-      <div class="flex items-center gap-md mb-lg">
+    <div class="px-lg py-md">
+      <div class="flex items-center gap-md mb-sm">
         <div class="w-1 h-6 gradient-bg rounded-full"></div>
         <h1 class="text-2xl font-bold text-main">搜索结果</h1>
         <span v-if="keyword" class="text-lg text-secondary">"{{ keyword }}"</span>
@@ -71,23 +71,28 @@ const playSong = (song: Song) => {
         <div class="text-secondary">搜索中...</div>
       </div>
 
-      <div v-else-if="searchResults.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-md">
+      <div v-else-if="searchResults.length > 0" class="flex flex-col">
         <div
-          v-for="song in searchResults"
+          v-for="(song, index) in searchResults"
           :key="song.rid"
-          class="bg-tertiary rounded-xl p-md cursor-pointer transition-all duration-200 hover:bg-active hover:shadow-lg hover:-translate-y-1 group"
+          class="flex items-center gap-md py-sm rounded-2xl hover:bg-active cursor-pointer group transition-all duration-200 mb-xs"
           @click="playSong(song)"
         >
-          <div class="relative aspect-square mb-4 rounded-lg overflow-hidden shadow-md">
-            <img :src="song.pic" class="w-full h-full object-cover" />
-            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center">
-              <div class="opacity-0 group-hover:opacity-100 w-12 h-12 gradient-bg rounded-full flex items-center justify-center transition-all duration-200 transform scale-75 group-hover:scale-100">
-                <Play theme="filled" size="20" class="text-white" />
-              </div>
-            </div>
+          <div class="w-10 text-center font-bold text-xl text-secondary">
+            {{ index + 1 }}
           </div>
-          <div class="text-sm font-medium text-main truncate mb-1 group-hover:text-primary transition-colors">{{ song.name }}</div>
-          <div class="text-xs text-secondary truncate">{{ song.artist }}</div>
+          <img 
+            :src="song.pic" 
+            class="w-14 h-14 rounded-xl object-cover shadow-sm group-hover:scale-105 transition-transform" 
+            @error="($event.target as HTMLImageElement).style.display = 'none'"
+          />
+          <div class="flex-1 min-w-0">
+            <div class="text-lg font-medium text-main truncate group-hover:text-primary transition-colors">{{ song.name }}</div>
+            <div class="text-sm text-secondary truncate mt-1">{{ song.artist }}</div>
+          </div>
+          <button class="opacity-0 group-hover:opacity-100 p-2.5 gradient-bg text-white rounded-full transition-all">
+            <Play theme="filled" size="18" />
+          </button>
         </div>
       </div>
 

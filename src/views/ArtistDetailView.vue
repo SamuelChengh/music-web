@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getArtistSongs, getArtistInfo } from '../api';
 import { usePlayerStore } from '../stores';
+import { Play } from '@icon-park/vue-next';
 
 interface Song {
   rid: number;
@@ -52,48 +53,49 @@ const goBack = () => {
 </script>
 
 <template>
-  <div class="flex-1 overflow-y-auto px-3 md:px-6 py-4 md:py-6 pb-24 md:pb-4">
-    <button v-if="artistInfo" class="mb-4 md:mb-6 text-sm md:text-base text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] flex items-center gap-1 md:gap-2 transition-colors" @click="goBack">
+  <div class="h-full overflow-y-auto bg-view px-lg py-md">
+    <button v-if="artistInfo" class="mb-md text-sm text-secondary hover-text flex items-center gap-sm transition-colors" @click="goBack">
       <span>←</span>
       <span>返回</span>
     </button>
     
-    <div v-if="loading" class="text-center py-16 text-lg text-[var(--color-text-secondary)]">
+    <div v-if="loading" class="text-center py-xl text-secondary">
       加载中...
     </div>
 
     <div v-else-if="artistInfo">
-      <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 md:gap-8 mb-6 md:mb-10">
+      <div class="flex flex-col sm:flex-row items-center sm:items-start gap-lg mb-xl">
         <img :src="artistInfo.pic" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover shadow-lg" />
         <div class="text-center sm:text-left">
-          <h1 class="text-xl md:text-3xl font-bold text-[var(--color-text-primary)]">{{ artistInfo.name }}</h1>
-          <p class="text-sm md:text-lg text-[var(--color-text-secondary)] mt-1 md:mt-2">共 {{ songs.length }} 首歌曲</p>
+          <h1 class="text-xl md:text-3xl font-bold text-primary">{{ artistInfo.name }}</h1>
+          <p class="text-sm md:text-lg text-secondary mt-1 md:mt-2">共 {{ songs.length }} 首歌曲</p>
         </div>
       </div>
 
-      <h2 class="text-lg md:text-2xl font-semibold mb-4 md:mb-6 text-[var(--color-text-primary)] border-b-2 border-[var(--color-primary)] pb-2">热门歌曲</h2>
-      <div class="space-y-2 md:space-y-3">
+      <h2 class="text-lg font-semibold mb-md text-main border-b-2 border-primary pb-sm">热门歌曲</h2>
+      <div class="flex flex-col">
         <div
           v-for="(song, index) in songs"
           :key="song.rid"
-          class="flex items-center gap-2 md:gap-4 p-2 md:p-4 rounded-lg md:rounded-xl hover:bg-[var(--color-bg-secondary)] cursor-pointer group transition-colors"
+          class="flex items-center gap-md py-sm rounded-2xl hover:bg-active cursor-pointer group transition-all duration-200 mb-xs"
           @click="playSong(song)"
         >
-          <div class="w-6 md:w-8 text-center text-sm md:text-lg text-[var(--color-text-secondary)]">
+          <div class="w-10 text-center font-bold text-xl" :class="index < 3 ? 'text-primary' : 'text-secondary'">
             {{ index + 1 }}
           </div>
-          <img :src="song.pic" class="w-10 h-10 md:w-14 md:h-14 rounded-lg object-cover shadow" />
+          <img :src="song.pic" class="w-14 h-14 rounded-xl object-cover shadow-sm group-hover:scale-105 transition-transform" />
           <div class="flex-1 min-w-0">
-            <div class="text-sm md:text-lg font-medium text-[var(--color-text-primary)] truncate">{{ song.name }}</div>
+            <div class="text-lg font-medium text-main truncate group-hover:text-primary transition-colors">{{ song.name }}</div>
+            <div class="text-sm text-secondary truncate mt-1">{{ song.artist || artistInfo.name }}</div>
           </div>
-          <button class="opacity-0 group-hover:opacity-100 px-3 md:px-5 py-1.5 md:py-2 bg-[var(--color-primary)] text-white rounded-lg text-xs md:text-base font-medium transition-opacity">
-            播放
+          <button class="opacity-0 group-hover:opacity-100 p-2.5 gradient-bg text-white rounded-full transition-all">
+            <Play theme="filled" size="18" />
           </button>
         </div>
       </div>
     </div>
 
-    <div v-else class="text-center py-16 text-lg text-[var(--color-text-secondary)]">
+    <div v-else class="text-center py-xl text-secondary">
       歌手不存在
     </div>
   </div>

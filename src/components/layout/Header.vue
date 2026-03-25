@@ -119,7 +119,7 @@ getHotSearch().then(res => {
                 class="flex items-center gap-md px-md py-md hover:bg-tertiary cursor-pointer transition-colors group"
                 @click="playSong(song)"
               >
-                <img :src="song.pic" class="w-10 h-10 rounded-lg object-cover" />
+                <img :src="song.pic" class="w-10 h-10 rounded-lg object-cover" @error="($event.target as HTMLImageElement).style.display = 'none'" />
                 <div class="flex-1 min-w-0">
                   <div class="text-sm text-main truncate">{{ song.name }}</div>
                   <div class="text-xs text-secondary truncate">{{ song.artist }}</div>

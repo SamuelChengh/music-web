@@ -6,6 +6,7 @@ import {
   GoEnd, GoAhead, Play, Pause, Switch, Refresh, List, Text, Download
 } from '@icon-park/vue-next';
 import PlayerSlider from './PlayerSlider.vue';
+import LyricPanel from '../LyricPanel.vue';
 
 const playerStore = usePlayerStore();
 const audioRef = ref<HTMLAudioElement | null>(null);
@@ -163,5 +164,7 @@ const downloadSong = async () => {
         <Download theme="outline" size="18" />
       </button>
     </div>
+    
+    <LyricPanel v-if="playerStore.showLyric" />
   </div>
 </template>

@@ -1,34 +1,61 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { usePlayerStore } from '../stores';
+import { Close } from '@icon-park/vue-next';
 
 const playerStore = usePlayerStore();
-const isMobile = ref(window.innerWidth < 768);
 </script>
 
 <template>
-  <div 
-    class="fixed z-50 bg-[var(--color-bg-secondary)] overflow-hidden flex flex-col"
-    :class="isMobile ? 'inset-0' : 'right-0 top-0 h-[calc(100vh-80px)] w-80 border-l border-[var(--color-border)]'"
-  >
-    <div class="p-4 border-b border-[var(--color-border)] flex justify-between items-center">
-      <h3 class="font-medium">歌词</h3>
-      <button class="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] text-xl" @click="playerStore.showLyric = false">✕</button>
-    </div>
-    <div class="flex-1 overflow-y-auto p-4 text-center">
-      <div v-if="playerStore.lyric.length === 0" class="text-[var(--color-text-secondary)] py-8">
-        暂无歌词
-      </div>
-      <div v-else class="space-y-3">
-        <div
-          v-for="(item, index) in playerStore.lyric"
-          :key="index"
-          class="transition-all duration-300 py-2"
-          :class="index === playerStore.currentLyricIndex ? 'text-[var(--color-primary)] font-medium text-lg sm:text-xl' : 'text-[var(--color-text-secondary)] text-sm sm:text-base'"
-        >
-          {{ item.lineLyric || '♪' }}
+  <Teleport to="body">
+    <Transition name="slide">
+      <div 
+        v-if="playerStore.showLyric"
+        class="fixed right-0 top-0 bottom-0 w-80 bg-view border-l border-default flex flex-col z-40"
+      >
+        <div class="h-12 flex items-center justify-between px-md border-b border-default">
+          <span class="text-sm text-main font-medium">歌词</span>
+          <button 
+            class="w-6 h-6 rounded flex items-center justify-center hover:bg-tertiary text-secondary"
+            @click="playerStore.showLyric = false"
+          >
+            <Close theme="outline" size="16" />
+          </button>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto px-md py-lg text-center">
+          <div v-if="playerStore.lyric.length === 0" class="flex items-center justify-center h-full text-secondary text-sm">
+            暂无歌词
+          </div>
+          <div v-else class="space-y-md">
+            <div
+              v-for="(item, index) in playerStore.lyric"
+              :key="index"
+              class="transition-all duration-300 py-sm"
+              :class="index === playerStore.currentLyricIndex ? 'text-primary font-medium text-lg' : 'text-secondary text-sm'"
+            >
+              {{ item.lineLyric || '♪' }}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
+    </Transition>
+    
+    <div 
+      v-if="playerStore.showLyric" 
+      class="fixed inset-0 bg-black/20 z-30"
+      @click="playerStore.showLyric = false"
+    />
+  </Teleport>
 </template>
+
+<style scoped>
+.slide-enter-active,
+.slide-leave-active {
+  transition: transform 0.3s ease;
+}
+
+.slide-enter-from,
+.slide-leave-to {
+  transform: translateX(100%);
+}
+</style>

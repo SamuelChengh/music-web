@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { usePlayerStore } from '../../stores';
 import { getSongUrl, getLyric } from '../../api';
 import { 
@@ -10,6 +10,17 @@ import LyricPanel from '../LyricPanel.vue';
 
 const playerStore = usePlayerStore();
 const audioRef = ref<HTMLAudioElement | null>(null);
+const showQualityMenu = ref(false);
+const qualities = [
+  { label: '标准 (128K)', value: 'standard' as const },
+  { label: '高音质 (320K)', value: 'exhigh' as const },
+  { label: '无损 (FLAC)', value: 'lossless' as const },
+  { label: 'HiRes', value: 'hires' as const },
+];
+
+const currentQualityLabel = computed(() => {
+  return qualities.find(q => q.value === playerStore.quality)?.label || '高音质';
+});
 
 const formatTime = (seconds: number) => {
   if (!seconds || isNaN(seconds)) return '0:00';
@@ -53,7 +64,7 @@ watch(() => playerStore.isPlaying, (playing) => {
 
 watch(() => playerStore.quality, async () => {
   if (playerStore.currentSong) {
-    const { url } = await getSongUrl(playerStore.currentSong.rid, playerStore.quality, 'mp3');
+    const { url } = await getSongUrl(playerStore.currentSong.rid, playerStore.quality);
     if (audioRef.value) {
       const currentTime = audioRef.value.currentTime;
       audioRef.value.src = url;
@@ -139,8 +150,28 @@ const downloadSong = async () => {
     </div>
 
     <div class="flex items-center gap-3 w-64 justify-end">
+      <div class="relative">
+        <button
+          class="text-xs px-2 py-1 rounded border border-default text-secondary hover:text-primary hover:border-primary transition-colors"
+          @click="showQualityMenu = !showQualityMenu"
+        >
+          {{ currentQualityLabel }}
+        </button>
+        <div v-if="showQualityMenu" class="absolute bottom-full mb-2 right-0 bg-view border border-default rounded-lg shadow-lg p-2 min-w-28 z-50">
+          <div
+            v-for="q in qualities"
+            :key="q.value"
+            class="px-3 py-2 cursor-pointer hover:bg-tertiary rounded text-sm whitespace-nowrap"
+            :class="playerStore.quality === q.value ? 'text-primary font-medium' : 'text-secondary'"
+            @click.stop="playerStore.setQuality(q.value); showQualityMenu = false"
+          >
+            {{ q.label }}
+          </div>
+        </div>
+      </div>
+      
       <button
-        class="text-secondary hover-text transition-default hidden lg:flex"
+        class="text-secondary hover-text transition-default"
         @click="playerStore.showLyric = !playerStore.showLyric"
         title="歌词"
       >

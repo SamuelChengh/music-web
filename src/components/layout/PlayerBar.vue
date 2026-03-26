@@ -3,7 +3,7 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { usePlayerStore } from '../../stores';
 import { getSongUrl, getLyric } from '../../api';
 import { 
-  GoEnd, GoAhead, Play, Pause, Switch, Refresh, List, Text, Download
+  Play, Pause, List, Text, Download
 } from '@icon-park/vue-next';
 import PlayerSlider from './PlayerSlider.vue';
 import LyricPanel from '../LyricPanel.vue';
@@ -138,12 +138,10 @@ onUnmounted(() => {
 
     <div class="flex-1 flex flex-col items-center max-w-2xl mx-auto">
       <div class="flex items-center gap-5 mb-2">
-        <button class="text-secondary hover-text transition-default hidden lg:block">
-          <Switch theme="outline" size="20" />
-        </button>
-        
         <button class="text-secondary hover-text transition-default" @click="playerStore.prev()">
-          <GoEnd theme="outline" size="22" />
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+          </svg>
         </button>
         
         <button
@@ -155,11 +153,9 @@ onUnmounted(() => {
         </button>
         
         <button class="text-secondary hover-text transition-default" @click="playerStore.next()">
-          <GoAhead theme="outline" size="22" />
-        </button>
-        
-        <button class="text-secondary hover-text transition-default hidden lg:block">
-          <Refresh theme="outline" size="20" />
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+          </svg>
         </button>
       </div>
       

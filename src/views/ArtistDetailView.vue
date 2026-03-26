@@ -44,7 +44,7 @@ const loadData = async () => {
     if (artist) {
       artistInfo.value = artist;
     }
-    allSongs.value = await getArtistSongs(artistId.value, 1, 200);
+    allSongs.value = await getArtistSongs(artistId.value, 1, 100);
     hasMore.value = allSongs.value.length > pageSize;
   } catch (e) {
     console.error(e);

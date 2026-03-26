@@ -156,6 +156,7 @@ getHotSearch().then(res => {
       </button>
       
       <button
+        v-if="false"
         class="w-9 h-9 rounded-full hover:bg-tertiary text-secondary hover-text flex items-center justify-center transition-default"
         title="用户"
       >
@@ -163,6 +164,7 @@ getHotSearch().then(res => {
       </button>
       
       <button
+        v-if="false"
         class="w-9 h-9 rounded-full hover:bg-tertiary text-secondary hover-text flex items-center justify-center transition-default"
         title="设置"
       >

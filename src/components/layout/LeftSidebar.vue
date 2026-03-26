@@ -14,16 +14,16 @@ const menuGroups = [
     ]
   },
   {
-    title: '我的音乐',
-    items: [
-      { name: '我喜欢', path: '/favorites', icon: Like },
-    ]
-  },
-  {
     title: '音乐馆',
     items: [
       { name: 'MV', path: '/mv', icon: Videocamera },
       { name: '电台', path: '/dj', icon: Broadcast },
+    ]
+  },
+  {
+    title: '我的音乐',
+    items: [
+      { name: '我喜欢', path: '/favorites', icon: Like },
     ]
   }
 ];

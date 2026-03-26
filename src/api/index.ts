@@ -33,6 +33,15 @@ export interface Song {
   duration?: number;
 }
 
+export interface Playlist {
+  id: number;
+  name: string;
+  creator: string;
+  pic: string;
+  playCount: number;
+  songCount: number;
+}
+
 export interface RankItem {
   rid: number;
   name: string;
@@ -56,12 +65,12 @@ export async function getHotSearch(): Promise<string[]> {
   return data.data || [];
 }
 
-export async function getRecommendList(name: string = '伤感', page = 1, limit = 30): Promise<SearchResult[]> {
+export async function getRecommendList(name: string = '伤感', page = 1, limit = 30): Promise<Playlist[]> {
   const { data } = await api.get(`/recommend`, { params: { name, page, limit } });
   return data.data || [];
 }
 
-export async function getNewList(page = 1, limit = 99): Promise<SearchResult[]> {
+export async function getNewList(page = 1, limit = 99): Promise<Playlist[]> {
   const { data } = await api.get(`/newlist`, { params: { page, limit } });
   return data.data || [];
 }

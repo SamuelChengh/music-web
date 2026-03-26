@@ -80,6 +80,17 @@ function normalizeArtist(artist) {
   };
 }
 
+function normalizePlaylist(item) {
+  return {
+    id: parseInt(item.rid || item.playlistid) || 0,
+    name: item.name || '',
+    creator: item.uname || item.artist || '',
+    pic: item.pic || '',
+    playCount: parseInt(item.PlayCnt || item.listencnt) || 0,
+    songCount: parseInt(item.total) || 0
+  };
+}
+
 function formatLyricTime(seconds) {
   const sec = parseFloat(seconds);
   const m = Math.floor(sec / 60);
@@ -132,12 +143,12 @@ app.use(async (req, res, next) => {
     });
     const result = await fetchFromAPI('/' + query);
     if (result.code === 200) {
-      if (Array.isArray(result.data)) {
-        result.data = result.data.map(normalizeSong);
-      } else if (result.data && Array.isArray(result.data.musicList)) {
-        result.data = result.data.musicList.map(normalizeSong);
+      if (result.data && Array.isArray(result.data.musicList)) {
+        result.data = result.data.musicList.map(normalizePlaylist);
+      } else if (Array.isArray(result.data)) {
+        result.data = result.data.map(normalizePlaylist);
       } else if (result.data && Array.isArray(result.data.list)) {
-        result.data = result.data.list.map(normalizeSong);
+        result.data = result.data.list.map(normalizePlaylist);
       }
     }
     return res.json(result);
@@ -152,7 +163,7 @@ app.use(async (req, res, next) => {
     });
     const result = await fetchFromAPI('/' + query);
     if (result.code === 200 && Array.isArray(result.data)) {
-      result.data = result.data.map(normalizeSong);
+      result.data = result.data.map(normalizePlaylist);
     }
     return res.json(result);
   }
@@ -346,6 +357,49 @@ app.use(async (req, res, next) => {
   if (url.startsWith('/banner')) {
     const result = await fetchFromAPI('/?type=banner');
     return res.json(result);
+  }
+  
+  if (url.startsWith('/playlistsongs')) {
+    const params = parseQuery(url);
+    const query = buildQueryString({
+      id: params.id,
+      type: 'list',
+      limit: params.limit || 100
+    });
+    const result = await fetchFromAPI('/' + query);
+    if (result && result.code === 200 && result.data && result.data.musicList) {
+      result.data = result.data.musicList.map(song => ({
+        rid: parseInt(song.rid) || 0,
+        name: song.name || song.SONGNAME || '',
+        artist: song.artist || song.ARTIST || '',
+        pic: song.pic || song.PICPATH || '',
+        duration: song.duration || song.DURATION || 0
+      }));
+    }
+    return res.json(result || { code: 500, data: [] });
+  }
+  
+  if (url.startsWith('/playlist')) {
+    const params = parseQuery(url);
+    const query = buildQueryString({
+      id: params.id,
+      type: 'list',
+      limit: 1
+    });
+    const result = await fetchFromAPI('/' + query);
+    if (result && result.code === 200 && result.data) {
+      const data = result.data;
+      result.data = {
+        id: data.id || params.id,
+        name: data.name || '',
+        pic: data.img500 || data.img || data.img300 || '',
+        creator: data.uname || data.userName || '',
+        desc: data.desc || '',
+        playCount: data.PlayCnt || 0,
+        songCount: data.tolal || data.total || 0
+      };
+    }
+    return res.json(result || { code: 500, data: {} });
   }
   
   next();

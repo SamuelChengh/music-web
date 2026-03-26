@@ -77,6 +77,16 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path,
       },
+      '/playlist': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        rewrite: (path) => path,
+      },
+      '/playlistsongs': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        rewrite: (path) => path,
+      },
     },
   },
 });

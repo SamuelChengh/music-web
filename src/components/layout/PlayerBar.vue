@@ -106,7 +106,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="h-24 bg-main border-t border-default flex items-center px-md relative">
+  <div class="h-24 bg-main border-t border-default flex items-center px-md relative lg:h-player">
     <audio
       ref="audioRef"
       @timeupdate="handleTimeUpdate"
@@ -114,9 +114,10 @@ onUnmounted(() => {
       @loadedmetadata="() => audioRef && playerStore.setDuration(audioRef.duration)"
     />
     
-    <div class="flex items-center w-64">
+    <div class="flex items-center w-64 lg:w-64">
       <div 
         class="w-12 h-12 rounded-lg overflow-hidden cursor-pointer transition-default hover:opacity-80"
+        :class="playerStore.currentSong ? 'lg:cursor-pointer' : ''"
         @click="playerStore.showLyric = !playerStore.showLyric"
       >
         <img
@@ -127,16 +128,16 @@ onUnmounted(() => {
         <div v-else class="w-full h-full bg-tertiary" />
       </div>
       
-      <div class="px-sm flex-1 min-w-0" v-if="playerStore.currentSong">
+      <div class="px-sm flex-1 min-w-0 hidden lg:block" v-if="playerStore.currentSong">
         <div class="text-sm text-main truncate">{{ playerStore.currentSong.name }}</div>
         <div class="text-xs text-secondary truncate">{{ playerStore.currentSong.artist }}</div>
       </div>
-      <div v-else class="px-sm flex-1">
+      <div v-else class="px-sm flex-1 hidden lg:block">
         <div class="text-sm text-secondary">暂无播放</div>
       </div>
     </div>
 
-    <div class="flex-1 flex flex-col items-center max-w-2xl mx-auto">
+    <div class="flex-1 flex-col items-center max-w-2xl mx-auto hidden lg:flex">
       <div class="flex items-center gap-5 mb-2">
         <button class="text-secondary hover-text transition-default" @click="playerStore.prev()">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -166,7 +167,7 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div class="flex items-center gap-md w-64 justify-end" @click.self="showQualityMenu = !showQualityMenu">
+    <div class="flex items-center gap-md w-64 justify-end hidden lg:flex" @click.self="showQualityMenu = !showQualityMenu">
       <div class="relative" ref="qualityMenuRef">
         <button
           class="text-xs px-sm py-1.5 rounded-full border border-default text-secondary hover:text-primary hover:border-primary transition-colors flex items-center gap-1.5"
@@ -181,7 +182,7 @@ onUnmounted(() => {
           <div v-if="showQualityMenu" class="absolute bottom-full mb-2 right-0 bg-view border border-default rounded-xl shadow-xl p-2 px-sm py-sm min-w-quality-menu min-h-quality-menu z-50">
             <div class="text-xs text-secondary px-3 py-2 font-bold mb-sm">音质选择</div>
             <div
-              v-for="(q, index) in qualities"
+              v-for="q in qualities"
               :key="q.value"
               class="flex items-center gap-3 px-3 py-4 cursor-pointer hover:bg-tertiary rounded-lg transition-colors group mb-sm"
               :class="{ 'bg-tertiary/50': playerStore.quality === q.value }"
@@ -232,6 +233,51 @@ onUnmounted(() => {
     
     <LyricPanel v-if="playerStore.showLyric" />
   </div>
+  
+  <div class="lg:hidden fixed bottom-0 left-0 right-0 h-player-mobile bg-main border-t border-default flex items-center justify-between px-md z-30 safe-area-bottom">
+    <div class="flex items-center gap-sm" @click="playerStore.showLyric = !playerStore.showLyric">
+      <img
+        v-if="playerStore.currentSong"
+        :src="playerStore.currentSong.pic"
+        class="w-10 h-10 rounded-lg object-cover"
+      />
+      <div v-else class="w-10 h-10 bg-tertiary rounded-lg" />
+      
+      <div class="min-w-0 max-w-[45vw]" v-if="playerStore.currentSong">
+        <div class="text-sm text-main truncate">{{ playerStore.currentSong.name }}</div>
+        <div class="text-xs text-secondary truncate">{{ playerStore.currentSong.artist }}</div>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-4">
+      <button class="text-secondary" @click="playerStore.prev()">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+        </svg>
+      </button>
+      
+      <button
+        class="w-10 h-10 rounded-full gradient-bg flex items-center justify-center text-white"
+        @click="playerStore.toggle()"
+      >
+        <Pause v-if="playerStore.isPlaying" theme="filled" size="20" />
+        <Play v-else theme="filled" size="20" />
+      </button>
+      
+      <button class="text-secondary" @click="playerStore.next()">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+        </svg>
+      </button>
+      
+      <button
+        class="text-secondary"
+        @click="playerStore.togglePlaylist"
+      >
+        <List theme="outline" size="20" />
+      </button>
+    </div>
+  </div>
 </template>
 
 <style scoped>
@@ -244,5 +290,9 @@ onUnmounted(() => {
 .fade-scale-leave-to {
   opacity: 0;
   transform: scale(0.95) translateY(8px);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 </style>

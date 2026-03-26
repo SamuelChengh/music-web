@@ -30,6 +30,8 @@ export default {
       height: {
         'header': 'var(--header-height)',
         'player': 'var(--player-height)',
+        'player-mobile': 'var(--player-height-mobile)',
+        'bottom-nav': 'var(--bottom-nav-height)',
       },
       backdropBlur: {
         'glass': '20px',

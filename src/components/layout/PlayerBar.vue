@@ -106,7 +106,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="h-24 bg-main border-t border-default flex items-center px-md relative lg:h-player">
+  <div class="hidden lg:flex h-24 bg-main border-t border-default items-center px-md relative lg:h-player">
     <audio
       ref="audioRef"
       @timeupdate="handleTimeUpdate"
@@ -230,54 +230,58 @@ onUnmounted(() => {
         <Download theme="outline" size="18" />
       </button>
     </div>
-    
-    <LyricPanel v-if="playerStore.showLyric" />
   </div>
   
-  <div class="lg:hidden fixed bottom-0 left-0 right-0 h-player-mobile bg-main border-t border-default flex items-center justify-between px-md z-30 safe-area-bottom">
-    <div class="flex items-center gap-sm" @click="playerStore.showLyric = !playerStore.showLyric">
-      <img
-        v-if="playerStore.currentSong"
-        :src="playerStore.currentSong.pic"
-        class="w-10 h-10 rounded-lg object-cover"
-      />
-      <div v-else class="w-10 h-10 bg-tertiary rounded-lg" />
+  <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-main border-t border-default z-30" style="height: calc(72px + env(safe-area-inset-bottom, 0));">
+    <div class="h-[72px] grid grid-cols-3 items-center px-md">
+      <div class="flex items-center gap-sm justify-self-start" @click="playerStore.showLyric = !playerStore.showLyric">
+        <img
+          v-if="playerStore.currentSong"
+          :src="playerStore.currentSong.pic"
+          class="w-11 h-11 rounded-lg object-cover"
+        />
+        <div v-else class="w-11 h-11 bg-tertiary rounded-lg" />
+        
+        <div class="min-w-0 max-w-[20vw]" v-if="playerStore.currentSong">
+          <div class="text-sm text-main truncate">{{ playerStore.currentSong.name }}</div>
+          <div class="text-xs text-secondary truncate">{{ playerStore.currentSong.artist }}</div>
+        </div>
+      </div>
       
-      <div class="min-w-0 max-w-[45vw]" v-if="playerStore.currentSong">
-        <div class="text-sm text-main truncate">{{ playerStore.currentSong.name }}</div>
-        <div class="text-xs text-secondary truncate">{{ playerStore.currentSong.artist }}</div>
+      <div class="flex items-center justify-center gap-5">
+        <button class="text-secondary" @click="playerStore.prev()">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+          </svg>
+        </button>
+        
+        <button
+          class="text-primary hover:text-primary-hover transition-default"
+          @click="playerStore.toggle()"
+        >
+          <Pause v-if="playerStore.isPlaying" theme="filled" size="28" />
+          <Play v-else theme="filled" size="28" />
+        </button>
+        
+        <button class="text-secondary" @click="playerStore.next()">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="flex justify-end">
+        <button
+          class="text-secondary"
+          @click="playerStore.showLyric = !playerStore.showLyric"
+        >
+          <Text theme="outline" size="22" />
+        </button>
       </div>
     </div>
-    
-    <div class="flex items-center gap-4">
-      <button class="text-secondary" @click="playerStore.prev()">
-        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
-        </svg>
-      </button>
-      
-      <button
-        class="w-10 h-10 rounded-full gradient-bg flex items-center justify-center text-white"
-        @click="playerStore.toggle()"
-      >
-        <Pause v-if="playerStore.isPlaying" theme="filled" size="20" />
-        <Play v-else theme="filled" size="20" />
-      </button>
-      
-      <button class="text-secondary" @click="playerStore.next()">
-        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
-        </svg>
-      </button>
-      
-      <button
-        class="text-secondary"
-        @click="playerStore.togglePlaylist"
-      >
-        <List theme="outline" size="20" />
-      </button>
-    </div>
   </div>
+  
+  <LyricPanel v-if="playerStore.showLyric" />
 </template>
 
 <style scoped>

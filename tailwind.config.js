@@ -33,6 +33,9 @@ export default {
         'player-mobile': 'var(--player-height-mobile)',
         'bottom-nav': 'var(--bottom-nav-height)',
       },
+      padding: {
+        'player': 'var(--player-height-mobile)',
+      },
       backdropBlur: {
         'glass': '20px',
       },

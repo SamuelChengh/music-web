@@ -27,7 +27,7 @@ const doSearch = async (kw: string) => {
   }
   searching.value = true;
   try {
-    searchResults.value = await searchSongs(kw, 1, 30);
+    searchResults.value = await searchSongs(kw, 1, 100);
   } catch (e) {
     console.error(e);
   }

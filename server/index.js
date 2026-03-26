@@ -94,18 +94,20 @@ app.use(async (req, res, next) => {
     const params = parseQuery(url);
     const page = parseInt(params.page) || 1;
     const limit = parseInt(params.limit) || 10;
-    const query = `?pn=${page - 1}&rn=${limit}&all=${encodeURIComponent(params.name)}&ft=music&rformat=json&encoding=utf8&pcjson=1`;
     
-    const result = await fetchFromAPI('https://search.kuwo.cn/r.s' + query);
-    if (result && result.abslist && Array.isArray(result.abslist)) {
+    const query = `?name=${encodeURIComponent(params.name)}&page=${page}&limit=${limit}`;
+    const result = await fetchFromAPI(query);
+    
+    if (result && result.code === 200 && result.data) {
+      const data = Array.isArray(result.data) ? result.data : [result.data];
       return res.json({
         code: 200,
-        data: result.abslist.map(song => ({
-          rid: song.MUSICRID ? song.MUSICRID.replace('MUSIC_', '') : song.MUSICRID,
-          name: song.SONGNAME || song.NAME,
-          artist: song.ARTIST || song.AARTIST,
-          pic: song.PICPATH || `https://img4.kuwo.cn/star/albumcover/300/${song.web_albumpic_short || ''}`,
-          duration: song.DURATION
+        data: data.map(song => ({
+          rid: song.rid,
+          name: song.name,
+          artist: song.artist,
+          pic: song.pic,
+          duration: song.duration
         }))
       });
     }

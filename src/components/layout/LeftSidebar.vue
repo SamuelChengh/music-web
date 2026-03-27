@@ -51,8 +51,8 @@ const isActive = (path: string) => {
           :class="{ 'active': isActive(item.path) }"
           @click="$router.push(item.path)"
         >
-          <component :is="item.icon" theme="outline" size="18" />
-          <span>{{ item.name }}</span>
+          <component :is="item.icon" theme="outline" size="18" :class="{ 'text-active': isActive(item.path) }" />
+          <span :class="{ 'text-active': isActive(item.path) }">{{ item.name }}</span>
         </div>
       </div>
     </nav>
@@ -83,7 +83,7 @@ const isActive = (path: string) => {
 }
 
 .menu-item.active {
-  background: linear-gradient(to right, rgba(52, 211, 153, 0.15), transparent);
+  background: linear-gradient(to right, var(--color-active-bg), transparent);
   color: var(--color-active-text);
   font-weight: 500;
   position: relative;

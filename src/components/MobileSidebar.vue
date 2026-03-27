@@ -119,7 +119,7 @@ const handleTouchEnd = () => {
 }
 
 .menu-item.active {
-  background: linear-gradient(to right, rgba(52, 211, 153, 0.15), transparent);
+  background: linear-gradient(to right, var(--color-active-bg), transparent);
   color: var(--color-active-text);
   font-weight: 500;
   position: relative;

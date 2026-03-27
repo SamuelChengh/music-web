@@ -30,7 +30,7 @@
   --color-gradient-end: #10b981;
   
   --color-active-bg: rgba(52, 211, 153, 0.15);
-  --color-active-text: #34d399;
+  --color-active-text: var(--color-primary);
   
   --sidebar-width: 420px;
   --header-height: 56px;
@@ -43,9 +43,9 @@
 
 .dark {
   --color-primary: #34d399;
-  --color-primary-hover: #10b981;
-  --color-primary-light: #059669;
-  --color-primary-dark: #047857;
+  --color-primary-hover: #6ee7b7;
+  --color-primary-light: #10b981;
+  --color-primary-dark: #059669;
   
   --color-bg-main: #171718;
   --color-bg-dc: #1e1e1f;
@@ -64,7 +64,7 @@
   --color-gradient-end: #10b981;
   
   --color-active-bg: rgba(52, 211, 153, 0.2);
-  --color-active-text: #34d399;
+  --color-active-text: var(--color-primary);
 }
 
 .theme-blue {

@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 import { useThemeStore } from '../../stores/theme';
 import { usePlayerStore } from '../../stores';
 import { searchSongs, getHotSearch } from '../../api';
-import { Left, Right, Search, User, Setting, Moon, Sunny, Play } from '@icon-park/vue-next';
+import { Left, Right, Search, Setting, Moon, Sunny, Play } from '@icon-park/vue-next';
 
 const router = useRouter();
 const themeStore = useThemeStore();
@@ -15,6 +15,20 @@ const searchResults = ref<any[]>([]);
 const hotSearch = ref<string[]>([]);
 const showDropdown = ref(false);
 const searching = ref(false);
+const showThemeMenu = ref(false);
+
+const themeColors = [
+  { value: 'green', hex: '#34d399' },
+  { value: 'blue', hex: '#3b82f6' },
+  { value: 'purple', hex: '#8b5cf6' },
+  { value: 'red', hex: '#ef4444' },
+  { value: 'pink', hex: '#ec4899' },
+  { value: 'orange', hex: '#f97316' },
+];
+
+const closeThemeMenu = () => {
+  showThemeMenu.value = false;
+};
 
 const goBack = () => router.back();
 const goForward = () => router.forward();
@@ -155,21 +169,38 @@ getHotSearch().then(res => {
         <Sunny v-else theme="outline" size="18" />
       </button>
       
-      <button
-        v-if="false"
-        class="w-9 h-9 rounded-full hover:bg-tertiary text-secondary hover-text flex items-center justify-center transition-default"
-        title="用户"
-      >
-        <User theme="outline" size="18" />
-      </button>
-      
-      <button
-        v-if="false"
-        class="w-9 h-9 rounded-full hover:bg-tertiary text-secondary hover-text flex items-center justify-center transition-default"
-        title="设置"
-      >
-        <Setting theme="outline" size="18" />
-      </button>
+      <div class="relative">
+        <button
+          class="w-9 h-9 rounded-full hover:bg-tertiary text-secondary hover-text flex items-center justify-center transition-default"
+          title="主题设置"
+          @click="showThemeMenu = !showThemeMenu"
+        >
+          <Setting theme="outline" size="18" />
+        </button>
+        
+        <Transition name="dropdown">
+          <div v-if="showThemeMenu" class="fixed inset-0 z-40" @click="closeThemeMenu"></div>
+        </Transition>
+        <Transition name="dropdown">
+          <div
+            v-if="showThemeMenu"
+            class="absolute right-0 top-full mt-2 w-44 bg-view border border-default rounded-xl shadow-lg p-md z-50"
+            @click.stop
+          >
+            <div class="text-xs text-secondary mb-sm">选择主题颜色</div>
+            <div class="flex flex-wrap gap-sm">
+              <button 
+                v-for="c in themeColors" 
+                :key="c.value"
+                class="w-6 h-6 rounded-full border-2 transition-transform hover:scale-110"
+                :style="{ backgroundColor: c.hex }"
+                :class="themeStore.color === c.value ? 'border-main scale-110' : 'border-transparent'"
+                @click="themeStore.setColor(c.value as any)"
+              />
+            </div>
+          </div>
+        </Transition>
+      </div>
     </div>
   </header>
 </template>

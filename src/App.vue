@@ -7,11 +7,13 @@ import AppHeader from './components/layout/Header.vue';
 import PlayerBar from './components/layout/PlayerBar.vue';
 import PlayListDrawer from './components/layout/PlayListDrawer.vue';
 import MobileSearch from './components/MobileSearch.vue';
+import MobileSidebar from './components/MobileSidebar.vue';
 import { Music, Moon, Sunny } from '@icon-park/vue-next';
 
 const router = useRouter();
 const themeStore = useThemeStore();
 const showMobileSearch = ref(false);
+const showMobileSidebar = ref(false);
 
 onMounted(() => {
   themeStore.init();
@@ -28,7 +30,7 @@ onMounted(() => {
       <div class="md:hidden h-14 flex items-center px-md bg-view border-b border-default gap-sm">
         <div 
           class="flex items-center cursor-pointer"
-          @click="router.push('/')"
+          @click="showMobileSidebar = true"
         >
           <Music theme="filled" size="22" class="text-primary" />
         </div>
@@ -67,5 +69,7 @@ onMounted(() => {
     <PlayListDrawer class="hidden lg:block" />
     
     <MobileSearch v-if="showMobileSearch" @close="showMobileSearch = false" class="md:hidden" />
+    
+    <MobileSidebar v-if="showMobileSidebar" @close="showMobileSidebar = false" class="md:hidden" />
   </div>
 </template>

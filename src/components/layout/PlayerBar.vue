@@ -272,7 +272,7 @@ onUnmounted(() => {
           </button>
         </div>
         
-        <div class="flex items-center justify-end gap-sm">
+        <div v-if="playerStore.currentSong" class="flex items-center justify-end gap-sm">
           <button
             class="text-xs px-2 py-1 rounded border border-default"
             :class="qualities.find(q => q.value === playerStore.quality)?.color"

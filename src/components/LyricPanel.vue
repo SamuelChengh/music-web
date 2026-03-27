@@ -102,12 +102,12 @@ watch(() => playerStore.showLyric, async (show) => {
           <div v-if="playerStore.lyric.length === 0" class="flex items-center justify-center h-full text-secondary">
             暂无歌词
           </div>
-          <div v-else class="space-y-lg">
+          <div v-else class="space-y-md">
             <div
               v-for="(item, index) in playerStore.lyric"
               :key="index"
               :ref="(el) => { if (el) lyricRefs[index] = el as HTMLElement }"
-              class="transition-all duration-300 py-md"
+              class="transition-all duration-300 py-sm"
               :class="index === playerStore.currentLyricIndex ? 'text-primary text-xl font-medium' : 'text-secondary text-base'"
             >
               {{ item.lineLyric || '♪' }}

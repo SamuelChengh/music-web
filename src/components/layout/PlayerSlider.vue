@@ -26,7 +26,7 @@ const progress = computed(() => {
 
 <template>
   <div 
-    class="relative h-1 bg-tertiary rounded-full cursor-pointer group"
+    class="relative h-2 bg-tertiary rounded-full cursor-pointer group"
     @click="handleSeek"
   >
     <div 

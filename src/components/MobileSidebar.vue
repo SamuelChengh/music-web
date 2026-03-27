@@ -79,7 +79,7 @@ const handleTouchEnd = () => {
       >
         <div class="flex items-center h-14 px-sm border-b border-default gap-2">
           <Music theme="filled" size="20" class="text-primary mr-2" />
-          <span class="text-lg text-main font-semibold px-xs">TheH音乐</span>
+          <span class="text-lg text-primary font-semibold px-xs">TheH音乐</span>
         </div>
         
         <nav class="flex-1 overflow-y-auto py-sm">

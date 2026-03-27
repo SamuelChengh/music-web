@@ -280,23 +280,13 @@ onUnmounted(() => {
           >
             {{ qualities.find(q => q.value === playerStore.quality)?.icon }}
           </button>
-          <button
-            class="text-secondary"
-            @click="playerStore.showLyric = !playerStore.showLyric"
-          >
-            <Text theme="outline" size="22" />
-          </button>
         </div>
       </div>
       
-      <div class="grid grid-cols-3 items-center h-[24px]">
-        <div></div>
-        <div class="flex items-center gap-sm justify-center">
-          <span class="text-xs text-secondary w-8 text-right flex-shrink-0">{{ formatTime(playerStore.currentTime) }}</span>
-          <PlayerSlider class="flex-1 min-w-[80px]" />
-          <span class="text-xs text-secondary w-8 flex-shrink-0">{{ formatTime(playerStore.duration) }}</span>
-        </div>
-        <div></div>
+      <div class="flex items-center gap-sm h-[24px] px-md">
+        <span class="text-xs text-secondary w-8 text-right flex-shrink-0">{{ formatTime(playerStore.currentTime) }}</span>
+        <PlayerSlider class="flex-1" />
+        <span class="text-xs text-secondary w-8 flex-shrink-0">{{ formatTime(playerStore.duration) }}</span>
       </div>
     </div>
   </div>

@@ -38,7 +38,7 @@ const isActive = (path: string) => {
   <aside class="w-(--width-sidebar) h-full bg-sidebar flex flex-col">
     <div class="flex items-center h-14 px-sm">
       <Music theme="filled" size="22" class="text-primary mr-2" />
-      <span class="text-xl text-main font-semibold px-sm">TheH音乐</span>
+      <span class="text-xl text-primary font-semibold px-sm">TheH音乐</span>
     </div>
     
     <nav class="flex-1 overflow-y-auto py-md">

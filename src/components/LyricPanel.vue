@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, nextTick } from 'vue';
 import { usePlayerStore } from '../stores';
+import { getLyric } from '../api';
 import { Close } from '@icon-park/vue-next';
 
 const playerStore = usePlayerStore();
@@ -11,6 +12,21 @@ watch(() => playerStore.currentLyricIndex, async (index) => {
   const el = lyricRefs.value[index];
   if (el) {
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+});
+
+watch(() => playerStore.showLyric, async (show) => {
+  if (show && playerStore.currentSong) {
+    const hasLyric = playerStore.lyric && playerStore.lyric.length > 0;
+    if (!hasLyric) {
+      try {
+        const lyricData = await getLyric(playerStore.currentSong.rid, 'lineLyric');
+        playerStore.setLyric(lyricData || []);
+      } catch (e) {
+        console.error('歌词加载失败:', e);
+        playerStore.setLyric([]);
+      }
+    }
   }
 });
 </script>
@@ -92,7 +108,7 @@ watch(() => playerStore.currentLyricIndex, async (index) => {
               :key="index"
               :ref="(el) => { if (el) lyricRefs[index] = el as HTMLElement }"
               class="transition-all duration-300 py-md"
-              :class="index === playerStore.currentLyricIndex ? 'text-white text-xl font-medium' : 'text-white/50 text-base'"
+              :class="index === playerStore.currentLyricIndex ? 'text-main text-xl font-medium' : 'text-secondary text-base'"
             >
               {{ item.lineLyric || '♪' }}
             </div>

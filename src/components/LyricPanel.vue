@@ -58,7 +58,7 @@ watch(() => playerStore.showLyric, async (show) => {
               :key="index"
               :ref="(el) => { if (el) lyricRefs[index] = el as HTMLElement }"
               class="transition-all duration-300 py-sm"
-              :class="index === playerStore.currentLyricIndex ? 'text-primary font-medium text-lg' : 'text-secondary text-sm'"
+              :class="index === playerStore.currentLyricIndex ? 'text-primary font-medium text-xl' : 'text-secondary text-sm'"
             >
               {{ item.lineLyric || '♪' }}
             </div>
@@ -108,7 +108,7 @@ watch(() => playerStore.showLyric, async (show) => {
               :key="index"
               :ref="(el) => { if (el) lyricRefs[index] = el as HTMLElement }"
               class="transition-all duration-300 py-md"
-              :class="index === playerStore.currentLyricIndex ? 'text-main text-xl font-medium' : 'text-secondary text-base'"
+              :class="index === playerStore.currentLyricIndex ? 'text-primary text-xl font-medium' : 'text-secondary text-base'"
             >
               {{ item.lineLyric || '♪' }}
             </div>

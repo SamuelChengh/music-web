@@ -7,7 +7,7 @@ import PlayerBar from './components/layout/PlayerBar.vue';
 import PlayListDrawer from './components/layout/PlayListDrawer.vue';
 import MobileSearch from './components/MobileSearch.vue';
 import MobileSidebar from './components/MobileSidebar.vue';
-import { Music, Moon, Sunny, Setting } from '@icon-park/vue-next';
+import { Music, Moon, Sunny, TShirt } from '@icon-park/vue-next';
 
 const themeStore = useThemeStore();
 const showMobileSearch = ref(false);
@@ -15,12 +15,12 @@ const showMobileSidebar = ref(false);
 const showMobileThemeMenu = ref(false);
 
 const themeColors = [
-  { value: 'green', hex: '#34d399' },
-  { value: 'blue', hex: '#3b82f6' },
-  { value: 'purple', hex: '#8b5cf6' },
-  { value: 'red', hex: '#ef4444' },
-  { value: 'pink', hex: '#ec4899' },
-  { value: 'orange', hex: '#f97316' },
+  { value: 'green', hex: '#00A878' },
+  { value: 'blue', hex: '#00838F' },
+  { value: 'purple', hex: '#F5D547' },
+  { value: 'red', hex: '#FF6B35' },
+  { value: 'pink', hex: '#9B2D6E' },
+  { value: 'orange', hex: '#CF3434' },
 ];
 
 onMounted(() => {
@@ -55,7 +55,7 @@ onMounted(() => {
         </button>
         
         <button
-          class="w-9 h-9 rounded-full hover:bg-tertiary text-secondary hover-text flex items-center justify-center transition-default"
+          class="w-9 h-9 rounded-full hover:bg-tertiary text-primary flex items-center justify-center transition-default"
           @click="themeStore.toggleMode()"
         >
           <Moon v-if="themeStore.mode === 'dark'" theme="filled" size="18" />
@@ -64,10 +64,10 @@ onMounted(() => {
         
         <div class="relative">
           <button
-            class="w-9 h-9 rounded-full hover:bg-tertiary text-secondary hover-text flex items-center justify-center transition-default"
+            class="w-9 h-9 rounded-full hover:bg-tertiary text-primary flex items-center justify-center transition-default"
             @click="showMobileThemeMenu = !showMobileThemeMenu"
           >
-            <Setting theme="outline" size="18" />
+            <TShirt theme="outline" size="18" />
           </button>
           
           <Transition name="dropdown">

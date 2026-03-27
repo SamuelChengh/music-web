@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 import { useThemeStore } from '../../stores/theme';
 import { usePlayerStore } from '../../stores';
 import { searchSongs, getHotSearch } from '../../api';
-import { Left, Right, Search, Setting, Moon, Sunny, Play } from '@icon-park/vue-next';
+import { Left, Right, Search, TShirt, Moon, Sunny, Play } from '@icon-park/vue-next';
 
 const router = useRouter();
 const themeStore = useThemeStore();
@@ -18,12 +18,12 @@ const searching = ref(false);
 const showThemeMenu = ref(false);
 
 const themeColors = [
-  { value: 'green', hex: '#34d399' },
-  { value: 'blue', hex: '#3b82f6' },
-  { value: 'purple', hex: '#8b5cf6' },
-  { value: 'red', hex: '#ef4444' },
-  { value: 'pink', hex: '#ec4899' },
-  { value: 'orange', hex: '#f97316' },
+  { value: 'green', hex: '#00A878' },
+  { value: 'blue', hex: '#00838F' },
+  { value: 'purple', hex: '#F5D547' },
+  { value: 'red', hex: '#FF6B35' },
+  { value: 'pink', hex: '#9B2D6E' },
+  { value: 'orange', hex: '#CF3434' },
 ];
 
 const closeThemeMenu = () => {
@@ -161,7 +161,7 @@ getHotSearch().then(res => {
     
     <div class="flex items-center gap-sm no-drag">
       <button
-        class="w-9 h-9 rounded-full hover:bg-tertiary text-secondary hover-text flex items-center justify-center transition-default"
+        class="w-9 h-9 rounded-full hover:bg-tertiary text-primary flex items-center justify-center transition-default"
         :title="themeStore.mode === 'dark' ? '浅色模式' : '深色模式'"
         @click="themeStore.toggleMode()"
       >
@@ -171,11 +171,11 @@ getHotSearch().then(res => {
       
       <div class="relative">
         <button
-          class="w-9 h-9 rounded-full hover:bg-tertiary text-secondary hover-text flex items-center justify-center transition-default"
+          class="w-9 h-9 rounded-full hover:bg-tertiary text-primary flex items-center justify-center transition-default"
           title="主题设置"
           @click="showThemeMenu = !showThemeMenu"
         >
-          <Setting theme="outline" size="18" />
+          <TShirt theme="outline" size="18" />
         </button>
         
         <Transition name="dropdown">

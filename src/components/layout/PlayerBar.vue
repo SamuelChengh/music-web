@@ -3,7 +3,7 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { usePlayerStore } from '../../stores';
 import { getSongUrl, getLyric } from '../../api';
 import { 
-  Play, Pause, List, Text, Download
+  Play, Pause, List, Text, Download, Close
 } from '@icon-park/vue-next';
 import PlayerSlider from './PlayerSlider.vue';
 import LyricPanel from '../LyricPanel.vue';
@@ -106,13 +106,14 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <audio
+    ref="audioRef"
+    @timeupdate="handleTimeUpdate"
+    @ended="handleEnded"
+    @loadedmetadata="() => audioRef && playerStore.setDuration(audioRef.duration)"
+  />
+  
   <div class="hidden lg:flex h-24 bg-main border-t border-default items-center px-md relative lg:h-player">
-    <audio
-      ref="audioRef"
-      @timeupdate="handleTimeUpdate"
-      @ended="handleEnded"
-      @loadedmetadata="() => audioRef && playerStore.setDuration(audioRef.duration)"
-    />
     
     <div class="flex items-center w-64 lg:w-64">
       <div 
@@ -232,54 +233,118 @@ onUnmounted(() => {
     </div>
   </div>
   
-  <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-main border-t border-default z-30" style="height: calc(72px + env(safe-area-inset-bottom, 0));">
-    <div class="h-[72px] grid grid-cols-3 items-center px-md">
-      <div class="flex items-center gap-sm justify-self-start" @click="playerStore.showLyric = !playerStore.showLyric">
-        <img
-          v-if="playerStore.currentSong"
-          :src="playerStore.currentSong.pic"
-          class="w-11 h-11 rounded-lg object-cover"
-        />
-        <div v-else class="w-11 h-11 bg-tertiary rounded-lg" />
+  <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-main border-t border-default z-50" style="height: calc(80px + env(safe-area-inset-bottom, 0));">
+    <div class="h-[80px] flex flex-col justify-center px-md">
+      <div class="h-[56px] grid grid-cols-3 items-center">
+        <div class="flex items-center gap-sm justify-self-start" @click="playerStore.showLyric = !playerStore.showLyric">
+          <img
+            v-if="playerStore.currentSong"
+            :src="playerStore.currentSong.pic"
+            class="w-11 h-11 rounded-lg object-cover"
+          />
+          <div v-else class="w-11 h-11 bg-tertiary rounded-lg" />
+          
+          <div class="min-w-0 max-w-[20vw]" v-if="playerStore.currentSong">
+            <div class="text-sm text-main truncate">{{ playerStore.currentSong.name }}</div>
+            <div class="text-xs text-secondary truncate">{{ playerStore.currentSong.artist }}</div>
+          </div>
+        </div>
         
-        <div class="min-w-0 max-w-[20vw]" v-if="playerStore.currentSong">
-          <div class="text-sm text-main truncate">{{ playerStore.currentSong.name }}</div>
-          <div class="text-xs text-secondary truncate">{{ playerStore.currentSong.artist }}</div>
+        <div class="flex items-center justify-center gap-5">
+          <button class="text-secondary" @click="playerStore.prev()">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+            </svg>
+          </button>
+          
+          <button
+            class="text-primary hover:text-primary-hover transition-default"
+            @click="playerStore.toggle()"
+          >
+            <Pause v-if="playerStore.isPlaying" theme="filled" size="28" />
+            <Play v-else theme="filled" size="28" />
+          </button>
+          
+          <button class="text-secondary" @click="playerStore.next()">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+            </svg>
+          </button>
+        </div>
+        
+        <div class="flex items-center justify-end gap-sm">
+          <button
+            class="text-xs px-2 py-1 rounded border border-default"
+            :class="qualities.find(q => q.value === playerStore.quality)?.color"
+            @touchstart="showQualityMenu = true"
+          >
+            {{ qualities.find(q => q.value === playerStore.quality)?.icon }}
+          </button>
+          <button
+            class="text-secondary"
+            @click="playerStore.showLyric = !playerStore.showLyric"
+          >
+            <Text theme="outline" size="22" />
+          </button>
         </div>
       </div>
       
-      <div class="flex items-center justify-center gap-5">
-        <button class="text-secondary" @click="playerStore.prev()">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
-          </svg>
-        </button>
-        
-        <button
-          class="text-primary hover:text-primary-hover transition-default"
-          @click="playerStore.toggle()"
-        >
-          <Pause v-if="playerStore.isPlaying" theme="filled" size="28" />
-          <Play v-else theme="filled" size="28" />
-        </button>
-        
-        <button class="text-secondary" @click="playerStore.next()">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
-          </svg>
-        </button>
-      </div>
-      
-      <div class="flex justify-end">
-        <button
-          class="text-secondary"
-          @click="playerStore.showLyric = !playerStore.showLyric"
-        >
-          <Text theme="outline" size="22" />
-        </button>
+      <div class="grid grid-cols-3 items-center h-[24px]">
+        <div></div>
+        <div class="flex items-center gap-sm justify-center">
+          <span class="text-xs text-secondary w-8 text-right flex-shrink-0">{{ formatTime(playerStore.currentTime) }}</span>
+          <PlayerSlider class="flex-1 min-w-[80px]" />
+          <span class="text-xs text-secondary w-8 flex-shrink-0">{{ formatTime(playerStore.duration) }}</span>
+        </div>
+        <div></div>
       </div>
     </div>
   </div>
+  
+  <Teleport to="body">
+    <Transition name="slide-up">
+      <div 
+        v-if="showQualityMenu"
+        class="fixed inset-0 z-[100] lg:hidden"
+      >
+        <div 
+          class="absolute inset-0 bg-black/50"
+          @click="showQualityMenu = false"
+        />
+        <div class="quality-panel absolute bottom-0 left-0 right-0 bg-view rounded-t-2xl safe-area-bottom">
+          <div class="flex items-center justify-between p-md border-b border-default">
+            <span class="text-base text-main font-medium">音质选择</span>
+            <button 
+              class="p-sm rounded-full hover:bg-tertiary text-secondary"
+              @click="showQualityMenu = false"
+            >
+              <Close theme="outline" size="20" />
+            </button>
+          </div>
+          <div class="p-md">
+            <div
+              v-for="q in qualities"
+              :key="q.value"
+              class="flex items-center gap-md p-md rounded-xl cursor-pointer transition-colors mb-sm"
+              :class="playerStore.quality === q.value ? 'bg-active' : 'hover:bg-tertiary'"
+              @click="selectQuality(q)"
+            >
+              <span :class="q.color" class="text-sm font-bold w-12">{{ q.icon }}</span>
+              <div class="flex-1">
+                <div class="text-main font-medium">{{ q.label }}</div>
+                <div class="text-xs text-secondary">{{ q.bitrate }}</div>
+              </div>
+              <span v-if="playerStore.quality === q.value" class="text-primary">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                </svg>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
   
   <LyricPanel v-if="playerStore.showLyric" />
 </template>
@@ -294,6 +359,25 @@ onUnmounted(() => {
 .fade-scale-leave-to {
   opacity: 0;
   transform: scale(0.95) translateY(8px);
+}
+
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all 0.3s ease;
+}
+
+.slide-up-enter-from,
+.slide-up-leave-to {
+  opacity: 0;
+}
+
+.slide-up-enter-from .quality-panel,
+.slide-up-leave-to .quality-panel {
+  transform: translateY(100%);
+}
+
+.quality-panel {
+  transition: transform 0.3s ease;
 }
 
 .safe-area-bottom {

@@ -3,7 +3,7 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { usePlayerStore } from '../../stores';
 import { getSongUrl, getLyric } from '../../api';
 import { 
-  Play, Pause, List, Text, Download, Close
+  Play, Pause, List, Text, Download, Close, ShuffleOne
 } from '@icon-park/vue-next';
 import PlayerSlider from './PlayerSlider.vue';
 import LyricPanel from '../LyricPanel.vue';
@@ -176,34 +176,29 @@ onUnmounted(() => {
           :title="currentPlayMode.title"
           @click="playerStore.togglePlayMode()"
         >
-          <!-- 顺序播放 - 三条横线 -->
-          <svg v-if="playerStore.playMode === 'order'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="4" y1="6" x2="20" y2="6"/>
-            <line x1="4" y1="12" x2="20" y2="12"/>
-            <line x1="4" y1="18" x2="16" y2="18"/>
+          <!-- 顺序播放 - 简洁线性风格 -->
+          <svg v-if="playerStore.playMode === 'order'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="7" x2="15" y2="7"/>
+            <polyline points="15 4 18 7 15 10"/>
+            <line x1="5" y1="17" x2="15" y2="17"/>
+            <polyline points="15 14 18 17 15 20"/>
           </svg>
-          <!-- 列表循环 - 圆形箭头 -->
-          <svg v-else-if="playerStore.playMode === 'loop'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M17 1l4 4-4 4"/>
-            <path d="M3 11V9a9 9 0 0 1 15-6.7L21 3"/>
-            <path d="M7 23l-4-4 4-4"/>
-            <path d="M21 13v2a9 9 0 0 1-15 6.7L3 21"/>
+          <!-- 列表循环 -->
+          <svg v-else-if="playerStore.playMode === 'loop'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="17 1 21 5 17 9"/>
+            <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+            <polyline points="7 23 3 19 7 15"/>
+            <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
           </svg>
-          <!-- 单曲循环 - 圆形箭头+1 -->
-          <svg v-else-if="playerStore.playMode === 'single'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="9"/>
-            <path d="M12 8v8"/>
-            <path d="M8 12h8"/>
-            <text x="12" y="15" font-size="6" fill="currentColor" stroke="none" text-anchor="middle">1</text>
+          <!-- 单曲循环 -->
+          <svg v-else-if="playerStore.playMode === 'single'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="17 1 21 5 17 9"/>
+            <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+            <polyline points="7 23 3 19 7 15"/>
+            <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+            <text x="12" y="14" font-size="6" font-weight="600" fill="currentColor" stroke="none" text-anchor="middle">1</text>
           </svg>
-          <!-- 随机播放 - 交叉箭头 -->
-          <svg v-else-if="playerStore.playMode === 'shuffle'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M16 3h5v5"/>
-            <path d="M21 3l-7 7"/>
-            <path d="M21 14v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-            <path d="M21 14H11"/>
-            <path d="M4 14l4-4"/>
-          </svg>
+<ShuffleOne v-else-if="playerStore.playMode === 'shuffle'" theme="outline" size="20" />
         </button>
       </div>
       
@@ -320,34 +315,29 @@ onUnmounted(() => {
             :title="currentPlayMode.title"
             @click="playerStore.togglePlayMode()"
           >
-            <!-- 顺序播放 - 三条横线 -->
-            <svg v-if="playerStore.playMode === 'order'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="4" y1="6" x2="20" y2="6"/>
-              <line x1="4" y1="12" x2="20" y2="12"/>
-              <line x1="4" y1="18" x2="16" y2="18"/>
+            <!-- 顺序播放 - 简洁线性风格 -->
+            <svg v-if="playerStore.playMode === 'order'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="7" x2="15" y2="7"/>
+              <polyline points="15 4 18 7 15 10"/>
+              <line x1="5" y1="17" x2="15" y2="17"/>
+              <polyline points="15 14 18 17 15 20"/>
             </svg>
-            <!-- 列表循环 - 圆形箭头 -->
-            <svg v-else-if="playerStore.playMode === 'loop'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M17 1l4 4-4 4"/>
-              <path d="M3 11V9a9 9 0 0 1 15-6.7L21 3"/>
-              <path d="M7 23l-4-4 4-4"/>
-              <path d="M21 13v2a9 9 0 0 1-15 6.7L3 21"/>
+            <!-- 列表循环 -->
+            <svg v-else-if="playerStore.playMode === 'loop'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="17 1 21 5 17 9"/>
+              <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+              <polyline points="7 23 3 19 7 15"/>
+              <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
             </svg>
-            <!-- 单曲循环 - 圆形箭头+1 -->
-            <svg v-else-if="playerStore.playMode === 'single'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="9"/>
-              <path d="M12 8v8"/>
-              <path d="M8 12h8"/>
-              <text x="12" y="15" font-size="6" fill="currentColor" stroke="none" text-anchor="middle">1</text>
+            <!-- 单曲循环 -->
+            <svg v-else-if="playerStore.playMode === 'single'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="17 1 21 5 17 9"/>
+              <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+              <polyline points="7 23 3 19 7 15"/>
+              <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+              <text x="12" y="14" font-size="6" font-weight="600" fill="currentColor" stroke="none" text-anchor="middle">1</text>
             </svg>
-            <!-- 随机播放 - 交叉箭头 -->
-            <svg v-else-if="playerStore.playMode === 'shuffle'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M16 3h5v5"/>
-              <path d="M21 3l-7 7"/>
-              <path d="M21 14v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-              <path d="M21 14H11"/>
-              <path d="M4 14l4-4"/>
-            </svg>
+<ShuffleOne v-else-if="playerStore.playMode === 'shuffle'" theme="outline" size="20" />
           </button>
         </div>
         

@@ -73,7 +73,8 @@ watch(() => playerStore.showLyric, async (show) => {
     <Transition name="fade">
       <div 
         v-if="playerStore.showLyric" 
-        class="fixed top-0 bottom-0 left-0 right-0 bg-black/80 z-30 lg:bg-black/20 lg:bottom-24"
+        class="fixed inset-0 bg-black/80 z-30 lg:bg-black/20"
+        style="bottom: calc(100px + env(safe-area-inset-bottom, 0));"
         @click="playerStore.showLyric = false"
       />
     </Transition>
@@ -81,7 +82,8 @@ watch(() => playerStore.showLyric, async (show) => {
     <Transition name="mobile-lyric">
       <div 
         v-if="playerStore.showLyric"
-        class="lg:hidden fixed inset-0 bg-view flex flex-col z-50"
+        class="lg:hidden fixed inset-x-0 top-0 bg-view flex flex-col z-40"
+        style="bottom: calc(100px + env(safe-area-inset-bottom, 0));"
       >
         <div class="h-14 flex items-center justify-between px-md border-b border-default">
           <el-tooltip content="关闭" placement="top">
@@ -93,16 +95,7 @@ watch(() => playerStore.showLyric, async (show) => {
             </button>
           </el-tooltip>
           <span class="text-base text-main font-medium truncate max-w-[60vw]">{{ playerStore.currentSong?.name || '歌词' }}</span>
-          <el-tooltip content="播放列表" placement="top">
-            <button 
-              class="p-sm rounded-full hover:bg-tertiary text-primary hover:text-primary-hover"
-              @click="playerStore.togglePlaylist"
-            >
-              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
-              </svg>
-            </button>
-          </el-tooltip>
+          <div class="w-10"></div>
         </div>
         
         <div class="flex-1 overflow-y-auto px-lg py-xl text-center">

@@ -71,7 +71,7 @@ watch(() => playerStore.showPlaylist, (show) => {
               <img :src="song.pic" class="w-full h-full object-cover" />
             </div>
             <div class="ml-3 flex-1 min-w-0">
-              <div class="text-sm truncate" :class="playerStore.currentIndex === index ? 'text-active' : 'text-main'">
+              <div class="text-sm truncate text-main">
                 {{ song.name }}
               </div>
               <div class="text-xs text-secondary truncate">{{ song.artist }}</div>

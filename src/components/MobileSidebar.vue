@@ -71,7 +71,7 @@ const handleTouchEnd = () => {
       />
       
       <div 
-        class="relative h-full w-[35%] max-w-[280px] bg-sidebar flex flex-col shadow-xl transition-transform duration-300 ease-out"
+        class="relative h-full w-[40vw] max-w-[280px] bg-sidebar flex flex-col shadow-xl transition-transform duration-300 ease-out"
         :style="{ transform: `translateX(0)` }"
         @touchstart="handleTouchStart"
         @touchmove="handleTouchMove"

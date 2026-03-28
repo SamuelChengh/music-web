@@ -359,6 +359,13 @@ onUnmounted(() => {
           >
             {{ qualities.find(q => q.value === playerStore.quality)?.icon }}
           </button>
+          <button
+            class="text-primary hover:text-primary-hover transition-default"
+            @click="playerStore.togglePlaylist"
+            title="播放列表"
+          >
+            <List theme="outline" size="22" />
+          </button>
         </div>
       </div>
       

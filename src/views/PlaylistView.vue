@@ -35,13 +35,13 @@ onMounted(loadData);
 
 watch(() => route.params.id, loadData);
 
-const playSong = (song: Song) => {
-  playerStore.setSong(song);
+const playSong = (song: Song, index: number) => {
+  playerStore.playSongList(songs.value, index);
 };
 
 const playAll = () => {
   if (songs.value.length > 0) {
-    playerStore.setSong(songs.value[0]);
+    playerStore.playSongList(songs.value, 0);
   }
 };
 </script>
@@ -77,7 +77,7 @@ const playAll = () => {
           v-for="(song, index) in songs"
           :key="song.rid"
           class="flex items-center gap-md py-sm rounded-2xl hover:bg-active cursor-pointer group transition-all duration-200 mb-xs"
-          @click="playSong(song)"
+          @click="playSong(song, index)"
         >
           <div class="w-10 text-center font-bold text-xl" :class="index < 3 ? 'text-primary' : 'text-secondary'">
             {{ index + 1 }}

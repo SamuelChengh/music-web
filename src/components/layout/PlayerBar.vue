@@ -49,7 +49,7 @@ const handleTimeUpdate = () => {
 };
 
 const handleEnded = () => {
-  playerStore.pause();
+  playerStore.next();
 };
 
 watch(() => playerStore.currentSong, async (song) => {
@@ -233,9 +233,9 @@ onUnmounted(() => {
     </div>
   </div>
   
-  <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-main border-t border-default z-50" style="height: calc(80px + env(safe-area-inset-bottom, 0));">
-    <div class="h-[80px] flex flex-col justify-center px-md">
-      <div class="h-[56px] grid grid-cols-3 items-center">
+  <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-main border-t border-default z-50" style="height: calc(100px + env(safe-area-inset-bottom, 0));">
+    <div class="h-[100px] flex flex-col justify-center px-md">
+      <div class="h-[64px] grid grid-cols-3 items-center">
         <div class="flex items-center gap-sm justify-self-start" @click="playerStore.showLyric = !playerStore.showLyric">
           <img
             v-if="playerStore.currentSong"
@@ -283,7 +283,7 @@ onUnmounted(() => {
         </div>
       </div>
       
-      <div class="flex items-center gap-sm h-[24px] px-md">
+      <div class="flex items-center mb-sm gap-sm h-[36px]">
         <span class="text-xs text-secondary w-8 text-right flex-shrink-0">{{ formatTime(playerStore.currentTime) }}</span>
         <PlayerSlider class="flex-1" />
         <span class="text-xs text-secondary w-8 flex-shrink-0">{{ formatTime(playerStore.duration) }}</span>

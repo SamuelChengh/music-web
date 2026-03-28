@@ -11,6 +11,15 @@ export interface Song {
   duration?: number;
 }
 
+export type PlayMode = 'order' | 'loop' | 'single' | 'shuffle';
+
+const playModeLabels: Record<PlayMode, string> = {
+  order: '顺序播放',
+  loop: '列表循环',
+  single: '单曲循环',
+  shuffle: '随机播放',
+};
+
 export const usePlayerStore = defineStore('player', () => {
   const currentSong = ref<Song | null>(null);
   const playlist = ref<Song[]>([]);
@@ -24,6 +33,9 @@ export const usePlayerStore = defineStore('player', () => {
   const showPlaylist = ref(false);
   const lyric = ref<{ time: string; lineLyric: string }[]>([]);
   const currentLyricIndex = ref(0);
+  const playMode = ref<PlayMode>('order');
+  const shuffledIndices = ref<number[]>([]);
+  const shuffleIndex = ref(-1);
 
   const progress = computed(() => {
     if (!duration.value) return 0;
@@ -42,6 +54,15 @@ export const usePlayerStore = defineStore('player', () => {
     } else {
       currentIndex.value = playlist.value.findIndex(s => s.rid === song.rid);
     }
+  };
+
+  const playSongList = (songs: Song[], startIndex = 0) => {
+    playlist.value = [...songs];
+    currentIndex.value = startIndex;
+    currentSong.value = songs[startIndex];
+    isPlaying.value = true;
+    currentTime.value = 0;
+    duration.value = songs[startIndex].duration || 0;
   };
 
   const play = () => {
@@ -153,15 +174,57 @@ export const usePlayerStore = defineStore('player', () => {
     playAt(newIndex);
   };
 
+  const shufflePlaylist = () => {
+    const indices = playlist.value.map((_, i) => i);
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+    shuffledIndices.value = indices;
+    shuffleIndex.value = 0;
+  };
+
   const next = () => {
     if (playlist.value.length === 0) return;
+    
+    if (playMode.value === 'shuffle') {
+      shuffleIndex.value++;
+      if (shuffleIndex.value >= shuffledIndices.value.length) {
+        shufflePlaylist();
+      }
+      playAt(shuffledIndices.value[shuffleIndex.value]);
+      return;
+    }
+
     let newIndex = currentIndex.value + 1;
-    if (newIndex >= playlist.value.length) newIndex = 0;
+    if (newIndex >= playlist.value.length) {
+      if (playMode.value === 'loop') {
+        newIndex = 0;
+      } else {
+        isPlaying.value = false;
+        return;
+      }
+    }
     playAt(newIndex);
   };
 
   const togglePlaylist = () => {
     showPlaylist.value = !showPlaylist.value;
+  };
+
+  const togglePlayMode = () => {
+    const modes: PlayMode[] = ['order', 'loop', 'single', 'shuffle'];
+    const currentIdx = modes.indexOf(playMode.value);
+    const nextIdx = (currentIdx + 1) % modes.length;
+    playMode.value = modes[nextIdx];
+    
+    if (playMode.value === 'shuffle') {
+      shufflePlaylist();
+    }
+  };
+
+  const getPlayModeLabel = () => {
+    return playModeLabels[playMode.value];
   };
 
   return {
@@ -178,7 +241,9 @@ export const usePlayerStore = defineStore('player', () => {
     lyric,
     currentLyricIndex,
     progress,
+    playMode,
     setSong,
+    playSongList,
     play,
     pause,
     toggle,
@@ -195,5 +260,7 @@ export const usePlayerStore = defineStore('player', () => {
     prev,
     next,
     togglePlaylist,
+    togglePlayMode,
+    getPlayModeLabel,
   };
 });

@@ -26,7 +26,14 @@ const handleTimeUpdate = () => {
 };
 
 const handleEnded = () => {
-  playerStore.pause();
+  if (playerStore.playMode === 'single') {
+    if (audioRef.value) {
+      audioRef.value.currentTime = 0;
+      audioRef.value.play();
+    }
+  } else {
+    playerStore.next();
+  }
 };
 
 const handleSeek = (e: MouseEvent) => {
@@ -85,6 +92,15 @@ watch(() => playerStore.quality, async () => {
 const currentQualityLabel = computed(() => {
   return qualities.find(q => q.value === playerStore.quality)?.label || '高音质';
 });
+
+const playModeIcons: Record<string, string> = {
+  order: '➡️',
+  loop: '🔁',
+  single: '🔂',
+  shuffle: '🔀',
+};
+
+const playModeIcon = computed(() => playModeIcons[playerStore.playMode]);
 </script>
 
 <template>
@@ -122,7 +138,11 @@ const currentQualityLabel = computed(() => {
           <span v-else class="text-lg">▶</span>
         </button>
         <button class="text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors text-xl">⏭</button>
-        <button class="text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors hidden md:block text-lg">🔁</button>
+        <button 
+          class="text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors text-lg select-none"
+          :title="playerStore.getPlayModeLabel()"
+          @click="playerStore.togglePlayMode()"
+        ><span v-text="playModeIcon"></span></button>
       </div>
       
       <div class="w-full max-w-xl flex items-center gap-2">

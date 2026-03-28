@@ -53,8 +53,8 @@ watch(() => route.query.q, (newQ) => {
   }
 });
 
-const playSong = (song: Song) => {
-  playerStore.setSong(song);
+const playSong = (song: Song, index: number) => {
+  playerStore.playSongList(searchResults.value, index);
 };
 </script>
 
@@ -76,7 +76,7 @@ const playSong = (song: Song) => {
           v-for="(song, index) in searchResults"
           :key="song.rid"
           class="flex items-center gap-md py-sm rounded-2xl hover:bg-active cursor-pointer group transition-all duration-200 mb-xs"
-          @click="playSong(song)"
+          @click="playSong(song, index)"
         >
           <div class="w-10 text-center font-bold text-xl text-secondary">
             {{ index + 1 }}

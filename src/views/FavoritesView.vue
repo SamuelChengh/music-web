@@ -22,13 +22,13 @@ const loadFavorites = () => {
 
 onMounted(loadFavorites);
 
-const playSong = (song: Song) => {
-  playerStore.setSong(song);
+const playSong = (song: Song, index: number) => {
+  playerStore.playSongList(favorites.value, index);
 };
 
 const playAll = () => {
   if (favorites.value.length > 0) {
-    playerStore.setSong(favorites.value[0]);
+    playerStore.playSongList(favorites.value, 0);
   }
 };
 
@@ -60,10 +60,10 @@ const removeFromFavorites = (song: Song) => {
         
         <div class="space-y-1">
           <div
-            v-for="song in favorites"
+            v-for="(song, index) in favorites"
             :key="song.rid"
             class="flex items-center gap-4 p-3 rounded-lg hover:bg-tertiary cursor-pointer group transition-colors"
-            @click="playSong(song)"
+            @click="playSong(song, index)"
           >
             <img :src="song.pic" class="w-12 h-12 rounded-lg object-cover" />
             <div class="flex-1 min-w-0">

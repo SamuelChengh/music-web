@@ -42,8 +42,8 @@ const loadRank = async (rankName: string) => {
 
 watch(currentRank, loadRank, { immediate: true });
 
-const playSong = (song: Song) => {
-  playerStore.setSong(song);
+const playSong = (song: Song, index: number) => {
+  playerStore.playSongList(rankList.value, index);
 };
 
 const handleImageError = (e: Event) => {
@@ -83,7 +83,7 @@ const handleImageError = (e: Event) => {
           v-for="(song, index) in rankList"
           :key="song.rid"
           class="flex items-center gap-md py-sm rounded-2xl hover:bg-active cursor-pointer group transition-all duration-200 mb-xs"
-          @click="playSong(song)"
+          @click="playSong(song, index)"
         >
           <div class="w-10 text-center font-bold text-xl" :class="index < 3 ? 'text-primary' : 'text-secondary'">
             {{ index + 1 }}

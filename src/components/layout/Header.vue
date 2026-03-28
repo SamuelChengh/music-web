@@ -47,8 +47,8 @@ watch(searchKeyword, async (val) => {
   searching.value = false;
 });
 
-const playSong = (song: any) => {
-  playerStore.setSong(song);
+const playSong = (song: any, index: number) => {
+  playerStore.playSongList(searchResults.value, index);
   searchKeyword.value = '';
   showDropdown.value = false;
 };
@@ -128,10 +128,10 @@ getHotSearch().then(res => {
             <div v-if="searchResults.length > 0" class="border-t border-default">
               <div class="text-xs text-secondary px-md py-sm bg-tertiary/50">搜索结果</div>
               <div
-                v-for="song in searchResults"
+                v-for="(song, index) in searchResults"
                 :key="song.rid"
                 class="flex items-center gap-md px-md py-md hover:bg-tertiary cursor-pointer transition-colors group"
-                @click="playSong(song)"
+                @click="playSong(song, index)"
               >
                 <img :src="song.pic" class="w-10 h-10 rounded-lg object-cover" @error="($event.target as HTMLImageElement).style.display = 'none'" />
                 <div class="flex-1 min-w-0">

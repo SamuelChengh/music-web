@@ -94,7 +94,7 @@ watch(() => playerStore.showLyric, async (show) => {
               <Close theme="outline" size="22" />
             </button>
           </el-tooltip>
-          <span class="text-base text-main font-medium truncate max-w-[60vw]">{{ playerStore.currentSong?.name || '歌词' }}</span>
+          <span class="text-base text-primary font-medium truncate max-w-[60vw]">{{ playerStore.currentSong?.name || '歌词' }}</span>
           <div class="w-10"></div>
         </div>
         

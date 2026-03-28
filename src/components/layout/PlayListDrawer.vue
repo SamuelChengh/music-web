@@ -30,7 +30,7 @@ watch(() => playerStore.showPlaylist, (show) => {
     <Transition name="slide">
       <div 
         v-if="playerStore.showPlaylist"
-        class="fixed right-0 top-0 bottom-0 w-[60vw] lg:w-80 bg-view border-l border-default flex flex-col z-50 shadow-lg"
+        class="fixed right-0 top-0 bottom-[100px] lg:bottom-[80px] w-[50vw] lg:w-80 bg-view border-l border-default flex flex-col z-50 shadow-lg"
       >
         <div class="h-12 flex items-center justify-between px-md border-b border-default">
           <span class="text-sm text-main font-medium">播放列表 ({{ playerStore.playlist.length }})</span>

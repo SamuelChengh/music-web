@@ -64,14 +64,14 @@ const handleTouchEnd = () => {
 
 <template>
   <Teleport to="body">
-    <div class="fixed inset-0 z-50 flex">
+    <div class="fixed top-0 right-0 bottom-[100px] left-0 z-50 flex">
       <div 
         class="absolute inset-0 bg-black/50"
         @click="emit('close')"
       />
       
       <div 
-        class="relative h-full w-[40vw] max-w-[280px] bg-sidebar flex flex-col shadow-xl transition-transform duration-300 ease-out"
+        class="relative h-full w-[35%] max-w-[280px] bg-sidebar flex flex-col shadow-xl transition-transform duration-300 ease-out"
         :style="{ transform: `translateX(0)` }"
         @touchstart="handleTouchStart"
         @touchmove="handleTouchMove"
@@ -84,7 +84,7 @@ const handleTouchEnd = () => {
         
         <nav class="flex-1 overflow-y-auto py-sm">
           <div v-for="group in menuGroups" :key="group.title" class="mb-md">
-            <div class="text-xs text-secondary px-md mb-xs">{{ group.title }}</div>
+            <div class="text-xs text-secondary px-lg mb-xs">{{ group.title }}</div>
             <div
               v-for="item in group.items"
               :key="item.path"
@@ -107,7 +107,7 @@ const handleTouchEnd = () => {
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  padding: 0.625rem 1rem;
+  padding: 0.625rem 1.5rem;
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s ease;

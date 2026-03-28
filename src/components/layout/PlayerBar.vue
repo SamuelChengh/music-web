@@ -284,22 +284,22 @@ onUnmounted(() => {
   
   <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-main border-t border-default z-50" style="height: calc(100px + env(safe-area-inset-bottom, 0));">
     <div class="h-[100px] flex flex-col justify-center px-md">
-      <div class="h-[64px] grid grid-cols-3 items-center">
-        <div class="flex items-center gap-sm justify-self-start" @click="playerStore.showLyric = !playerStore.showLyric">
+      <div class="h-[64px] grid grid-cols-[auto_1fr_auto] items-center">
+        <div class="flex items-center gap-sm max-w-[28vw] flex-shrink-0 pr-2" @click="playerStore.showLyric = !playerStore.showLyric">
           <img
             v-if="playerStore.currentSong"
             :src="playerStore.currentSong.pic"
-            class="w-11 h-11 rounded-lg object-cover"
+            class="w-11 h-11 rounded-lg object-cover flex-shrink-0"
           />
-          <div v-else class="w-11 h-11 bg-tertiary rounded-lg" />
+          <div v-else class="w-11 h-11 bg-tertiary rounded-lg flex-shrink-0" />
           
-          <div class="min-w-0 max-w-[20vw]" v-if="playerStore.currentSong">
+          <div class="min-w-0" v-if="playerStore.currentSong">
             <div class="text-sm text-main truncate">{{ playerStore.currentSong.name }}</div>
             <div class="text-xs text-secondary truncate">{{ playerStore.currentSong.artist }}</div>
           </div>
         </div>
         
-        <div class="flex items-center justify-center gap-5">
+        <div class="flex items-center justify-center gap-5 pl-4">
           <button class="text-secondary" @click="playerStore.prev()">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
               <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
@@ -351,7 +351,7 @@ onUnmounted(() => {
           </button>
         </div>
         
-        <div v-if="playerStore.currentSong" class="flex items-center justify-end gap-sm">
+        <div v-if="playerStore.currentSong" class="flex items-center justify-end gap-sm pl-2">
           <button
             class="text-xs px-2 py-1 rounded border border-default"
             :class="qualities.find(q => q.value === playerStore.quality)?.color"

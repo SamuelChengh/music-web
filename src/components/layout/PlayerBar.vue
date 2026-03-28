@@ -20,6 +20,17 @@ const qualities = [
   { label: 'HiRes', value: 'hires' as const, bitrate: 'FLAC', icon: 'Hi-Res', color: 'text-purple-400' },
 ];
 
+const playModes = [
+  { mode: 'order' as const, title: '顺序播放' },
+  { mode: 'loop' as const, title: '列表循环' },
+  { mode: 'single' as const, title: '单曲循环' },
+  { mode: 'shuffle' as const, title: '随机播放' },
+];
+
+const currentPlayMode = computed(() => {
+  return playModes.find(m => m.mode === playerStore.playMode) || playModes[0];
+});
+
 const currentQualityLabel = computed(() => {
   return qualities.find(q => q.value === playerStore.quality)?.label || '高音质';
 });
@@ -159,6 +170,41 @@ onUnmounted(() => {
             <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
           </svg>
         </button>
+        
+        <button 
+          class="text-secondary hover-text transition-default"
+          :title="currentPlayMode.title"
+          @click="playerStore.togglePlayMode()"
+        >
+          <!-- 顺序播放 - 三条横线 -->
+          <svg v-if="playerStore.playMode === 'order'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="4" y1="6" x2="20" y2="6"/>
+            <line x1="4" y1="12" x2="20" y2="12"/>
+            <line x1="4" y1="18" x2="16" y2="18"/>
+          </svg>
+          <!-- 列表循环 - 圆形箭头 -->
+          <svg v-else-if="playerStore.playMode === 'loop'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 1l4 4-4 4"/>
+            <path d="M3 11V9a9 9 0 0 1 15-6.7L21 3"/>
+            <path d="M7 23l-4-4 4-4"/>
+            <path d="M21 13v2a9 9 0 0 1-15 6.7L3 21"/>
+          </svg>
+          <!-- 单曲循环 - 圆形箭头+1 -->
+          <svg v-else-if="playerStore.playMode === 'single'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 8v8"/>
+            <path d="M8 12h8"/>
+            <text x="12" y="15" font-size="6" fill="currentColor" stroke="none" text-anchor="middle">1</text>
+          </svg>
+          <!-- 随机播放 - 交叉箭头 -->
+          <svg v-else-if="playerStore.playMode === 'shuffle'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 3h5v5"/>
+            <path d="M21 3l-7 7"/>
+            <path d="M21 14v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+            <path d="M21 14H11"/>
+            <path d="M4 14l4-4"/>
+          </svg>
+        </button>
       </div>
       
       <div class="w-full flex items-center gap-3">
@@ -205,8 +251,7 @@ onUnmounted(() => {
       </div>
       
       <button
-        class="hover-text transition-default"
-        :class="playerStore.showLyric ? 'text-primary' : 'text-secondary'"
+        class="text-primary hover:text-primary-hover transition-default"
         @click="playerStore.showLyric = !playerStore.showLyric"
         title="歌词"
       >
@@ -214,8 +259,7 @@ onUnmounted(() => {
       </button>
       
       <button
-        class="hover-text transition-default"
-        :class="playerStore.showPlaylist ? 'text-primary' : 'text-secondary'"
+        class="text-primary hover:text-primary-hover transition-default"
         @click="playerStore.togglePlaylist"
         title="播放列表"
       >
@@ -224,7 +268,7 @@ onUnmounted(() => {
       
       <button
         v-if="playerStore.currentSong"
-        class="text-secondary hover-text transition-default"
+        class="text-primary hover:text-primary-hover transition-default"
         @click="downloadSong"
         title="下载"
       >
@@ -268,6 +312,41 @@ onUnmounted(() => {
           <button class="text-secondary" @click="playerStore.next()">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
               <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+            </svg>
+          </button>
+          
+          <button 
+            class="text-secondary"
+            :title="currentPlayMode.title"
+            @click="playerStore.togglePlayMode()"
+          >
+            <!-- 顺序播放 - 三条横线 -->
+            <svg v-if="playerStore.playMode === 'order'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="4" y1="6" x2="20" y2="6"/>
+              <line x1="4" y1="12" x2="20" y2="12"/>
+              <line x1="4" y1="18" x2="16" y2="18"/>
+            </svg>
+            <!-- 列表循环 - 圆形箭头 -->
+            <svg v-else-if="playerStore.playMode === 'loop'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 1l4 4-4 4"/>
+              <path d="M3 11V9a9 9 0 0 1 15-6.7L21 3"/>
+              <path d="M7 23l-4-4 4-4"/>
+              <path d="M21 13v2a9 9 0 0 1-15 6.7L3 21"/>
+            </svg>
+            <!-- 单曲循环 - 圆形箭头+1 -->
+            <svg v-else-if="playerStore.playMode === 'single'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="9"/>
+              <path d="M12 8v8"/>
+              <path d="M8 12h8"/>
+              <text x="12" y="15" font-size="6" fill="currentColor" stroke="none" text-anchor="middle">1</text>
+            </svg>
+            <!-- 随机播放 - 交叉箭头 -->
+            <svg v-else-if="playerStore.playMode === 'shuffle'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 3h5v5"/>
+              <path d="M21 3l-7 7"/>
+              <path d="M21 14v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+              <path d="M21 14H11"/>
+              <path d="M4 14l4-4"/>
             </svg>
           </button>
         </div>

@@ -41,7 +41,7 @@ watch(() => playerStore.showLyric, async (show) => {
         <div class="h-12 flex items-center justify-between px-md border-b border-default">
           <span class="text-sm text-main font-medium">歌词</span>
           <button 
-            class="w-6 h-6 rounded flex items-center justify-center hover:bg-tertiary text-secondary"
+            class="w-6 h-6 rounded flex items-center justify-center hover:bg-tertiary text-primary hover:text-primary-hover"
             @click="playerStore.showLyric = false"
           >
             <Close theme="outline" size="16" />
@@ -82,14 +82,14 @@ watch(() => playerStore.showLyric, async (show) => {
       >
         <div class="h-14 flex items-center justify-between px-md border-b border-default">
           <button 
-            class="p-sm rounded-full hover:bg-tertiary text-secondary"
+            class="p-sm rounded-full hover:bg-tertiary text-primary hover:text-primary-hover"
             @click="playerStore.showLyric = false"
           >
             <Close theme="outline" size="22" />
           </button>
           <span class="text-base text-main font-medium truncate max-w-[60vw]">{{ playerStore.currentSong?.name || '歌词' }}</span>
           <button 
-            class="p-sm rounded-full hover:bg-tertiary text-secondary"
+            class="p-sm rounded-full hover:bg-tertiary text-primary hover:text-primary-hover"
             @click="playerStore.togglePlaylist"
           >
             <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">

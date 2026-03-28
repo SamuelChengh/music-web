@@ -43,7 +43,7 @@ watch(() => playerStore.showPlaylist, (show) => {
               清空
             </button>
             <button 
-              class="w-6 h-6 rounded flex items-center justify-center hover:bg-tertiary text-secondary"
+              class="w-6 h-6 rounded flex items-center justify-center hover:bg-tertiary text-primary hover:text-primary-hover"
               @click="playerStore.showPlaylist = false"
             >
               <Close theme="outline" size="16" />
@@ -72,8 +72,8 @@ watch(() => playerStore.showPlaylist, (show) => {
               </div>
               <div class="text-xs text-secondary truncate">{{ song.artist }}</div>
             </div>
-            <button 
-              class="w-6 h-6 rounded flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-tertiary text-secondary"
+<button 
+              class="w-6 h-6 rounded flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-tertiary text-primary hover:text-primary-hover"
               @click.stop="removeSong(index)"
             >
               <Delete theme="outline" size="14" />

@@ -84,7 +84,7 @@ const handleTouchEnd = () => {
         
         <nav class="flex-1 overflow-y-auto py-sm">
           <div v-for="group in menuGroups" :key="group.title" class="mb-md">
-            <div class="text-xs text-secondary px-lg mb-xs">{{ group.title }}</div>
+            <div class="text-xs text-main px-md mb-xs">{{ group.title }}</div>
             <div
               v-for="item in group.items"
               :key="item.path"

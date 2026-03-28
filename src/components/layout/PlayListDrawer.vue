@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue';
 import { usePlayerStore } from '../../stores';
 import { Close, Delete } from '@icon-park/vue-next';
+import { ElTooltip } from 'element-plus';
 
 const playerStore = usePlayerStore();
 const listRef = ref<HTMLDivElement | null>(null);
@@ -35,19 +36,22 @@ watch(() => playerStore.showPlaylist, (show) => {
         <div class="h-12 flex items-center justify-between px-md border-b border-default">
           <span class="text-sm text-main font-medium">播放列表 ({{ playerStore.playlist.length }})</span>
           <div class="flex items-center gap-sm">
-            <button 
-              v-if="playerStore.playlist.length > 0"
-              class="text-xs text-secondary hover-text"
-              @click="clearList"
-            >
-              清空
-            </button>
-            <button 
-              class="w-6 h-6 rounded flex items-center justify-center hover:bg-tertiary text-primary hover:text-primary-hover"
-              @click="playerStore.showPlaylist = false"
-            >
-              <Close theme="outline" size="16" />
-            </button>
+            <el-tooltip v-if="playerStore.playlist.length > 0" content="清空播放列表" placement="top">
+              <button 
+                class="text-xs text-secondary hover-text"
+                @click="clearList"
+              >
+                清空
+              </button>
+            </el-tooltip>
+            <el-tooltip content="关闭" placement="top">
+              <button 
+                class="w-6 h-6 rounded flex items-center justify-center hover:bg-tertiary text-primary hover:text-primary-hover"
+                @click="playerStore.showPlaylist = false"
+              >
+                <Close theme="outline" size="16" />
+              </button>
+            </el-tooltip>
           </div>
         </div>
         
@@ -72,12 +76,14 @@ watch(() => playerStore.showPlaylist, (show) => {
               </div>
               <div class="text-xs text-secondary truncate">{{ song.artist }}</div>
             </div>
-<button 
-              class="w-6 h-6 rounded flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-tertiary text-primary hover:text-primary-hover"
-              @click.stop="removeSong(index)"
-            >
-              <Delete theme="outline" size="14" />
-            </button>
+<el-tooltip content="移除" placement="top">
+              <button 
+                class="w-6 h-6 rounded flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-tertiary text-primary hover:text-primary-hover"
+                @click.stop="removeSong(index)"
+              >
+                <Delete theme="outline" size="14" />
+              </button>
+            </el-tooltip>
           </div>
         </div>
       </div>

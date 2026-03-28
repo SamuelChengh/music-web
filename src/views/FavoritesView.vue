@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { usePlayerStore } from '../stores';
 import { Like, Play, Delete } from '@icon-park/vue-next';
+import { ElTooltip } from 'element-plus';
 
 interface Song {
   rid: number;
@@ -70,12 +71,14 @@ const removeFromFavorites = (song: Song) => {
               <div class="text-main truncate group-hover:text-primary transition-colors">{{ song.name }}</div>
               <div class="text-sm text-secondary truncate">{{ song.artist }}</div>
             </div>
-            <button 
-              class="opacity-0 group-hover:opacity-100 p-2 rounded-full hover:bg-red-500/10 text-red-500 transition-all"
-              @click.stop="removeFromFavorites(song)"
-            >
-              <Delete theme="outline" size="18" />
-            </button>
+            <el-tooltip content="移除收藏" placement="top">
+              <button 
+                class="opacity-0 group-hover:opacity-100 p-2 rounded-full hover:bg-red-500/10 text-red-500 transition-all"
+                @click.stop="removeFromFavorites(song)"
+              >
+                <Delete theme="outline" size="18" />
+              </button>
+            </el-tooltip>
           </div>
         </div>
       </div>

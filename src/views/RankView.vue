@@ -3,6 +3,7 @@ import { ref, onMounted, watch } from 'vue';
 import { getRankList, getRankTags } from '../api';
 import { usePlayerStore } from '../stores';
 import { Play } from '@icon-park/vue-next';
+import { ElTooltip } from 'element-plus';
 
 interface Song {
   rid: number;
@@ -100,9 +101,11 @@ const handleImageError = (e: Event) => {
           <div v-if="song.info" class="text-sm text-secondary px-sm hidden lg:block max-w-xs truncate">
             {{ song.info }}
           </div>
-          <button class="opacity-0 group-hover:opacity-100 p-2.5 gradient-bg text-white rounded-full transition-all">
-            <Play theme="filled" size="18" />
-          </button>
+          <el-tooltip content="播放" placement="top">
+            <button class="opacity-0 group-hover:opacity-100 p-2.5 gradient-bg text-white rounded-full transition-all">
+              <Play theme="filled" size="18" />
+            </button>
+          </el-tooltip>
         </div>
       </div>
     </div>

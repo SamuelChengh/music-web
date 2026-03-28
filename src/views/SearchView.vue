@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router';
 import { searchSongs, getHotSearch } from '../api';
 import { usePlayerStore } from '../stores';
 import { Play } from '@icon-park/vue-next';
+import { ElTooltip } from 'element-plus';
 
 interface Song {
   rid: number;
@@ -90,9 +91,11 @@ const playSong = (song: Song, index: number) => {
             <div class="text-lg font-medium text-main truncate group-hover:text-primary transition-colors">{{ song.name }}</div>
             <div class="text-sm text-secondary truncate mt-1">{{ song.artist }}</div>
           </div>
-          <button class="opacity-0 group-hover:opacity-100 p-2.5 gradient-bg text-white rounded-full transition-all">
-            <Play theme="filled" size="18" />
-          </button>
+          <el-tooltip content="播放" placement="top">
+            <button class="opacity-0 group-hover:opacity-100 p-2.5 gradient-bg text-white rounded-full transition-all">
+              <Play theme="filled" size="18" />
+            </button>
+          </el-tooltip>
         </div>
       </div>
 

@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { getArtistInfo } from '../api';
 import { Play } from '@icon-park/vue-next';
+import { ElTooltip } from 'element-plus';
 
 interface Artist {
   id: number;
@@ -76,7 +77,9 @@ const goToArtistDetail = (id: number) => {
               class="w-full h-full object-cover rounded-full shadow-md group-hover:shadow-lg transition-all group-hover:scale-105" 
             />
             <div class="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center">
-              <Play theme="filled" size="32" class="text-white opacity-0 group-hover:opacity-100 transition-all" />
+              <el-tooltip content="播放" placement="top">
+                <Play theme="filled" size="32" class="text-white opacity-0 group-hover:opacity-100 transition-all cursor-pointer" />
+              </el-tooltip>
             </div>
           </div>
           <div class="mt-3 text-center text-sm font-medium text-main truncate group-hover:text-primary transition-colors">{{ artist.name }}</div>

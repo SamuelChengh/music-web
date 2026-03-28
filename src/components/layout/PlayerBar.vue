@@ -5,6 +5,7 @@ import { getSongUrl, getLyric } from '../../api';
 import { 
   Play, Pause, List, Text, Download, Close, ShuffleOne
 } from '@icon-park/vue-next';
+import { ElTooltip } from 'element-plus';
 import PlayerSlider from './PlayerSlider.vue';
 import LyricPanel from '../LyricPanel.vue';
 
@@ -151,31 +152,37 @@ onUnmounted(() => {
 
     <div class="flex-1 flex-col items-center max-w-2xl mx-auto hidden lg:flex">
       <div class="flex items-center gap-5 mb-2">
-        <button class="text-secondary hover-text transition-default" @click="playerStore.prev()">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
-          </svg>
-        </button>
+        <el-tooltip content="上一曲" placement="top">
+          <button class="text-secondary hover-text transition-default" @click="playerStore.prev()">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+            </svg>
+          </button>
+        </el-tooltip>
         
-        <button
-          class="text-primary hover:text-primary-hover transition-default"
-          @click="playerStore.toggle()"
-        >
-          <Pause v-if="playerStore.isPlaying" theme="filled" size="28" />
-          <Play v-else theme="filled" size="28" />
-        </button>
+        <el-tooltip :content="playerStore.isPlaying ? '暂停' : '播放'" placement="top">
+          <button
+            class="text-primary hover:text-primary-hover transition-default"
+            @click="playerStore.toggle()"
+          >
+            <Pause v-if="playerStore.isPlaying" theme="filled" size="28" />
+            <Play v-else theme="filled" size="28" />
+          </button>
+        </el-tooltip>
         
-        <button class="text-secondary hover-text transition-default" @click="playerStore.next()">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
-          </svg>
-        </button>
+        <el-tooltip content="下一曲" placement="top">
+          <button class="text-secondary hover-text transition-default" @click="playerStore.next()">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+            </svg>
+          </button>
+        </el-tooltip>
         
-        <button 
-          class="text-secondary hover-text transition-default"
-          :title="currentPlayMode.title"
-          @click="playerStore.togglePlayMode()"
-        >
+        <el-tooltip :content="currentPlayMode.title" placement="top">
+          <button 
+            class="text-secondary hover-text transition-default"
+            @click="playerStore.togglePlayMode()"
+          >
           <!-- 顺序播放 - 简洁线性风格 -->
           <svg v-if="playerStore.playMode === 'order'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="5" y1="7" x2="15" y2="7"/>
@@ -199,7 +206,8 @@ onUnmounted(() => {
             <text x="12" y="14" font-size="6" font-weight="600" fill="currentColor" stroke="none" text-anchor="middle">1</text>
           </svg>
 <ShuffleOne v-else-if="playerStore.playMode === 'shuffle'" theme="outline" size="20" />
-        </button>
+          </button>
+        </el-tooltip>
       </div>
       
       <div class="w-full flex items-center gap-3">
@@ -245,30 +253,32 @@ onUnmounted(() => {
         </Transition>
       </div>
       
-      <button
-        class="text-primary hover:text-primary-hover transition-default"
-        @click="playerStore.showLyric = !playerStore.showLyric"
-        title="歌词"
-      >
-        <Text theme="outline" size="18" />
-      </button>
+      <el-tooltip content="歌词" placement="top">
+        <button
+          class="text-primary hover:text-primary-hover transition-default"
+          @click="playerStore.showLyric = !playerStore.showLyric"
+        >
+          <Text theme="outline" size="18" />
+        </button>
+      </el-tooltip>
       
-      <button
-        class="text-primary hover:text-primary-hover transition-default"
-        @click="playerStore.togglePlaylist"
-        title="播放列表"
-      >
-        <List theme="outline" size="18" />
-      </button>
+      <el-tooltip content="播放列表" placement="top">
+        <button
+          class="text-primary hover:text-primary-hover transition-default"
+          @click="playerStore.togglePlaylist"
+        >
+          <List theme="outline" size="18" />
+        </button>
+      </el-tooltip>
       
-      <button
-        v-if="playerStore.currentSong"
-        class="text-primary hover:text-primary-hover transition-default"
-        @click="downloadSong"
-        title="下载"
-      >
-        <Download theme="outline" size="18" />
-      </button>
+      <el-tooltip v-if="playerStore.currentSong" content="下载" placement="top">
+        <button
+          class="text-primary hover:text-primary-hover transition-default"
+          @click="downloadSong"
+        >
+          <Download theme="outline" size="18" />
+        </button>
+      </el-tooltip>
     </div>
   </div>
   

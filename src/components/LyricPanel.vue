@@ -3,6 +3,7 @@ import { ref, watch, nextTick } from 'vue';
 import { usePlayerStore } from '../stores';
 import { getLyric } from '../api';
 import { Close } from '@icon-park/vue-next';
+import { ElTooltip } from 'element-plus';
 
 const playerStore = usePlayerStore();
 const lyricRefs = ref<HTMLElement[]>([]);
@@ -40,12 +41,14 @@ watch(() => playerStore.showLyric, async (show) => {
       >
         <div class="h-12 flex items-center justify-between px-md border-b border-default">
           <span class="text-sm text-main font-medium">歌词</span>
-          <button 
-            class="w-6 h-6 rounded flex items-center justify-center hover:bg-tertiary text-primary hover:text-primary-hover"
-            @click="playerStore.showLyric = false"
-          >
-            <Close theme="outline" size="16" />
-          </button>
+          <el-tooltip content="关闭" placement="top">
+            <button 
+              class="w-6 h-6 rounded flex items-center justify-center hover:bg-tertiary text-primary hover:text-primary-hover"
+              @click="playerStore.showLyric = false"
+            >
+              <Close theme="outline" size="16" />
+            </button>
+          </el-tooltip>
         </div>
         
         <div class="flex-1 overflow-y-auto px-md py-lg text-center">
@@ -81,21 +84,25 @@ watch(() => playerStore.showLyric, async (show) => {
         class="lg:hidden fixed inset-0 bg-view flex flex-col z-50"
       >
         <div class="h-14 flex items-center justify-between px-md border-b border-default">
-          <button 
-            class="p-sm rounded-full hover:bg-tertiary text-primary hover:text-primary-hover"
-            @click="playerStore.showLyric = false"
-          >
-            <Close theme="outline" size="22" />
-          </button>
+          <el-tooltip content="关闭" placement="top">
+            <button 
+              class="p-sm rounded-full hover:bg-tertiary text-primary hover:text-primary-hover"
+              @click="playerStore.showLyric = false"
+            >
+              <Close theme="outline" size="22" />
+            </button>
+          </el-tooltip>
           <span class="text-base text-main font-medium truncate max-w-[60vw]">{{ playerStore.currentSong?.name || '歌词' }}</span>
-          <button 
-            class="p-sm rounded-full hover:bg-tertiary text-primary hover:text-primary-hover"
-            @click="playerStore.togglePlaylist"
-          >
-            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
-            </svg>
-          </button>
+          <el-tooltip content="播放列表" placement="top">
+            <button 
+              class="p-sm rounded-full hover:bg-tertiary text-primary hover:text-primary-hover"
+              @click="playerStore.togglePlaylist"
+            >
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+              </svg>
+            </button>
+          </el-tooltip>
         </div>
         
         <div class="flex-1 overflow-y-auto px-lg py-xl text-center">

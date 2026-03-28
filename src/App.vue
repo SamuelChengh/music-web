@@ -1,18 +1,19 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useThemeStore } from './stores';
 import LeftSidebar from './components/layout/LeftSidebar.vue';
 import AppHeader from './components/layout/Header.vue';
 import PlayerBar from './components/layout/PlayerBar.vue';
 import PlayListDrawer from './components/layout/PlayListDrawer.vue';
-import MobileSearch from './components/MobileSearch.vue';
 import MobileSidebar from './components/MobileSidebar.vue';
-import { Music, Moon, Sunny, TShirt } from '@icon-park/vue-next';
+import { Music, Moon, Sunny, TShirt, Search } from '@icon-park/vue-next';
 
+const router = useRouter();
 const themeStore = useThemeStore();
-const showMobileSearch = ref(false);
 const showMobileSidebar = ref(false);
 const showMobileThemeMenu = ref(false);
+const searchKeyword = ref('');
 
 const themeColors = [
   { value: 'green', hex: '#00A878' },
@@ -22,6 +23,12 @@ const themeColors = [
   { value: 'pink', hex: '#9B2D6E' },
   { value: 'orange', hex: '#CF3434' },
 ];
+
+const goToSearch = () => {
+  if (searchKeyword.value.trim()) {
+    router.push({ path: '/search', query: { q: searchKeyword.value } });
+  }
+};
 
 onMounted(() => {
   themeStore.init();
@@ -43,16 +50,16 @@ onMounted(() => {
           <Music theme="filled" size="22" class="text-primary" />
         </div>
         
-        <button 
-          class="flex-1 flex items-center justify-center bg-tertiary rounded-full h-10 text-secondary px-md"
-          @click="showMobileSearch = true"
-        >
-          <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"/>
-            <path d="m21 21-4.35-4.35"/>
-          </svg>
-          <span class="text-sm">搜索歌曲、歌手...</span>
-        </button>
+        <div class="flex-1 flex items-center bg-tertiary rounded-full h-10 px-md">
+          <Search class="text-secondary shrink-0" theme="outline" size="16" />
+          <input
+            v-model="searchKeyword"
+            type="text"
+            placeholder="搜索歌曲、歌手..."
+            class="flex-1 h-10 bg-transparent text-sm text-main placeholder-secondary focus:outline-none ml-2"
+            @keyup.enter="goToSearch"
+          />
+        </div>
         
         <button
           class="w-9 h-9 rounded-full hover:bg-tertiary text-primary flex items-center justify-center transition-default"
@@ -105,8 +112,6 @@ onMounted(() => {
     </div>
     
     <PlayListDrawer class="hidden lg:block" />
-    
-    <MobileSearch v-if="showMobileSearch" @close="showMobileSearch = false" class="md:hidden" />
     
     <MobileSidebar v-if="showMobileSidebar" @close="showMobileSidebar = false" class="md:hidden" />
   </div>

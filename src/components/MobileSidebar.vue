@@ -99,7 +99,7 @@ const handleTouchEnd = () => {
         </nav>
         
         <div class="flex items-center justify-center p-md border-t border-default">
-          <div class="text-xs text-description text-center flex flex-col gap-1">
+          <div class="text-[10px] text-description text-center flex flex-col gap-1">
             <span>⚠️ 本项目仅供学习使用</span>
             <span>请支持正版音乐</span>
           </div>

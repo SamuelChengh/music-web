@@ -79,12 +79,12 @@ const handleTouchEnd = () => {
       >
         <div class="flex items-center h-14 px-sm border-b border-default gap-2">
           <Music theme="filled" size="20" class="text-primary mr-2" />
-          <span class="text-lg text-primary font-semibold px-xs">TheH音乐</span>
+          <span class="text-base text-primary font-semibold px-xs">TheH音乐</span>
         </div>
         
         <nav class="flex-1 overflow-y-auto py-sm">
           <div v-for="group in menuGroups" :key="group.title" class="mb-md">
-            <div class="text-xs text-main px-md mb-xs">{{ group.title }}</div>
+            <div class="text-xs text-secondary px-md mb-xs">{{ group.title }}</div>
             <div
               v-for="item in group.items"
               :key="item.path"

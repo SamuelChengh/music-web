@@ -40,17 +40,17 @@ const goToArtistDetail = (id: number) => {
 
 <template>
   <div class="h-full overflow-y-auto bg-view">
-    <div class="px-lg py-lg">
-      <div class="flex items-center gap-md mb-lg">
-        <div class="w-1 h-6 gradient-bg rounded-full"></div>
-        <h1 class="text-2xl font-bold text-main">歌手</h1>
+    <div class="px-md py-md md:px-lg md:py-lg">
+      <div class="flex items-center gap-md mb-md md:mb-lg">
+        <div class="w-1 h-5 md:h-6 gradient-bg rounded-full"></div>
+        <h1 class="text-xl md:text-2xl font-bold text-main">歌手</h1>
       </div>
       
-      <div class="flex gap-sm mb-lg overflow-x-auto pb-3 scrollbar-hide">
+      <div class="flex gap-sm mb-md md:mb-lg overflow-x-auto pb-2 md:pb-3 scrollbar-hide">
         <div
           v-for="cat in categories"
           :key="cat"
-          class="flex-shrink-0 px-md py-sm rounded-full cursor-pointer transition-all duration-200 text-sm whitespace-nowrap"
+          class="flex-shrink-0 px-sm py-xs md:px-md md:py-sm rounded-full cursor-pointer transition-all duration-200 text-sm md:text-sm whitespace-nowrap"
           :class="category === cat 
             ? 'bg-primary text-white shadow-md' 
             : 'bg-tertiary hover:bg-active text-secondary hover:text-active'"
@@ -64,7 +64,7 @@ const goToArtistDetail = (id: number) => {
         加载中...
       </div>
 
-      <div v-else class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-lg">
+      <div v-else class="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-md md:gap-lg">
         <div
           v-for="artist in artists"
           :key="artist.id"
@@ -78,11 +78,11 @@ const goToArtistDetail = (id: number) => {
             />
             <div class="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center">
               <el-tooltip content="播放" placement="top">
-                <Play theme="filled" size="32" class="text-white opacity-0 group-hover:opacity-100 transition-all cursor-pointer" />
+                <Play theme="filled" size="24" class="text-white opacity-0 group-hover:opacity-100 transition-all cursor-pointer" />
               </el-tooltip>
             </div>
           </div>
-          <div class="mt-3 text-center text-sm font-medium text-main truncate group-hover:text-primary transition-colors">{{ artist.name }}</div>
+          <div class="mt-2 md:mt-3 text-center text-sm md:text-sm font-medium text-main truncate group-hover:text-primary transition-colors">{{ artist.name }}</div>
         </div>
       </div>
     </div>

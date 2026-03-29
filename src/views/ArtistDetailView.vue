@@ -98,39 +98,39 @@ const playSong = (song: Song, index: number) => {
 </script>
 
 <template>
-  <div class="h-full overflow-y-auto bg-view px-lg py-md" @scroll="handleScroll">
+  <div class="h-full overflow-y-auto bg-view px-md py-sm md:px-lg md:py-md" @scroll="handleScroll">
     <div v-if="loading" class="text-center py-xl text-secondary">
       加载中...
     </div>
 
     <div v-else-if="artistInfo">
-      <div class="flex flex-col sm:flex-row items-center sm:items-start gap-lg mb-sm">
-        <img :src="artistInfo.pic" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover shadow-lg" />
+      <div class="flex flex-col sm:flex-row items-center sm:items-start gap-md md:gap-lg mb-sm">
+        <img :src="artistInfo.pic" class="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover shadow-lg" />
         <div class="text-center sm:text-left">
-          <h1 class="text-xl md:text-3xl font-bold text-primary">{{ artistInfo.name }}</h1>
-          <p class="text-sm md:text-lg text-secondary mt-1 md:mt-2">共 {{ allSongs.length }} 首歌曲</p>
+          <h1 class="text-xl md:text-xl font-bold text-primary">{{ artistInfo.name }}</h1>
+          <p class="text-sm md:text-sm text-secondary mt-1">共 {{ allSongs.length }} 首歌曲</p>
         </div>
       </div>
 
-      <h2 class="text-lg font-semibold mb-sm text-main border-primary pb-sm">热门歌曲</h2>
+      <h2 class="text-lg md:text-lg font-semibold mb-sm text-main">热门歌曲</h2>
       <div class="flex flex-col">
         <div
           v-for="(song, index) in songs"
           :key="song.rid"
-          class="flex items-center gap-md py-sm rounded-2xl hover:bg-active cursor-pointer group transition-all duration-200 mb-xs"
+          class="flex items-center gap-sm md:gap-md py-sm rounded-xl md:rounded-2xl hover:bg-active cursor-pointer group transition-all duration-200 mb-xs"
           @click="playSong(song, index)"
         >
-          <div class="w-10 text-center font-bold text-xl" :class="index < 3 ? 'text-primary' : 'text-secondary'">
+          <div class="w-8 md:w-10 text-center font-bold text-lg md:text-xl" :class="index < 3 ? 'text-primary' : 'text-secondary'">
             {{ index + 1 }}
           </div>
-          <img :src="song.pic" class="w-14 h-14 rounded-xl object-cover shadow-sm group-hover:scale-105 transition-transform" />
+          <img :src="song.pic" class="w-11 h-11 md:w-14 md:h-14 rounded-lg md:rounded-xl object-cover shadow-sm group-hover:scale-105 transition-transform" />
           <div class="flex-1 min-w-0">
-            <div class="text-lg font-medium text-main truncate group-hover:text-primary transition-colors">{{ song.name }}</div>
-            <div class="text-sm text-secondary truncate mt-1">{{ song.artist || artistInfo.name }}</div>
+            <div class="text-lg md:text-lg font-medium text-main truncate group-hover:text-primary transition-colors">{{ song.name }}</div>
+            <div class="text-sm md:text-sm text-secondary truncate mt-1">{{ song.artist || artistInfo.name }}</div>
           </div>
           <el-tooltip content="播放" placement="top">
-            <button class="opacity-0 group-hover:opacity-100 p-2.5 gradient-bg text-white rounded-full transition-all">
-              <Play theme="filled" size="18" />
+            <button class="opacity-0 group-hover:opacity-100 p-2 md:p-2.5 gradient-bg text-white rounded-full transition-all">
+              <Play theme="filled" size="16" />
             </button>
           </el-tooltip>
         </div>

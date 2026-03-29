@@ -55,17 +55,17 @@ const handleImageError = (e: Event) => {
 
 <template>
   <div class="h-full overflow-y-auto bg-view">
-    <div class="px-lg py-md">
+    <div class="px-md py-sm md:px-lg md:py-md">
       <div class="flex items-center gap-md mb-sm">
-        <div class="w-1 h-6 gradient-bg rounded-full"></div>
-        <h1 class="text-2xl font-bold text-main">排行榜</h1>
+        <div class="w-1 h-5 md:h-6 gradient-bg rounded-full"></div>
+        <h1 class="text-xl md:text-2xl font-bold text-main">排行榜</h1>
       </div>
       
-      <div class="flex items-center gap-sm mb-sm overflow-x-auto pb-3 scrollbar-hide">
+      <div class="flex items-center gap-xs md:gap-sm mb-sm overflow-x-auto pb-2 md:pb-3 scrollbar-hide">
         <div
           v-for="rank in allRanks"
           :key="rank"
-          class="flex-shrink-0 px-md py-sm rounded-lg cursor-pointer transition-all duration-200 text-base whitespace-nowrap border border-transparent"
+          class="flex-shrink-0 px-sm py-xs md:px-md md:py-sm rounded-lg cursor-pointer transition-all duration-200 text-base md:text-base whitespace-nowrap border border-transparent"
           :class="currentRank === rank 
             ? 'bg-primary text-white shadow-md border-primary' 
             : 'bg-tertiary/50 hover:bg-active hover:border-default text-secondary hover:text-main'"
@@ -83,27 +83,27 @@ const handleImageError = (e: Event) => {
         <div
           v-for="(song, index) in rankList"
           :key="song.rid"
-          class="flex items-center gap-md py-sm rounded-2xl hover:bg-active cursor-pointer group transition-all duration-200 mb-xs"
+          class="flex items-center gap-sm md:gap-md py-sm rounded-xl md:rounded-2xl hover:bg-active cursor-pointer group transition-all duration-200 mb-xs"
           @click="playSong(song, index)"
         >
-          <div class="w-10 text-center font-bold text-xl" :class="index < 3 ? 'text-primary' : 'text-secondary'">
+          <div class="w-8 md:w-10 text-center font-bold text-lg md:text-xl" :class="index < 3 ? 'text-primary' : 'text-secondary'">
             {{ index + 1 }}
           </div>
           <img 
             :src="song.pic" 
-            class="w-14 h-14 rounded-xl object-cover shadow-sm group-hover:scale-105 transition-transform" 
+            class="w-11 h-11 md:w-14 md:h-14 rounded-lg md:rounded-xl object-cover shadow-sm group-hover:scale-105 transition-transform" 
             @error="handleImageError"
           />
           <div class="flex-1 min-w-0">
-            <div class="text-lg font-medium text-main truncate group-hover:text-primary transition-colors">{{ song.name }}</div>
-            <div class="text-sm text-secondary truncate mt-1">{{ song.artist }}</div>
+            <div class="text-lg md:text-lg font-medium text-main truncate group-hover:text-primary transition-colors">{{ song.name }}</div>
+            <div class="text-sm md:text-sm text-secondary truncate mt-1">{{ song.artist }}</div>
           </div>
           <div v-if="song.info" class="text-sm text-secondary px-sm hidden lg:block max-w-xs truncate">
             {{ song.info }}
           </div>
           <el-tooltip content="播放" placement="top">
-            <button class="opacity-0 group-hover:opacity-100 p-2.5 gradient-bg text-white rounded-full transition-all">
-              <Play theme="filled" size="18" />
+            <button class="opacity-0 group-hover:opacity-100 p-2 md:p-2.5 gradient-bg text-white rounded-full transition-all">
+              <Play theme="filled" size="16" />
             </button>
           </el-tooltip>
         </div>

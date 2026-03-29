@@ -470,6 +470,7 @@ body {
 /* ===== 自定义间距工具类 ===== */
 
 /* Padding - 上下 */
+.py-xs { padding-top: 8px; padding-bottom: 8px; }
 .py-sm { padding-top: 12px; padding-bottom: 12px; }
 .py-md { padding-top: 16px; padding-bottom: 16px; }
 .py-lg { padding-top: 24px; padding-bottom: 24px; }
@@ -477,6 +478,7 @@ body {
 .py-2xl { padding-top: 40px; padding-bottom: 40px; }
 
 /* Padding - 左右 */
+.px-xs { padding-left: 8px; padding-right: 8px; }
 .px-sm { padding-left: 12px; padding-right: 12px; }
 .px-md { padding-left: 16px; padding-right: 16px; }
 .px-lg { padding-left: 24px; padding-right: 24px; }
@@ -489,12 +491,14 @@ body {
 .p-xl { padding: 32px; }
 
 /* Gap - 间距 */
+.gap-xs { gap: 8px; }
 .gap-sm { gap: 12px; }
 .gap-md { gap: 16px; }
 .gap-lg { gap: 24px; }
 .gap-xl { gap: 32px; }
 
 /* Margin - 底部 */
+.mb-xs { margin-bottom: 8px; }
 .mb-sm { margin-bottom: 12px; }
 .mb-md { margin-bottom: 16px; }
 .mb-lg { margin-bottom: 24px; }
@@ -504,3 +508,20 @@ body {
 .mt-sm { margin-top: 12px; }
 .mt-md { margin-top: 16px; }
 .mt-lg { margin-top: 24px; }
+
+/* ===== 移动端响应式间距 ===== */
+@media (max-width: 768px) {
+  .px-lg { padding-left: 16px; padding-right: 16px; }
+  .px-md { padding-left: 12px; padding-right: 12px; }
+  .py-lg { padding-top: 16px; padding-bottom: 16px; }
+  .py-md { padding-top: 12px; padding-bottom: 12px; }
+  .py-sm { padding-top: 8px; padding-bottom: 8px; }
+  .gap-lg { gap: 16px; }
+  .gap-md { gap: 12px; }
+  .gap-sm { gap: 8px; }
+  .mb-lg { margin-bottom: 16px; }
+  .mb-md { margin-bottom: 12px; }
+  .mb-sm { margin-bottom: 8px; }
+  .p-lg { padding: 16px; }
+  .p-md { padding: 12px; }
+}

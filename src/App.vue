@@ -7,7 +7,7 @@ import AppHeader from './components/layout/Header.vue';
 import PlayerBar from './components/layout/PlayerBar.vue';
 import PlayListDrawer from './components/layout/PlayListDrawer.vue';
 import MobileSidebar from './components/MobileSidebar.vue';
-import { Music, Moon, Sunny, TShirt, Search } from '@icon-park/vue-next';
+import { Music, Moon, Sunny, TShirt, Search, Home } from '@icon-park/vue-next';
 
 const router = useRouter();
 const themeStore = useThemeStore();
@@ -49,6 +49,14 @@ onMounted(() => {
         >
           <Music theme="filled" size="22" class="text-primary" />
         </div>
+        
+        <button
+          class="w-9 h-9 rounded-full hover:bg-tertiary text-primary flex items-center justify-center transition-default"
+          @click="router.push('/')"
+          title="首页"
+        >
+          <Home theme="outline" size="20" />
+        </button>
         
         <div class="flex-1 flex items-center bg-tertiary rounded-full h-10 px-md">
           <Search class="text-secondary shrink-0" theme="outline" size="16" />

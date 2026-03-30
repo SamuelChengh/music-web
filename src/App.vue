@@ -22,6 +22,8 @@ const themeColors = [
   { value: 'red', hex: '#FF6B35' },
   { value: 'pink', hex: '#9B2D6E' },
   { value: 'orange', hex: '#CF3434' },
+  { value: 'cyan', hex: '#00BCD4' },
+  { value: 'brown', hex: '#795548' },
 ];
 
 const goToSearch = () => {
@@ -93,7 +95,7 @@ onMounted(() => {
               v-if="showMobileThemeMenu"
               class="absolute right-0 top-full mt-2 w-36 bg-view border border-default rounded-xl shadow-lg p-md z-50"
             >
-              <div class="flex flex-wrap gap-sm">
+              <div class="grid grid-cols-4 gap-2">
                 <button 
                   v-for="c in themeColors" 
                   :key="c.value"

@@ -1,12 +1,50 @@
 const express = require('express');
 const cors = require('cors');
 const https = require('https');
+const CryptoJS = require('crypto-js');
 
 const app = express();
 const PORT = 3001;
 
+const SECRET_KEY = 'music-web-2024-secure-key-32bit';
+
+function encrypt(data) {
+  return CryptoJS.AES.encrypt(JSON.stringify(data), SECRET_KEY).toString();
+}
+
+function decrypt(encrypted) {
+  const bytes = CryptoJS.AES.decrypt(encrypted, SECRET_KEY);
+  return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+}
+
 app.use(cors());
 app.use(express.json());
+
+app.use('/api', async (req, res, next) => {
+  try {
+    const encryptedData = req.query.data;
+    if (!encryptedData) {
+      return res.status(400).json({ error: 'Missing data parameter' });
+    }
+
+    const decrypted = decrypt(decodeURIComponent(encryptedData));
+    const { endpoint, params } = decrypted;
+
+    const queryString = buildQueryString(params);
+    req.apiEndpoint = endpoint + queryString;
+    req.originalUrl = '?' + req.apiEndpoint;
+
+    const originalJson = res.json.bind(res);
+    res.json = (data) => {
+      return originalJson(encrypt(data));
+    };
+
+    next();
+  } catch (e) {
+    console.error('Decryption error:', e.message);
+    return res.status(400).json({ error: 'Invalid encrypted data' });
+  }
+});
 
 const API_BASE = 'https://kw-api.cenguigui.cn';
 
@@ -99,7 +137,7 @@ function formatLyricTime(seconds) {
 }
 
 app.use(async (req, res, next) => {
-  const url = req.url;
+  const url = req.apiEndpoint || req.url;
   
   if (url.startsWith('/search')) {
     const params = parseQuery(url);

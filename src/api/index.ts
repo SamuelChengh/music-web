@@ -1,10 +1,36 @@
 import axios from 'axios';
+import { encrypt, decrypt } from '../utils/crypto';
 
 const API_BASE = '';
 
 const api = axios.create({
   baseURL: API_BASE,
   timeout: 30000,
+});
+
+api.interceptors.request.use((config) => {
+  const method = config.method?.toUpperCase() || 'GET';
+  const url = config.url?.split('?')[0] || '';
+  const params = config.params || {};
+  
+  const encryptedData = encrypt({ endpoint: url, params });
+  config.url = `/api?data=${encodeURIComponent(encryptedData)}`;
+  config.params = {};
+  
+  return config;
+});
+
+api.interceptors.response.use((response) => {
+  const encryptedData = response.data;
+  if (typeof encryptedData === 'string' && encryptedData.startsWith('U2FsdGVkX1')) {
+    try {
+      const decrypted = decrypt<{ code: number; data: unknown; msg?: string }>(encryptedData);
+      return { ...response, data: decrypted };
+    } catch (e) {
+      return response;
+    }
+  }
+  return response;
 });
 
 export interface SearchResult {

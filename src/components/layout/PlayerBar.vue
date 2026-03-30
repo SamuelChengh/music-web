@@ -66,6 +66,10 @@ const handleEnded = () => {
 
 watch(() => playerStore.currentSong, async (song) => {
   if (song) {
+    if (audioRef.value) {
+      audioRef.value.pause();
+      audioRef.value.currentTime = 0;
+    }
     const { url } = await getSongUrl(song.rid, playerStore.quality);
     if (audioRef.value) {
       audioRef.value.src = url;
@@ -103,8 +107,12 @@ watch(() => playerStore.quality, async () => {
 
 const downloadSong = async () => {
   if (!playerStore.currentSong) return;
-  const filename = `${playerStore.currentSong.artist} - ${playerStore.currentSong.name}.mp3`;
-  const downloadUrl = `/download?url=${encodeURIComponent(`https://kw-api.cenguigui.cn/?id=${playerStore.currentSong.rid}&type=song&level=${playerStore.quality}&format=mp3`)}&filename=${encodeURIComponent(filename)}`;
+  const quality = playerStore.quality;
+  const isLossless = quality === 'lossless' || quality === 'hires';
+  const format = isLossless ? 'flac' : 'mp3';
+  const ext = isLossless ? 'flac' : 'mp3';
+  const filename = `${playerStore.currentSong.artist} - ${playerStore.currentSong.name}.${ext}`;
+  const downloadUrl = `/download?url=${encodeURIComponent(`https://kw-api.cenguigui.cn/?id=${playerStore.currentSong.rid}&type=song&level=${quality}&format=${format}`)}&filename=${encodeURIComponent(filename)}`;
   window.location.href = downloadUrl;
 };
 
@@ -180,7 +188,7 @@ onUnmounted(() => {
         
         <el-tooltip :content="currentPlayMode.title" placement="top">
           <button 
-            class="text-secondary hover-text transition-default"
+            class="text-primary hover-opacity transition-default"
             @click="playerStore.togglePlayMode()"
           >
           <!-- 顺序播放 - 简洁线性风格 -->
@@ -205,7 +213,7 @@ onUnmounted(() => {
             <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
             <text x="12" y="14" font-size="6" font-weight="600" fill="currentColor" stroke="none" text-anchor="middle">1</text>
           </svg>
-<ShuffleOne v-else-if="playerStore.playMode === 'shuffle'" theme="outline" size="20" />
+<ShuffleOne v-else-if="playerStore.playMode === 'shuffle'" theme="filled" size="20" class="text-primary" />
           </button>
         </el-tooltip>
       </div>
@@ -321,7 +329,7 @@ onUnmounted(() => {
           </button>
           
           <button 
-            class="text-secondary"
+            class="text-primary"
             :title="currentPlayMode.title"
             @click="playerStore.togglePlayMode()"
           >
@@ -347,7 +355,7 @@ onUnmounted(() => {
               <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
               <text x="12" y="14" font-size="6" font-weight="600" fill="currentColor" stroke="none" text-anchor="middle">1</text>
             </svg>
-<ShuffleOne v-else-if="playerStore.playMode === 'shuffle'" theme="outline" size="20" />
+<ShuffleOne v-else-if="playerStore.playMode === 'shuffle'" theme="filled" size="20" class="text-primary" />
           </button>
         </div>
         

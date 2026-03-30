@@ -24,6 +24,8 @@ const themeColors = [
   { value: 'red', hex: '#FF6B35' },
   { value: 'pink', hex: '#9B2D6E' },
   { value: 'orange', hex: '#CF3434' },
+  { value: 'cyan', hex: '#00BCD4' },
+  { value: 'brown', hex: '#795548' },
 ];
 
 const closeThemeMenu = () => {

@@ -47,13 +47,21 @@ const handleSeek = (e: MouseEvent) => {
 
 const downloadSong = async () => {
   if (!playerStore.currentSong) return;
-  const filename = `${playerStore.currentSong.artist} - ${playerStore.currentSong.name}.mp3`;
-  const downloadUrl = `/download?url=${encodeURIComponent(`https://kw-api.cenguigui.cn/?id=${playerStore.currentSong.rid}&type=song&level=${playerStore.quality}&format=mp3`)}&filename=${encodeURIComponent(filename)}`;
+  const quality = playerStore.quality;
+  const isLossless = quality === 'lossless' || quality === 'hires';
+  const format = isLossless ? 'flac' : 'mp3';
+  const ext = isLossless ? 'flac' : 'mp3';
+  const filename = `${playerStore.currentSong.artist} - ${playerStore.currentSong.name}.${ext}`;
+  const downloadUrl = `/download?url=${encodeURIComponent(`https://kw-api.cenguigui.cn/?id=${playerStore.currentSong.rid}&type=song&level=${quality}&format=${format}`)}&filename=${encodeURIComponent(filename)}`;
   window.location.href = downloadUrl;
 };
 
 watch(() => playerStore.currentSong, async (song) => {
   if (song) {
+    if (audioRef.value) {
+      audioRef.value.pause();
+      audioRef.value.currentTime = 0;
+    }
     const { url } = await getSongUrl(song.rid, playerStore.quality, 'mp3');
     if (audioRef.value) {
       audioRef.value.src = url;
@@ -139,7 +147,7 @@ const playModeIcon = computed(() => playModeIcons[playerStore.playMode]);
         </button>
         <button class="text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors text-xl">⏭</button>
         <button 
-          class="text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors text-lg select-none"
+          class="text-[var(--color-primary)] hover:opacity-80 transition-colors text-lg select-none"
           :title="playerStore.getPlayModeLabel()"
           @click="playerStore.togglePlayMode()"
         ><span v-text="playModeIcon"></span></button>

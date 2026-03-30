@@ -61,7 +61,7 @@ const playAll = () => {
             <h1 class="text-xl md:text-xl font-bold text-main mb-sm">{{ playlistInfo.name }}</h1>
             <p class="text-sm md:text-sm text-secondary mb-md">{{ playlistInfo.desc || '暂无描述' }}</p>
           </div>
-          <div class="flex justify-center sm:justify-start">
+          <div class="hidden md:flex justify-center sm:justify-start">
             <button 
               class="px-md py-sm md:px-lg gradient-bg text-white rounded-full text-sm md:text-base font-medium hover:opacity-90 transition-opacity flex items-center gap-sm"
               @click="playAll"

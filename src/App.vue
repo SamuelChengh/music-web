@@ -110,7 +110,7 @@ onMounted(() => {
         </div>
       </div>
       
-      <main class="flex-1 overflow-y-auto pb-player lg:pb-0">
+      <main class="flex-1 overflow-y-auto lg:pb-0" style="padding-bottom: 100px;">
         <router-view v-slot="{ Component }">
           <keep-alive>
             <component :is="Component" />

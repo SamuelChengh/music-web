@@ -509,6 +509,17 @@ body {
 .mt-md { margin-top: 16px; }
 .mt-lg { margin-top: 24px; }
 
+/* ===== 移动端底部安全区域 ===== */
+.pb-safe {
+  padding-bottom: calc(100px + env(safe-area-inset-bottom, 0));
+}
+
+@media (min-width: 1024px) {
+  .pb-safe {
+    padding-bottom: 0;
+  }
+}
+
 /* ===== 移动端响应式间距 ===== */
 @media (max-width: 768px) {
   .px-lg { padding-left: 16px; padding-right: 16px; }

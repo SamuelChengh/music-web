@@ -101,18 +101,8 @@ watch(() => playerStore.showLyric, async (show) => {
           <Close theme="outline" size="24" />
         </button>
         
-        <!-- 专辑封面 - 大图 -->
-        <div class="album-cover-container">
-          <img
-            v-if="playerStore.currentSong"
-            :src="playerStore.currentSong.pic"
-            class="album-cover-large"
-          />
-          <div v-else class="album-cover-large bg-tertiary" />
-        </div>
-        
         <!-- 歌词容器 -->
-        <div class="lyric-container">
+        <div class="lyric-container-extended">
           <div v-if="playerStore.lyric.length === 0" class="no-lyric">
             暂无歌词
           </div>
@@ -243,53 +233,23 @@ watch(() => playerStore.showLyric, async (show) => {
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* 专辑封面容器 */
-.album-cover-container {
-  flex-shrink: 0;
-  padding-top: 60px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* 专辑封面 - 大图 */
-.album-cover-large {
-  width: 280px;
-  height: 280px;
-  border-radius: 20px;
-  box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.3),
-    0 0 80px rgba(var(--color-primary-rgb), 0.2);
-  animation: coverFloat 6s ease-in-out infinite;
-  object-fit: cover;
-}
-
-@keyframes coverFloat {
-  0%, 100% { 
-    transform: translateY(0) rotate(0deg); 
-  }
-  50% { 
-    transform: translateY(-10px) rotate(2deg); 
-  }
-}
-
-/* 歌词容器 */
-.lyric-container {
+/* 歌词容器 - 扩展版（无封面） */
+.lyric-container-extended {
   flex: 1;
   overflow-y: auto;
-  padding: 20px 40px;
+  padding: 60px 40px 20px;
   -webkit-mask-image: linear-gradient(
     to bottom,
     transparent,
-    black 10%,
-    black 90%,
+    black 5%,
+    black 95%,
     transparent
   );
   mask-image: linear-gradient(
     to bottom,
     transparent,
-    black 10%,
-    black 90%,
+    black 5%,
+    black 95%,
     transparent
   );
 }

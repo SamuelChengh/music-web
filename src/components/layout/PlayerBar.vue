@@ -22,10 +22,10 @@ const qualities = [
 ];
 
 const playModes = [
-  { mode: 'order' as const, title: '顺序播放' },
-  { mode: 'loop' as const, title: '列表循环' },
-  { mode: 'single' as const, title: '单曲循环' },
-  { mode: 'shuffle' as const, title: '随机播放' },
+  { mode: 'order' as const, title: '顺序播放', label: '顺序' },
+  { mode: 'loop' as const, title: '列表循环', label: '循环' },
+  { mode: 'single' as const, title: '单曲循环', label: '单曲' },
+  { mode: 'shuffle' as const, title: '随机播放', label: '随机' },
 ];
 
 const currentPlayMode = computed(() => {
@@ -355,6 +355,70 @@ onUnmounted(() => {
       ></div>
     </div>
     
+    <!-- 功能栏 -->
+    <div class="player-function-bar">
+      <!-- 播放模式 -->
+      <button 
+        class="function-btn"
+        @click="playerStore.togglePlayMode()"
+        :title="currentPlayMode.title"
+      >
+        <!-- 顺序播放 -->
+        <svg v-if="playerStore.playMode === 'order'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="5" y1="7" x2="15" y2="7"/>
+          <polyline points="15 4 18 7 15 10"/>
+          <line x1="5" y1="17" x2="15" y2="17"/>
+          <polyline points="15 14 18 17 15 20"/>
+        </svg>
+        <!-- 列表循环 -->
+        <svg v-else-if="playerStore.playMode === 'loop'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="17 1 21 5 17 9"/>
+          <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+          <polyline points="7 23 3 19 7 15"/>
+          <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+        </svg>
+        <!-- 单曲循环 -->
+        <svg v-else-if="playerStore.playMode === 'single'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="17 1 21 5 17 9"/>
+          <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+          <polyline points="7 23 3 19 7 15"/>
+          <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+          <text x="12" y="14" font-size="6" font-weight="600" fill="currentColor" stroke="none" text-anchor="middle">1</text>
+        </svg>
+        <!-- 随机播放 -->
+        <ShuffleOne v-else-if="playerStore.playMode === 'shuffle'" theme="filled" size="20" />
+        <span class="text-xs">{{ currentPlayMode.label }}</span>
+      </button>
+      
+      <!-- 音质选择 -->
+      <button 
+        class="function-btn"
+        @click="showQualityMenu = true"
+      >
+        <span :class="qualities.find(q => q.value === playerStore.quality)?.color" class="text-sm font-bold">
+          {{ qualities.find(q => q.value === playerStore.quality)?.icon }}
+        </span>
+      </button>
+      
+      <!-- 歌词 -->
+      <button 
+        class="function-btn"
+        @click="playerStore.showLyric = !playerStore.showLyric"
+        title="歌词"
+      >
+        <Text theme="outline" size="20" />
+      </button>
+      
+      <!-- 播放列表 -->
+      <button 
+        class="function-btn"
+        @click="playerStore.togglePlaylist"
+        title="播放列表"
+      >
+        <List theme="outline" size="20" />
+      </button>
+    </div>
+    
     <!-- Safe Area -->
     <div class="h-[env(safe-area-inset-bottom, 0)]"></div>
   </div>
@@ -557,5 +621,48 @@ onUnmounted(() => {
   background: var(--color-primary);
   border-radius: 1px;
   transition: width 0.1s ease;
+}
+
+/* 功能栏 */
+.player-function-bar {
+  margin-top: 12px;
+  height: 44px;
+  background: rgba(var(--color-bg-view-rgb), 0.95);
+  backdrop-filter: blur(30px) saturate(200%);
+  -webkit-backdrop-filter: blur(30px) saturate(200%);
+  border-radius: 22px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  transition: all 0.3s ease;
+}
+
+:global(.dark) .player-function-bar {
+  background: rgba(30, 30, 30, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 功能按钮 */
+.function-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 16px;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  transition: all 0.3s ease;
+}
+
+.function-btn:hover {
+  color: var(--color-primary);
+  background: rgba(var(--color-primary-rgb), 0.1);
+}
+
+.function-btn:active {
+  transform: scale(0.95);
 }
 </style>

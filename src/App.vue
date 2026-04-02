@@ -155,6 +155,12 @@ onMounted(() => {
               0 0 40px rgba(var(--color-primary-rgb), 0.04);
 }
 
+@media (min-width: 768px) {
+  .mobile-header {
+    display: none;
+  }
+}
+
 .header-left {
   display: flex;
   align-items: center;

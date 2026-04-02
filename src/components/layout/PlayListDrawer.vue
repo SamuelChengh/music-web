@@ -84,15 +84,22 @@ const isMobile = computed(() => window.innerWidth < 768);
       class="playlist-drawer"
       :class="{ 'is-mobile': isMobile, 'is-dragging': isDragging, 'is-closing': isClosing }"
       :style="{ transform: drawerTransform }"
-      @touchstart="handleTouchStart"
-      @touchmove="handleTouchMove"
-      @touchend="handleTouchEnd"
     >
-      <div class="drawer-handle">
+      <div 
+        class="drawer-handle"
+        @touchstart="handleTouchStart"
+        @touchmove="handleTouchMove"
+        @touchend="handleTouchEnd"
+      >
         <div class="handle-bar"></div>
       </div>
       
-      <div class="drawer-header">
+      <div 
+        class="drawer-header"
+        @touchstart="handleTouchStart"
+        @touchmove="handleTouchMove"
+        @touchend="handleTouchEnd"
+      >
         <div class="header-title">
           <Music theme="filled" size="18" class="text-primary" />
           <span class="text-sm text-main font-medium">播放列表</span>
@@ -242,6 +249,8 @@ const isMobile = computed(() => window.innerWidth < 768);
   justify-content: space-between;
   padding: 12px 16px;
   border-bottom: 1px solid rgba(var(--color-border), 0.5);
+  touch-action: none;
+  cursor: grab;
 }
 
 .header-title {

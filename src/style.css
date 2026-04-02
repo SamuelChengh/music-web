@@ -571,3 +571,390 @@ body {
   .px-md { padding-left: 10px; padding-right: 10px; }
   .px-lg { padding-left: 12px; padding-right: 12px; }
 }
+
+/* ===== 网易云简约风格 - 移动端内容区域 ===== */
+
+/* 涟漪动画 */
+@keyframes ripple {
+  0% {
+    opacity: 0.4;
+    transform: scale(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.5);
+  }
+}
+
+/* 标题分隔线 - 左侧彩色短条 */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-left: 12px;
+  position: relative;
+}
+
+.section-divider::before {
+  content: '';
+  width: 4px;
+  height: 18px;
+  background: var(--color-primary);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* 歌单卡片 - 无边框纯阴影 */
+.playlist-card-light {
+  position: relative;
+  border-radius: 10px;
+  background: var(--color-bg-view);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.dark .playlist-card-light {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+.playlist-card-light:active {
+  transform: scale(0.97);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+}
+
+.dark .playlist-card-light:active {
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* 封面图片 - 简洁圆角 */
+.cover-light {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.dark .cover-light {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* 歌曲列表行 - 简洁单行 */
+.song-row-simple {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-border-light);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.song-row-simple:last-child {
+  border-bottom: none;
+}
+
+.song-row-simple:active {
+  background: rgba(var(--color-primary-rgb), 0.06);
+}
+
+.song-row-simple:active::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100px;
+  height: 100px;
+  background: rgba(var(--color-primary-rgb), 0.15);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: ripple 0.4s ease-out;
+}
+
+/* 歌曲封面 - 小圆角 */
+.song-cover-simple {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--color-bg-tertiary);
+}
+
+/* 排名徽章 - 金银铜 */
+.rank-badge {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.rank-badge.gold {
+  color: #FFB800;
+}
+
+.rank-badge.silver {
+  color: #8A8A8A;
+}
+
+.rank-badge.bronze {
+  color: #CF6B35;
+}
+
+/* 标签胶囊 - 简洁圆角 */
+.tag-pill-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tag-pill-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.tag-pill {
+  flex-shrink: 0;
+  padding: 7px 14px;
+  border-radius: 16px;
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.tag-pill:active {
+  transform: scale(0.96);
+}
+
+.tag-pill.active {
+  background: var(--color-primary);
+  color: white;
+}
+
+/* 播放按钮 - 简约圆角 */
+.play-btn-simple {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-tertiary);
+  border-radius: 50%;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.play-btn-simple:active {
+  transform: scale(0.92);
+  background: var(--color-primary);
+  color: white;
+}
+
+/* 歌单详情头部 - 简约卡片 */
+.playlist-header-light {
+  display: flex;
+  gap: 14px;
+  padding: 14px 0;
+  margin-bottom: 12px;
+}
+
+.playlist-cover-large {
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--color-bg-tertiary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dark .playlist-cover-large {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* 播放全部按钮 - 简约胶囊 */
+.play-all-btn-light {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: var(--color-primary);
+  color: white;
+  border-radius: 20px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 16px;
+}
+
+.play-all-btn-light:active {
+  transform: scale(0.96);
+  opacity: 0.9;
+}
+
+/* 空状态提示 */
+.empty-state-simple {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: var(--color-text-secondary);
+}
+
+.empty-icon-simple {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+/* ===== 移动端响应式 ===== */
+@media (max-width: 768px) {
+  .section-divider {
+    margin-bottom: 10px;
+    padding-left: 10px;
+  }
+  
+  .section-divider::before {
+    width: 3px;
+    height: 16px;
+  }
+  
+  .playlist-card-light {
+    border-radius: 8px;
+  }
+  
+  .cover-light {
+    border-radius: 6px;
+  }
+  
+  .song-row-simple {
+    padding: 10px 0;
+    gap: 10px;
+  }
+  
+  .song-cover-simple {
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+  }
+  
+  .rank-badge {
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
+  }
+  
+  .tag-pill-bar {
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  
+  .tag-pill {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  
+  .play-btn-simple {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .playlist-header-light {
+    gap: 12px;
+    padding: 12px 0;
+  }
+  
+  .playlist-cover-large {
+    width: 72px;
+    height: 72px;
+    border-radius: 8px;
+  }
+  
+  .play-all-btn-light {
+    padding: 8px 14px;
+    font-size: 14px;
+    border-radius: 18px;
+  }
+}
+
+@media (max-width: 400px) {
+  .section-divider {
+    margin-bottom: 8px;
+    padding-left: 8px;
+  }
+  
+  .section-divider::before {
+    width: 3px;
+    height: 14px;
+  }
+  
+  .playlist-card-light {
+    border-radius: 6px;
+  }
+  
+  .cover-light {
+    border-radius: 4px;
+  }
+  
+  .song-row-simple {
+    padding: 8px 0;
+    gap: 8px;
+  }
+  
+  .song-cover-simple {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+  }
+  
+  .rank-badge {
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+  }
+  
+  .tag-pill-bar {
+    gap: 5px;
+  }
+  
+  .tag-pill {
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 14px;
+  }
+  
+  .play-btn-simple {
+    width: 26px;
+    height: 26px;
+  }
+  
+  .playlist-cover-large {
+    width: 64px;
+    height: 64px;
+    border-radius: 6px;
+  }
+  
+  .play-all-btn-light {
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 16px;
+  }
+}

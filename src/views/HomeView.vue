@@ -31,7 +31,7 @@ const goToPlaylist = (id: number) => {
 };
 
 const formatName = (name: string) => {
-  return name.length > 15 ? name.substring(0, 15) + '...' : name;
+  return name.length > 12 ? name.substring(0, 12) + '...' : name;
 };
 </script>
 
@@ -43,81 +43,64 @@ const formatName = (name: string) => {
     
     <template v-else>
       <div class="px-md py-md md:px-lg md:py-lg">
-        <div class="flex items-center gap-md mb-md md:mb-lg">
-          <div class="w-1 h-5 md:h-6 gradient-bg rounded-full"></div>
+        <div class="section-divider">
           <h1 class="text-xl md:text-2xl font-bold text-main">发现音乐</h1>
         </div>
 
-        <div class="mb-lg md:mb-xl">
-          <div class="flex items-center justify-between mb-md md:mb-lg">
-            <h2 class="text-lg md:text-lg font-semibold text-main flex items-center gap-sm">
-              <span class="w-1 h-4 gradient-bg rounded-full"></span>
-              热门推荐
-            </h2>
+        <section class="mb-lg md:mb-xl">
+          <div class="section-divider">
+            <h2 class="text-base md:text-lg font-semibold text-main">热门推荐</h2>
           </div>
           
-          <div class="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-md md:gap-lg">
+          <div class="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-sm md:gap-md">
             <div
               v-for="playlist in recommendList"
               :key="playlist.id"
-              class="group cursor-pointer"
+              class="playlist-card-light"
               @click="goToPlaylist(playlist.id)"
             >
-              <CoverPlay :pic-url="playlist.pic" :play-count="playlist.playCount" show-play-count />
-              <div class="mt-2 md:mt-3 text-sm md:text-sm text-main line-clamp-2 leading-snug group-hover:text-primary transition-colors">
-                {{ formatName(playlist.name) }}
+              <div class="cover-light">
+                <CoverPlay :pic-url="playlist.pic" :play-count="playlist.playCount" show-play-count />
               </div>
-              <div class="text-xs md:text-xs text-secondary mt-1 truncate">
-                {{ playlist.songCount }}首 · {{ playlist.creator }}
+              <div class="mt-2 px-1 pb-1">
+                <div class="text-xs md:text-sm text-main line-clamp-2 leading-snug">
+                  {{ formatName(playlist.name) }}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div class="mb-lg md:mb-xl">
-          <div class="flex items-center justify-between mb-md md:mb-lg">
-            <h2 class="text-lg md:text-lg font-semibold text-main flex items-center gap-sm">
-              <span class="w-1 h-4 gradient-bg rounded-full"></span>
-              新歌首发
-            </h2>
+        <section class="mb-lg md:mb-xl">
+          <div class="section-divider">
+            <h2 class="text-base md:text-lg font-semibold text-main">新歌首发</h2>
           </div>
           
-          <div class="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-md md:gap-lg">
+          <div class="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-sm md:gap-md">
             <div
               v-for="(playlist, index) in newList"
               :key="playlist.id"
-              class="group cursor-pointer"
+              class="playlist-card-light"
               @click="goToPlaylist(playlist.id)"
             >
-              <div class="relative">
+              <div class="cover-light relative">
                 <CoverPlay :pic-url="playlist.pic" :play-count="playlist.playCount" show-play-count />
                 <div v-if="index < 3" 
-                  class="absolute top-1.5 left-1.5 md:top-2 md:left-2 text-white text-xs md:text-xs font-bold w-5 h-5 md:w-5 md:h-5 flex items-center justify-center rounded"
+                  class="absolute top-1 left-1 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-sm"
                   :class="index === 0 ? 'bg-red-500' : index === 1 ? 'bg-orange-500' : 'bg-yellow-500'"
                 >
                   {{ index + 1 }}
                 </div>
               </div>
-              <div class="mt-2 md:mt-3 text-sm md:text-sm text-main line-clamp-2 leading-snug group-hover:text-primary transition-colors">
-                {{ formatName(playlist.name) }}
-              </div>
-              <div class="text-xs md:text-xs text-secondary mt-1 truncate">
-                {{ playlist.songCount }}首 · {{ playlist.creator }}
+              <div class="mt-2 px-1 pb-1">
+                <div class="text-xs md:text-sm text-main line-clamp-2 leading-snug">
+                  {{ formatName(playlist.name) }}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </section>
       </div>
     </template>
   </div>
 </template>
-
-<style scoped>
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-</style>

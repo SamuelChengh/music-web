@@ -103,9 +103,9 @@ onMounted(() => {
             <Transition name="dropdown">
               <div
                 v-if="showMobileThemeMenu"
-                class="theme-menu-glass"
+                class="theme-menu-glass fixed right-2 top-[76px] z-50"
               >
-                <div class="grid grid-cols-4 gap-2">
+                <div class="grid grid-cols-4 gap-3">
                   <button 
                     v-for="c in themeColors" 
                     :key="c.value"
@@ -325,10 +325,7 @@ onMounted(() => {
 }
 
 .theme-menu-glass {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 8px);
-  width: 140px;
+  width: 160px;
   padding: 12px;
   background: rgba(var(--color-bg-view-rgb), 0.92);
   backdrop-filter: blur(20px);
@@ -337,7 +334,6 @@ onMounted(() => {
   border: 1px solid rgba(var(--color-primary-rgb), 0.25);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12),
               0 0 24px rgba(var(--color-primary-rgb), 0.08);
-  z-index: 50;
 }
 
 .theme-color-btn {

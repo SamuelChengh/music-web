@@ -3,8 +3,6 @@ import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { searchSongs, getHotSearch } from '../api';
 import { usePlayerStore } from '../stores';
-import { Play } from '@icon-park/vue-next';
-import { ElTooltip } from 'element-plus';
 
 interface Song {
   rid: number;
@@ -62,10 +60,11 @@ const playSong = (song: Song, index: number) => {
 <template>
   <div class="h-full overflow-y-auto bg-view">
     <div class="px-md py-sm md:px-lg md:py-md">
-      <div class="flex items-center gap-md mb-sm">
-        <div class="w-1 h-5 md:h-6 gradient-bg rounded-full"></div>
+      <div class="section-divider">
         <h1 class="text-xl md:text-2xl font-bold text-main">搜索结果</h1>
-        <span v-if="keyword" class="text-lg md:text-lg text-secondary">"{{ keyword }}"</span>
+        <span v-if="keyword" class="text-base md:text-lg text-secondary font-normal">
+          "{{ keyword }}"
+        </span>
       </div>
 
       <div v-if="searching" class="flex items-center justify-center py-xl">
@@ -76,35 +75,34 @@ const playSong = (song: Song, index: number) => {
         <div
           v-for="(song, index) in searchResults"
           :key="song.rid"
-          class="flex items-center gap-sm md:gap-md py-sm rounded-xl md:rounded-2xl hover:bg-active cursor-pointer group transition-all duration-200 mb-xs"
+          class="song-row-simple"
           @click="playSong(song, index)"
         >
-          <div class="w-8 md:w-10 text-center font-bold text-lg md:text-xl text-secondary">
+          <div class="rank-badge">
             {{ index + 1 }}
           </div>
           <img 
             :src="song.pic" 
-            class="w-11 h-11 md:w-14 md:h-14 rounded-lg md:rounded-xl object-cover shadow-sm group-hover:scale-105 transition-transform" 
+            class="song-cover-simple"
             @error="($event.target as HTMLImageElement).style.display = 'none'"
           />
           <div class="flex-1 min-w-0">
-            <div class="text-lg md:text-lg font-medium text-main truncate group-hover:text-primary transition-colors">{{ song.name }}</div>
-            <div class="text-sm md:text-sm text-secondary truncate mt-1">{{ song.artist }}</div>
+            <div class="text-base md:text-lg font-medium text-main truncate">
+              {{ song.name }}
+            </div>
+            <div class="text-sm md:text-base text-secondary truncate mt-0.5">
+              {{ song.artist }}
+            </div>
           </div>
-          <el-tooltip content="播放" placement="top">
-            <button class="opacity-0 group-hover:opacity-100 p-2 md:p-2.5 gradient-bg text-white rounded-full transition-all">
-              <Play theme="filled" size="16" />
-            </button>
-          </el-tooltip>
         </div>
       </div>
 
-      <div v-else-if="keyword" class="text-center py-xl text-secondary">
-        未找到相关歌曲
+      <div v-else-if="keyword" class="empty-state-simple">
+        <div class="text-sm">未找到相关歌曲</div>
       </div>
 
-      <div v-else class="text-center py-lg text-secondary">
-        在上方搜索框输入关键词搜索歌曲
+      <div v-else class="empty-state-simple">
+        <div class="text-sm">在上方搜索框输入关键词搜索歌曲</div>
       </div>
     </div>
   </div>

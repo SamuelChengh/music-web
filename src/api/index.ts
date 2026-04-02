@@ -126,7 +126,7 @@ export async function getArtistSongs(artistId: number, page = 1, limit = 30): Pr
   return data.data || [];
 }
 
-export async function getSongUrl(songId: number, level: string = 'exhigh', format: string = 'json'): Promise<{ url: string; type: string }> {
+export async function getSongUrl(songId: number, level: string = 'lossless', format: string = 'json'): Promise<{ url: string; type: string }> {
   const { data } = await api.get(`/song`, { params: { id: songId, level, format } });
   return { url: data.data?.url || '', type: level };
 }

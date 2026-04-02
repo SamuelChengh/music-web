@@ -209,7 +209,7 @@ const isMobile = computed(() => window.innerWidth < 768);
 }
 
 .playlist-drawer.is-mobile {
-  max-height: 55vh;
+  max-height: 60vh;
 }
 
 @keyframes slide-in {

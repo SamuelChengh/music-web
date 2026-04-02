@@ -146,8 +146,8 @@ onMounted(() => {
   height: 64px;
   display: flex;
   align-items: center;
-  padding: 0 16px;
-  gap: 12px;
+  padding: 0 12px;
+  gap: 10px;
   background: rgba(var(--color-bg-view-rgb), 0.88);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
@@ -158,6 +158,37 @@ onMounted(() => {
 @media (min-width: 768px) {
   .mobile-header {
     display: none;
+  }
+}
+
+@media (max-width: 400px) {
+  .mobile-header {
+    padding: 0 10px;
+    gap: 8px;
+  }
+  
+  .logo-icon-glow {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .back-btn-glass {
+    width: 26px;
+    height: 26px;
+  }
+  
+  .btn-glass {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+  }
+  
+  .header-left {
+    gap: 6px;
+  }
+  
+  .header-right {
+    gap: 6px;
   }
 }
 

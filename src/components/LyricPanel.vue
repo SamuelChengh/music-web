@@ -2,11 +2,20 @@
 import { ref, watch, nextTick } from 'vue';
 import { usePlayerStore } from '../stores';
 import { getLyric } from '../api';
-import { Close } from '@icon-park/vue-next';
+import { Close, Play, Pause } from '@icon-park/vue-next';
 import { ElTooltip } from 'element-plus';
+import PlayerSlider from './layout/PlayerSlider.vue';
 
 const playerStore = usePlayerStore();
 const lyricRefs = ref<HTMLElement[]>([]);
+
+// 格式化时间
+const formatTime = (seconds: number) => {
+  if (!seconds || isNaN(seconds)) return '0:00';
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
+};
 
 watch(() => playerStore.currentLyricIndex, async (index) => {
   await nextTick();
@@ -82,36 +91,70 @@ watch(() => playerStore.showLyric, async (show) => {
     <Transition name="mobile-lyric">
       <div 
         v-if="playerStore.showLyric"
-        class="lg:hidden fixed inset-x-0 top-0 bg-view flex flex-col z-40"
-        style="bottom: calc(100px + env(safe-area-inset-bottom, 0));"
+        class="lg:hidden lyric-fullscreen"
       >
-        <div class="h-14 flex items-center justify-between px-md border-b border-default">
-          <el-tooltip content="关闭" placement="top">
-            <button 
-              class="p-sm rounded-full hover:bg-tertiary text-primary hover:text-primary-hover"
-              @click="playerStore.showLyric = false"
-            >
-              <Close theme="outline" size="22" />
-            </button>
-          </el-tooltip>
-          <span class="text-base text-primary font-medium truncate max-w-[60vw]">{{ playerStore.currentSong?.name || '歌词' }}</span>
-          <div class="w-10"></div>
+        <!-- 关闭按钮 - 悬浮 -->
+        <button 
+          class="close-btn-floating"
+          @click="playerStore.showLyric = false"
+        >
+          <Close theme="outline" size="24" />
+        </button>
+        
+        <!-- 专辑封面 - 大图 -->
+        <div class="album-cover-container">
+          <img
+            v-if="playerStore.currentSong"
+            :src="playerStore.currentSong.pic"
+            class="album-cover-large"
+          />
+          <div v-else class="album-cover-large bg-tertiary" />
         </div>
         
-        <div class="flex-1 overflow-y-auto px-lg py-xl text-center">
-          <div v-if="playerStore.lyric.length === 0" class="flex items-center justify-center h-full text-secondary">
+        <!-- 歌词容器 -->
+        <div class="lyric-container">
+          <div v-if="playerStore.lyric.length === 0" class="no-lyric">
             暂无歌词
           </div>
-          <div v-else class="space-y-md">
+          <div v-else class="lyric-content">
             <div
               v-for="(item, index) in playerStore.lyric"
               :key="index"
               :ref="(el) => { if (el) lyricRefs[index] = el as HTMLElement }"
-              class="transition-all duration-300 py-sm"
-              :class="index === playerStore.currentLyricIndex ? 'text-primary text-xl font-medium' : 'text-secondary text-base'"
+              class="lyric-line"
+              :class="{ active: index === playerStore.currentLyricIndex }"
             >
               {{ item.lineLyric || '♪' }}
             </div>
+          </div>
+        </div>
+        
+        <!-- 底部迷你播放器 -->
+        <div class="mini-player">
+          <div class="mini-controls">
+            <button class="mini-btn" @click="playerStore.prev()">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+              </svg>
+            </button>
+            
+            <button class="play-btn-mini" @click="playerStore.toggle()">
+              <Pause v-if="playerStore.isPlaying" theme="filled" size="24" />
+              <Play v-else theme="filled" size="24" />
+            </button>
+            
+            <button class="mini-btn" @click="playerStore.next()">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+              </svg>
+            </button>
+          </div>
+          
+          <!-- 进度条 -->
+          <div class="mini-progress">
+            <span class="text-xs text-secondary">{{ formatTime(playerStore.currentTime) }}</span>
+            <PlayerSlider class="flex-1" />
+            <span class="text-xs text-secondary">{{ formatTime(playerStore.duration) }}</span>
           </div>
         </div>
       </div>
@@ -148,5 +191,209 @@ watch(() => playerStore.showLyric, async (show) => {
 .mobile-lyric-enter-from,
 .mobile-lyric-leave-to {
   transform: translateY(100%);
+}
+
+/* 全屏毛玻璃歌词面板 */
+.lyric-fullscreen {
+  position: fixed;
+  inset: 0;
+  background: rgba(var(--color-bg-view-rgb), 0.85);
+  backdrop-filter: blur(60px) saturate(180%);
+  -webkit-backdrop-filter: blur(60px) saturate(180%);
+  display: flex;
+  flex-direction: column;
+  z-index: 40;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* 关闭按钮 - 悬浮 */
+.close-btn-floating {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-main);
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.close-btn-floating:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(90deg);
+}
+
+:global(.dark) .close-btn-floating {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+:global(.dark) .close-btn-floating:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* 专辑封面容器 */
+.album-cover-container {
+  flex-shrink: 0;
+  padding-top: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 专辑封面 - 大图 */
+.album-cover-large {
+  width: 280px;
+  height: 280px;
+  border-radius: 20px;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.3),
+    0 0 80px rgba(var(--color-primary-rgb), 0.2);
+  animation: coverFloat 6s ease-in-out infinite;
+  object-fit: cover;
+}
+
+@keyframes coverFloat {
+  0%, 100% { 
+    transform: translateY(0) rotate(0deg); 
+  }
+  50% { 
+    transform: translateY(-10px) rotate(2deg); 
+  }
+}
+
+/* 歌词容器 */
+.lyric-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 40px;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 10%,
+    black 90%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 10%,
+    black 90%,
+    transparent
+  );
+}
+
+.lyric-content {
+  text-align: center;
+  padding-bottom: 20px;
+}
+
+/* 歌词行 */
+.lyric-line {
+  font-size: 18px;
+  color: var(--color-text-secondary);
+  margin: 16px 0;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  line-height: 1.6;
+}
+
+.lyric-line.active {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-shadow: 0 0 30px rgba(var(--color-primary-rgb), 0.6);
+  transform: scale(1.1);
+}
+
+/* 无歌词提示 */
+.no-lyric {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 16px;
+  color: var(--color-text-secondary);
+}
+
+/* 底部迷你播放器 */
+.mini-player {
+  height: 100px;
+  padding: 12px 32px;
+  background: rgba(var(--color-bg-view-rgb), 0.5);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+
+.mini-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 8px;
+}
+
+/* 播放按钮 - 迷你版 */
+.play-btn-mini {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 
+    0 6px 20px rgba(var(--color-primary-rgb), 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.play-btn-mini:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 30px rgba(var(--color-primary-rgb), 0.5);
+}
+
+.play-btn-mini:active {
+  transform: scale(1.05);
+}
+
+/* 迷你控制按钮 */
+.mini-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  transition: all 0.3s ease;
+}
+
+.mini-btn:hover {
+  color: var(--color-text-main);
+  transform: scale(1.1);
+}
+
+/* 迷你进度条 */
+.mini-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px;
 }
 </style>

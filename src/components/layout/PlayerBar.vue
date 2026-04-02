@@ -297,99 +297,66 @@ onUnmounted(() => {
     </div>
   </div>
   
-  <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-main border-t border-default z-50" style="height: calc(100px + env(safe-area-inset-bottom, 0));">
-    <div class="h-[100px] flex flex-col justify-center px-md">
-      <div class="h-[64px] grid grid-cols-[auto_1fr_auto] items-center">
-        <div class="flex items-center gap-sm max-w-[28vw] flex-shrink-0 pr-2" @click="playerStore.showLyric = !playerStore.showLyric">
-          <img
-            v-if="playerStore.currentSong"
-            :src="playerStore.currentSong.pic"
-            class="w-11 h-11 rounded-lg object-cover flex-shrink-0"
-          />
-          <div v-else class="w-11 h-11 bg-tertiary rounded-lg flex-shrink-0" />
-          
-          <div class="min-w-0" v-if="playerStore.currentSong">
-            <div class="text-sm text-main truncate">{{ playerStore.currentSong.name }}</div>
-            <div class="text-xs text-secondary truncate">{{ playerStore.currentSong.artist }}</div>
-          </div>
-        </div>
-        
-        <div class="flex items-center justify-center gap-5 pl-4">
-          <button class="text-secondary" @click="playerStore.prev()">
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
-            </svg>
-          </button>
-          
-          <button
-            class="text-primary hover:text-primary-hover transition-default"
-            @click="playerStore.toggle()"
-          >
-            <Pause v-if="playerStore.isPlaying" theme="filled" size="28" />
-            <Play v-else theme="filled" size="28" />
-          </button>
-          
-          <button class="text-secondary" @click="playerStore.next()">
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
-            </svg>
-          </button>
-          
-          <button 
-            class="text-primary"
-            :title="currentPlayMode.title"
-            @click="playerStore.togglePlayMode()"
-          >
-            <!-- 顺序播放 - 简洁线性风格 -->
-            <svg v-if="playerStore.playMode === 'order'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="5" y1="7" x2="15" y2="7"/>
-              <polyline points="15 4 18 7 15 10"/>
-              <line x1="5" y1="17" x2="15" y2="17"/>
-              <polyline points="15 14 18 17 15 20"/>
-            </svg>
-            <!-- 列表循环 -->
-            <svg v-else-if="playerStore.playMode === 'loop'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="17 1 21 5 17 9"/>
-              <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
-              <polyline points="7 23 3 19 7 15"/>
-              <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
-            </svg>
-            <!-- 单曲循环 -->
-            <svg v-else-if="playerStore.playMode === 'single'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="17 1 21 5 17 9"/>
-              <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
-              <polyline points="7 23 3 19 7 15"/>
-              <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
-              <text x="12" y="14" font-size="6" font-weight="600" fill="currentColor" stroke="none" text-anchor="middle">1</text>
-            </svg>
-<ShuffleOne v-else-if="playerStore.playMode === 'shuffle'" theme="filled" size="20" class="text-primary" />
-          </button>
-        </div>
-        
-        <div v-if="playerStore.currentSong" class="flex items-center justify-end gap-sm pl-2">
-          <button
-            class="text-xs px-2 py-1 rounded border border-default"
-            :class="qualities.find(q => q.value === playerStore.quality)?.color"
-            @touchstart="showQualityMenu = true"
-          >
-            {{ qualities.find(q => q.value === playerStore.quality)?.icon }}
-          </button>
-          <button
-            class="text-primary hover:text-primary-hover transition-default"
-            @click="playerStore.togglePlaylist"
-            title="播放列表"
-          >
-            <List theme="outline" size="22" />
-          </button>
-        </div>
+  <!-- 移动端播放器 - 悬浮胶囊设计 -->
+  <div class="lg:hidden fixed bottom-4 left-4 right-4 z-50">
+    <div 
+      class="player-capsule relative"
+      :class="{ 'playing': playerStore.isPlaying }"
+    >
+      <!-- 封面 - 圆形 -->
+      <div 
+        class="relative cursor-pointer"
+        @click="playerStore.showLyric = !playerStore.showLyric"
+      >
+        <img
+          v-if="playerStore.currentSong"
+          :src="playerStore.currentSong.pic"
+          class="cover-circle"
+        />
+        <div v-else class="cover-circle bg-tertiary" />
       </div>
       
-      <div class="flex items-center mb-sm gap-sm h-[36px]">
-        <span class="text-xs text-secondary w-8 text-right flex-shrink-0">{{ formatTime(playerStore.currentTime) }}</span>
-        <PlayerSlider class="flex-1" />
-        <span class="text-xs text-secondary w-8 flex-shrink-0">{{ formatTime(playerStore.duration) }}</span>
+      <!-- 歌曲信息 -->
+      <div class="flex-1 min-w-0">
+        <div v-if="playerStore.currentSong">
+          <div class="text-base font-semibold text-main truncate">{{ playerStore.currentSong.name }}</div>
+          <div class="text-sm text-secondary truncate mt-1">{{ playerStore.currentSong.artist }}</div>
+        </div>
+        <div v-else class="text-sm text-secondary">暂无播放</div>
       </div>
+      
+      <!-- 控制按钮 -->
+      <div class="flex items-center gap-3">
+        <!-- 上一曲 -->
+        <button class="control-btn" @click="playerStore.prev()">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+          </svg>
+        </button>
+        
+        <!-- 播放/暂停 -->
+        <button class="play-btn-main" @click="playerStore.toggle()">
+          <Pause v-if="playerStore.isPlaying" theme="filled" size="20" />
+          <Play v-else theme="filled" size="20" />
+        </button>
+        
+        <!-- 下一曲 -->
+        <button class="control-btn" @click="playerStore.next()">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+          </svg>
+        </button>
+      </div>
+      
+      <!-- 进度条 - 极细 -->
+      <div 
+        class="progress-line"
+        :style="{ '--progress': (playerStore.currentTime / playerStore.duration * 100) + '%' }"
+      ></div>
     </div>
+    
+    <!-- Safe Area -->
+    <div class="h-[env(safe-area-inset-bottom, 0)]"></div>
   </div>
   
   <Teleport to="body">
@@ -473,5 +440,122 @@ onUnmounted(() => {
 
 .safe-area-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* 悬浮胶囊播放器 */
+.player-capsule {
+  height: 72px;
+  background: rgba(var(--color-bg-view-rgb), 0.95);
+  backdrop-filter: blur(30px) saturate(200%);
+  -webkit-backdrop-filter: blur(30px) saturate(200%);
+  border-radius: 28px;
+  box-shadow: 
+    0 10px 40px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+:global(.dark) .player-capsule {
+  background: rgba(30, 30, 30, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 播放时浮动动画 */
+.player-capsule.playing {
+  animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* 封面 - 圆形 */
+.cover-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.cover-circle:hover {
+  transform: scale(1.1) rotate(10deg);
+}
+
+/* 播放按钮 - 渐变圆形 */
+.play-btn-main {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 
+    0 6px 20px rgba(var(--color-primary-rgb), 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.play-btn-main:hover {
+  transform: scale(1.15);
+  box-shadow: 0 8px 30px rgba(var(--color-primary-rgb), 0.5);
+}
+
+.play-btn-main:active {
+  transform: scale(1.1);
+}
+
+/* 控制按钮 */
+.control-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+  color: var(--color-text-main);
+  transform: scale(1.1);
+}
+
+.control-btn:active {
+  transform: scale(0.95);
+}
+
+/* 进度条 - 极细线条 */
+.progress-line {
+  position: absolute;
+  bottom: 0;
+  left: 20px;
+  right: 20px;
+  height: 2px;
+  background: rgba(var(--color-primary-rgb), 0.1);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.progress-line::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: var(--progress, 0%);
+  background: var(--color-primary);
+  border-radius: 1px;
+  transition: width 0.1s ease;
 }
 </style>

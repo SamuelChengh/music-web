@@ -101,6 +101,16 @@ watch(() => playerStore.showLyric, async (show) => {
         v-if="playerStore.showLyric"
         class="lg:hidden lyric-fullscreen"
       >
+        <!-- 模糊背景图片 -->
+        <img
+          v-if="playerStore.currentSong"
+          :src="playerStore.currentSong.pic"
+          class="lyric-bg-blur"
+        />
+        
+        <!-- 渐变遮罩层 -->
+        <div class="lyric-gradient-overlay"></div>
+        
         <!-- 关闭按钮 - 悬浮 -->
         <button 
           class="close-btn-floating"
@@ -109,7 +119,7 @@ watch(() => playerStore.showLyric, async (show) => {
           <Close theme="outline" size="18" />
         </button>
         
-        <!-- 顶部：封面 + 歌曲信息（上下居中布局） -->
+        <!-- 顶部：封面 -->
         <div class="lyric-header-vertical">
           <img
             v-if="playerStore.currentSong"
@@ -117,12 +127,6 @@ watch(() => playerStore.showLyric, async (show) => {
             class="cover-small"
           />
           <div v-else class="cover-small bg-tertiary" />
-          
-          <div v-if="playerStore.currentSong" class="song-info-vertical">
-            <div class="song-name">{{ playerStore.currentSong.name }}</div>
-            <div class="artist-name">{{ playerStore.currentSong.artist }}</div>
-          </div>
-          <div v-else class="text-secondary">暂无播放</div>
         </div>
         
         <!-- 歌词容器 -->
@@ -200,17 +204,50 @@ watch(() => playerStore.showLyric, async (show) => {
   transform: translateY(100%);
 }
 
-/* 全屏毛玻璃歌词面板 */
+/* 全屏歌词面板 */
 .lyric-fullscreen {
   position: fixed;
   inset: 0;
-  background: rgba(var(--color-bg-view-rgb), 0.85);
-  backdrop-filter: blur(60px) saturate(180%);
-  -webkit-backdrop-filter: blur(60px) saturate(180%);
-  display: flex;
-  flex-direction: column;
+  background: var(--color-bg-view);
   z-index: 40;
   animation: fadeIn 0.5s ease;
+  overflow: hidden;
+}
+
+/* 模糊背景图片 */
+.lyric-bg-blur {
+  position: fixed;
+  inset: -50px;
+  width: calc(100% + 100px);
+  height: calc(100% + 100px);
+  object-fit: cover;
+  filter: blur(50px) saturate(120%);
+  -webkit-filter: blur(50px) saturate(120%);
+  opacity: 0.95;
+  z-index: 1;
+  transition: opacity 0.5s ease;
+}
+
+/* 渐变遮罩层 */
+.lyric-gradient-overlay {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(var(--color-bg-view-rgb), 0.3) 0%,
+    rgba(var(--color-bg-view-rgb), 0.5) 40%,
+    rgba(var(--color-bg-view-rgb), 0.7) 100%
+  );
+  z-index: 2;
+}
+
+:global(.dark) .lyric-gradient-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.2) 0%,
+    rgba(0, 0, 0, 0.4) 40%,
+    rgba(0, 0, 0, 0.6) 100%
+  );
 }
 
 @keyframes fadeIn {
@@ -218,45 +255,56 @@ watch(() => playerStore.showLyric, async (show) => {
   to { opacity: 1; }
 }
 
-/* 关闭按钮 - 悬浮 */
+/* 关闭按钮 - 悬浮（透明化） */
 .close-btn-floating {
-  position: absolute;
+  position: fixed;
   top: 16px;
   right: 16px;
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: transparent;
+  border: 1px solid rgba(var(--color-border), 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--color-text-main);
   transition: all 0.3s ease;
   z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .close-btn-floating:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: rotate(90deg);
+  background: rgba(var(--color-primary-rgb), 0.15);
+  border-color: rgba(var(--color-primary-rgb), 0.6);
+  transform: rotate(90deg) scale(1.1);
+  box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.2);
 }
 
 :global(.dark) .close-btn-floating {
-  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 :global(.dark) .close-btn-floating:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(var(--color-primary-rgb), 0.2);
+  border-color: rgba(var(--color-primary-rgb), 0.7);
+  box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.3);
 }
 
-/* 歌词头部 - 上下居中布局 */
+/* 歌词头部 - 固定顶部（完全透明） */
 .lyric-header-vertical {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 28px 16px 20px;
+  justify-content: center;
+  padding: 20px 16px;
+  z-index: 5;
 }
 
 /* 小封面 - 100px */
@@ -266,33 +314,32 @@ watch(() => playerStore.showLyric, async (show) => {
   border-radius: 10px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   object-fit: cover;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* 歌曲信息 - 垂直布局 */
-.song-info-vertical {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
+.cover-small:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-.song-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--color-text-main);
-  text-align: center;
+:global(.dark) .cover-small {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
-.artist-name {
-  font-size: 13px;
-  color: var(--color-text-secondary);
+:global(.dark) .cover-small:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
 }
 
-/* 歌词容器 - 扩展版 */
+/* 歌词容器 - 独立滚动区域 */
 .lyric-container-extended {
-  flex: 1;
+  position: absolute;
+  top: 100px;
+  bottom: calc(100px + env(safe-area-inset-bottom, 0));
+  left: 0;
+  right: 0;
   overflow-y: auto;
   padding: 16px 32px;
+  z-index: 4;
   -webkit-mask-image: linear-gradient(
     to bottom,
     transparent,
@@ -317,18 +364,29 @@ watch(() => playerStore.showLyric, async (show) => {
 /* 歌词行 */
 .lyric-line {
   font-size: 16px;
-  color: var(--color-text-secondary);
+  color: var(--color-text-main);
   margin: 14px 0;
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   line-height: 1.6;
+  opacity: 0.7;
 }
 
 .lyric-line.active {
   font-size: 18px;
   font-weight: 700;
   color: var(--color-primary);
-  text-shadow: 0 0 30px rgba(var(--color-primary-rgb), 0.6);
+  text-shadow: 0 2px 20px rgba(var(--color-primary-rgb), 0.6);
   transform: scale(1.05);
+  opacity: 1;
+}
+
+:global(.dark) .lyric-line {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+:global(.dark) .lyric-line.active {
+  color: var(--color-primary);
+  text-shadow: 0 2px 30px rgba(var(--color-primary-rgb), 0.8);
 }
 
 /* 无歌词提示 */
@@ -341,12 +399,27 @@ watch(() => playerStore.showLyric, async (show) => {
   color: var(--color-text-secondary);
 }
 
-/* 底部迷你播放器 */
+:global(.dark) .no-lyric {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* 底部迷你播放器 - 固定底部 */
 .mini-player {
-  padding: 16px 24px 28px;
-  background: rgba(var(--color-bg-view-rgb), 0.5);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  padding: 16px 24px;
+  padding-bottom: calc(28px + env(safe-area-inset-bottom, 0));
+  z-index: 5;
+  background: rgba(var(--color-bg-view-rgb), 0.3);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+}
+
+:global(.dark) .mini-player {
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .mini-controls {
@@ -368,13 +441,21 @@ watch(() => playerStore.showLyric, async (show) => {
   color: white;
   box-shadow: 
     0 6px 20px rgba(var(--color-primary-rgb), 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    0 2px 8px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
+}
+
+:global(.dark) .play-btn-mini {
+  box-shadow: 
+    0 6px 20px rgba(var(--color-primary-rgb), 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .play-btn-mini:hover {
   transform: scale(1.1);
-  box-shadow: 0 8px 30px rgba(var(--color-primary-rgb), 0.5);
+  box-shadow: 
+    0 8px 30px rgba(var(--color-primary-rgb), 0.5),
+    0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .play-btn-mini:active {
@@ -389,13 +470,23 @@ watch(() => playerStore.showLyric, async (show) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-secondary);
+  color: var(--color-text-main);
   transition: all 0.3s ease;
+  background: rgba(var(--color-bg-view-rgb), 0.3);
 }
 
 .mini-btn:hover {
-  color: var(--color-text-main);
+  color: var(--color-primary);
+  background: rgba(var(--color-primary-rgb), 0.15);
   transform: scale(1.1);
+}
+
+:global(.dark) .mini-btn {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+:global(.dark) .mini-btn:hover {
+  background: rgba(var(--color-primary-rgb), 0.2);
 }
 
 

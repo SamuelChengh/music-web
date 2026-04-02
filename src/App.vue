@@ -121,8 +121,8 @@ onMounted(() => {
       <PlayerBar />
     </div>
     
-    <PlayListDrawer class="hidden lg:block" />
+    <PlayListDrawer />
     
-    <MobileSidebar v-if="showMobileSidebar" @close="showMobileSidebar = false" class="md:hidden" />
+    <MobileSidebar v-if="showMobileSidebar" @close="showMobileSidebar = false" />
   </div>
 </template>

@@ -303,6 +303,16 @@ onUnmounted(() => {
       class="player-capsule-extended"
       :class="{ 'playing': playerStore.isPlaying }"
     >
+      <!-- 封面模糊背景（仅歌曲播放时显示） -->
+      <img
+        v-if="playerStore.currentSong"
+        :src="playerStore.currentSong.pic"
+        class="player-bg-blur"
+      />
+      
+      <!-- 渐变遮罩层（确保内容清晰） -->
+      <div class="player-gradient-overlay"></div>
+      
       <!-- 上层：封面 + 歌曲信息 + 主控制 -->
       <div class="player-top">
         <!-- 封面 - 圆形 -->
@@ -614,6 +624,7 @@ onUnmounted(() => {
 
 /* 扩展胶囊 - 合并版 */
 .player-capsule-extended {
+  position: relative;
   background: rgba(var(--color-bg-view-rgb), 0.98);
   backdrop-filter: blur(30px) saturate(200%);
   -webkit-backdrop-filter: blur(30px) saturate(200%);
@@ -627,6 +638,7 @@ onUnmounted(() => {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 :global(.dark) .player-capsule-extended {
@@ -637,6 +649,43 @@ onUnmounted(() => {
     0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
+/* 封面模糊背景 */
+.player-bg-blur {
+  position: absolute;
+  inset: -10px;
+  width: calc(100% + 20px);
+  height: calc(100% + 20px);
+  object-fit: cover;
+  filter: blur(30px) saturate(150%);
+  -webkit-filter: blur(30px) saturate(150%);
+  opacity: 0.7;
+  z-index: 0;
+  transition: opacity 0.5s ease;
+}
+
+/* 渐变遮罩层 */
+.player-gradient-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(var(--color-bg-view-rgb), 0.6) 0%,
+    rgba(var(--color-bg-view-rgb), 0.75) 50%,
+    rgba(var(--color-bg-view-rgb), 0.85) 100%
+  );
+  z-index: 1;
+  border-radius: 24px;
+}
+
+:global(.dark) .player-gradient-overlay {
+  background: linear-gradient(
+    135deg,
+    rgba(30, 30, 30, 0.5) 0%,
+    rgba(30, 30, 30, 0.65) 50%,
+    rgba(30, 30, 30, 0.75) 100%
+  );
+}
+
 /* 播放时浮动动画 */
 .player-capsule-extended.playing {
   animation: float 2s ease-in-out infinite;
@@ -644,19 +693,23 @@ onUnmounted(() => {
 
 /* 上层 */
 .player-top {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
   height: 40px;
+  z-index: 2;
 }
 
 /* 下层功能栏 */
 .player-bottom {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-around;
   height: 32px;
   margin-top: 4px;
+  z-index: 2;
 }
 
 /* 功能按钮 */
@@ -682,10 +735,12 @@ onUnmounted(() => {
 
 /* 进度条区域 */
 .progress-section {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 4px 0 2px;
+  z-index: 2;
 }
 
 .time-display {

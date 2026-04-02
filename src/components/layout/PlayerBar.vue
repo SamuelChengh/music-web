@@ -61,7 +61,14 @@ const handleTimeUpdate = () => {
 };
 
 const handleEnded = () => {
-  playerStore.next();
+  if (playerStore.playMode === 'single') {
+    if (audioRef.value) {
+      audioRef.value.currentTime = 0;
+      audioRef.value.play();
+    }
+  } else {
+    playerStore.next();
+  }
 };
 
 watch(() => playerStore.currentSong, async (song) => {

@@ -37,6 +37,14 @@ watch(() => playerStore.showLyric, async (show) => {
         playerStore.setLyric([]);
       }
     }
+    
+    // 滚动到当前播放位置 - 使用延时确保DOM渲染完成
+    setTimeout(() => {
+      const currentIndex = playerStore.currentLyricIndex;
+      if (currentIndex >= 0 && lyricRefs.value[currentIndex]) {
+        lyricRefs.value[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
   }
 });
 </script>
@@ -247,15 +255,15 @@ watch(() => playerStore.showLyric, async (show) => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
-  padding: 60px 20px 32px;
+  gap: 12px;
+  padding: 40px 20px 24px;
 }
 
-/* 小封面 - 120px */
+/* 小封面 - 100px */
 .cover-small {
-  width: 120px;
-  height: 120px;
-  border-radius: 16px;
+  width: 100px;
+  height: 100px;
+  border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   object-fit: cover;
 }
@@ -316,11 +324,11 @@ watch(() => playerStore.showLyric, async (show) => {
 }
 
 .lyric-line.active {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--color-primary);
   text-shadow: 0 0 30px rgba(var(--color-primary-rgb), 0.6);
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
 /* 无歌词提示 */

@@ -101,8 +101,8 @@ watch(() => playerStore.showLyric, async (show) => {
           <Close theme="outline" size="24" />
         </button>
         
-        <!-- 顶部：小封面 + 歌曲信息 -->
-        <div class="lyric-header">
+        <!-- 顶部：封面 + 歌曲信息（上下居中布局） -->
+        <div class="lyric-header-vertical">
           <img
             v-if="playerStore.currentSong"
             :src="playerStore.currentSong.pic"
@@ -110,13 +110,11 @@ watch(() => playerStore.showLyric, async (show) => {
           />
           <div v-else class="cover-small bg-tertiary" />
           
-          <div class="song-info">
-            <div v-if="playerStore.currentSong">
-              <div class="song-name">{{ playerStore.currentSong.name }}</div>
-              <div class="artist-name">{{ playerStore.currentSong.artist }}</div>
-            </div>
-            <div v-else class="text-secondary">暂无播放</div>
+          <div v-if="playerStore.currentSong" class="song-info-vertical">
+            <div class="song-name">{{ playerStore.currentSong.name }}</div>
+            <div class="artist-name">{{ playerStore.currentSong.artist }}</div>
           </div>
+          <div v-else class="text-secondary">暂无播放</div>
         </div>
         
         <!-- 歌词容器 -->
@@ -137,7 +135,7 @@ watch(() => playerStore.showLyric, async (show) => {
           </div>
         </div>
         
-        <!-- 底部迷你播放器 -->
+        <!-- 底部迷你播放器 - 只保留控制 -->
         <div class="mini-player">
           <div class="mini-controls">
             <button class="mini-btn" @click="playerStore.prev()">
@@ -156,13 +154,6 @@ watch(() => playerStore.showLyric, async (show) => {
                 <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
               </svg>
             </button>
-          </div>
-          
-          <!-- 进度条 -->
-          <div class="mini-progress">
-            <span class="text-xs text-secondary">{{ formatTime(playerStore.currentTime) }}</span>
-            <PlayerSlider class="flex-1" />
-            <span class="text-xs text-secondary">{{ formatTime(playerStore.duration) }}</span>
           </div>
         </div>
       </div>
@@ -251,13 +242,13 @@ watch(() => playerStore.showLyric, async (show) => {
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* 歌词头部 */
-.lyric-header {
+/* 歌词头部 - 上下居中布局 */
+.lyric-header-vertical {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 16px;
-  padding: 20px;
-  margin-top: 50px;
+  padding: 60px 20px 32px;
 }
 
 /* 小封面 - 120px */
@@ -267,21 +258,21 @@ watch(() => playerStore.showLyric, async (show) => {
   border-radius: 16px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   object-fit: cover;
-  flex-shrink: 0;
 }
 
-/* 歌曲信息 */
-.song-info {
-  flex: 1;
-  min-width: 0;
+/* 歌曲信息 - 垂直布局 */
+.song-info-vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
 }
 
 .song-name {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--color-text-main);
-  margin-bottom: 4px;
-  line-height: 1.3;
+  text-align: center;
 }
 
 .artist-name {
@@ -344,23 +335,17 @@ watch(() => playerStore.showLyric, async (show) => {
 
 /* 底部迷你播放器 */
 .mini-player {
-  height: 100px;
-  padding: 12px 32px;
+  padding: 20px 32px 32px;
   background: rgba(var(--color-bg-view-rgb), 0.5);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 8px;
 }
 
 .mini-controls {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
-  margin-bottom: 8px;
+  gap: 32px;
 }
 
 /* 播放按钮 - 迷你版 */
@@ -405,11 +390,5 @@ watch(() => playerStore.showLyric, async (show) => {
   transform: scale(1.1);
 }
 
-/* 迷你进度条 */
-.mini-progress {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 8px;
-}
+
 </style>

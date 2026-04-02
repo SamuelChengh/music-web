@@ -336,11 +336,11 @@ onUnmounted(() => {
             </svg>
           </button>
           
-          <!-- 播放/暂停 -->
-          <button class="play-btn-main" @click="playerStore.toggle()">
-            <Pause v-if="playerStore.isPlaying" theme="filled" size="20" />
-            <Play v-else theme="filled" size="20" />
-          </button>
+<!-- 播放/暂停 -->
+           <button class="control-btn play-btn" @click="playerStore.toggle()">
+             <Pause v-if="playerStore.isPlaying" theme="filled" size="22" />
+             <Play v-else theme="filled" size="22" />
+           </button>
           
           <!-- 下一曲 -->
           <button class="control-btn" @click="playerStore.next()">
@@ -351,11 +351,12 @@ onUnmounted(() => {
         </div>
       </div>
       
-      <!-- 进度条 - 极细 -->
-      <div 
-        class="progress-line"
-        :style="{ '--progress': (playerStore.currentTime / playerStore.duration * 100) + '%' }"
-      ></div>
+      <!-- 进度条 - 可交互 -->
+      <div class="progress-section">
+        <span class="time-display">{{ formatTime(playerStore.currentTime) }}</span>
+        <PlayerSlider class="progress-slider" />
+        <span class="time-display">{{ formatTime(playerStore.duration) }}</span>
+      </div>
       
       <!-- 下层：功能按钮 -->
       <div class="player-bottom">
@@ -500,6 +501,20 @@ onUnmounted(() => {
   padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
+/* 音质弹窗增强样式 */
+.quality-panel {
+  background: var(--color-bg-view);
+  box-shadow: 
+    0 -8px 40px rgba(0, 0, 0, 0.2),
+    0 -2px 8px rgba(0, 0, 0, 0.1);
+}
+
+:global(.dark) .quality-panel {
+  background: var(--color-bg-view);
+  box-shadow: 
+    0 -8px 40px rgba(0, 0, 0, 0.4);
+}
+
 /* 悬浮胶囊播放器 */
 .player-capsule {
   height: 72px;
@@ -547,35 +562,10 @@ onUnmounted(() => {
   transform: scale(1.1) rotate(10deg);
 }
 
-/* 播放按钮 - 渐变圆形 */
-.play-btn-main {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  box-shadow: 
-    0 6px 20px rgba(var(--color-primary-rgb), 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  transition: all 0.3s ease;
-}
-
-.play-btn-main:hover {
-  transform: scale(1.15);
-  box-shadow: 0 8px 30px rgba(var(--color-primary-rgb), 0.5);
-}
-
-.play-btn-main:active {
-  transform: scale(1.1);
-}
-
 /* 控制按钮 */
 .control-btn {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -593,41 +583,31 @@ onUnmounted(() => {
   transform: scale(0.95);
 }
 
-/* 进度条 - 极细线条 */
-.progress-line {
-  position: absolute;
-  bottom: 0;
-  left: 20px;
-  right: 20px;
-  height: 2px;
-  background: rgba(var(--color-primary-rgb), 0.1);
-  border-radius: 1px;
-  overflow: hidden;
+/* 播放按钮 - 主题色突出 */
+.play-btn {
+  color: var(--color-primary);
+  width: 44px;
+  height: 44px;
 }
 
-.progress-line::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: var(--progress, 0%);
-  background: var(--color-primary);
-  border-radius: 1px;
-  transition: width 0.1s ease;
+.play-btn:hover {
+  color: var(--color-primary-hover);
 }
+
+
 
 /* 扩展胶囊 - 合并版 */
 .player-capsule-extended {
-  background: rgba(var(--color-bg-view-rgb), 0.95);
+  background: rgba(var(--color-bg-view-rgb), 0.98);
   backdrop-filter: blur(30px) saturate(200%);
   -webkit-backdrop-filter: blur(30px) saturate(200%);
   border-radius: 28px;
   box-shadow: 
-    0 10px 40px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  padding: 12px 20px;
+    0 12px 50px rgba(0, 0, 0, 0.18),
+    0 4px 12px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 12px 20px 16px;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
@@ -636,6 +616,9 @@ onUnmounted(() => {
 :global(.dark) .player-capsule-extended {
   background: rgba(30, 30, 30, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 12px 50px rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* 播放时浮动动画 */
@@ -673,17 +656,36 @@ onUnmounted(() => {
   gap: 6px;
   padding: 8px 12px;
   border-radius: 16px;
-  color: var(--color-text-secondary);
+  color: var(--color-primary);
   font-size: 13px;
   transition: all 0.3s ease;
 }
 
 .function-btn:hover {
-  color: var(--color-primary);
-  background: rgba(var(--color-primary-rgb), 0.1);
+  color: var(--color-primary-hover);
+  background: rgba(var(--color-primary-rgb), 0.15);
 }
 
 .function-btn:active {
   transform: scale(0.95);
+}
+
+/* 进度条区域 */
+.progress-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0 4px;
+}
+
+.time-display {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  min-width: 32px;
+}
+
+.progress-slider {
+  flex: 1;
 }
 </style>

@@ -106,7 +106,7 @@ watch(() => playerStore.showLyric, async (show) => {
           class="close-btn-floating"
           @click="playerStore.showLyric = false"
         >
-          <Close theme="outline" size="24" />
+          <Close theme="outline" size="18" />
         </button>
         
         <!-- 顶部：封面 + 歌曲信息（上下居中布局） -->
@@ -221,10 +221,10 @@ watch(() => playerStore.showLyric, async (show) => {
 /* 关闭按钮 - 悬浮 */
 .close-btn-floating {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 44px;
-  height: 44px;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
@@ -255,15 +255,15 @@ watch(() => playerStore.showLyric, async (show) => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 40px 20px 24px;
+  gap: 10px;
+  padding: 28px 16px 20px;
 }
 
 /* 小封面 - 100px */
 .cover-small {
-  width: 100px;
-  height: 100px;
-  border-radius: 12px;
+  width: 72px;
+  height: 72px;
+  border-radius: 10px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   object-fit: cover;
 }
@@ -277,14 +277,14 @@ watch(() => playerStore.showLyric, async (show) => {
 }
 
 .song-name {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--color-text-main);
   text-align: center;
 }
 
 .artist-name {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--color-text-secondary);
 }
 
@@ -292,7 +292,7 @@ watch(() => playerStore.showLyric, async (show) => {
 .lyric-container-extended {
   flex: 1;
   overflow-y: auto;
-  padding: 20px 40px;
+  padding: 16px 32px;
   -webkit-mask-image: linear-gradient(
     to bottom,
     transparent,
@@ -316,15 +316,15 @@ watch(() => playerStore.showLyric, async (show) => {
 
 /* 歌词行 */
 .lyric-line {
-  font-size: 18px;
+  font-size: 16px;
   color: var(--color-text-secondary);
-  margin: 16px 0;
+  margin: 14px 0;
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   line-height: 1.6;
 }
 
 .lyric-line.active {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--color-primary);
   text-shadow: 0 0 30px rgba(var(--color-primary-rgb), 0.6);
@@ -343,7 +343,7 @@ watch(() => playerStore.showLyric, async (show) => {
 
 /* 底部迷你播放器 */
 .mini-player {
-  padding: 20px 32px 32px;
+  padding: 16px 24px 28px;
   background: rgba(var(--color-bg-view-rgb), 0.5);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -353,13 +353,13 @@ watch(() => playerStore.showLyric, async (show) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 32px;
+  gap: 24px;
 }
 
 /* 播放按钮 - 迷你版 */
 .play-btn-mini {
-  width: 56px;
-  height: 56px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
   display: flex;
@@ -383,8 +383,8 @@ watch(() => playerStore.showLyric, async (show) => {
 
 /* 迷你控制按钮 */
 .mini-btn {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;

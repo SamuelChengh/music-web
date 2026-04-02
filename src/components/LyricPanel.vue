@@ -101,6 +101,24 @@ watch(() => playerStore.showLyric, async (show) => {
           <Close theme="outline" size="24" />
         </button>
         
+        <!-- 顶部：小封面 + 歌曲信息 -->
+        <div class="lyric-header">
+          <img
+            v-if="playerStore.currentSong"
+            :src="playerStore.currentSong.pic"
+            class="cover-small"
+          />
+          <div v-else class="cover-small bg-tertiary" />
+          
+          <div class="song-info">
+            <div v-if="playerStore.currentSong">
+              <div class="song-name">{{ playerStore.currentSong.name }}</div>
+              <div class="artist-name">{{ playerStore.currentSong.artist }}</div>
+            </div>
+            <div v-else class="text-secondary">暂无播放</div>
+          </div>
+        </div>
+        
         <!-- 歌词容器 -->
         <div class="lyric-container-extended">
           <div v-if="playerStore.lyric.length === 0" class="no-lyric">
@@ -233,11 +251,49 @@ watch(() => playerStore.showLyric, async (show) => {
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* 歌词容器 - 扩展版（无封面） */
+/* 歌词头部 */
+.lyric-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  margin-top: 50px;
+}
+
+/* 小封面 - 120px */
+.cover-small {
+  width: 120px;
+  height: 120px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+/* 歌曲信息 */
+.song-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.song-name {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-text-main);
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.artist-name {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+/* 歌词容器 - 扩展版 */
 .lyric-container-extended {
   flex: 1;
   overflow-y: auto;
-  padding: 60px 40px 20px;
+  padding: 20px 40px;
   -webkit-mask-image: linear-gradient(
     to bottom,
     transparent,

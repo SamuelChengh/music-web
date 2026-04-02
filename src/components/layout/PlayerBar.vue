@@ -297,55 +297,58 @@ onUnmounted(() => {
     </div>
   </div>
   
-  <!-- 移动端播放器 - 悬浮胶囊设计 -->
+  <!-- 移动端播放器 - 悬浮胶囊设计（合并版） -->
   <div class="lg:hidden fixed bottom-4 left-4 right-4 z-50">
     <div 
-      class="player-capsule relative"
+      class="player-capsule-extended"
       :class="{ 'playing': playerStore.isPlaying }"
     >
-      <!-- 封面 - 圆形 -->
-      <div 
-        class="relative cursor-pointer"
-        @click="playerStore.showLyric = !playerStore.showLyric"
-      >
-        <img
-          v-if="playerStore.currentSong"
-          :src="playerStore.currentSong.pic"
-          class="cover-circle"
-        />
-        <div v-else class="cover-circle bg-tertiary" />
-      </div>
-      
-      <!-- 歌曲信息 -->
-      <div class="flex-1 min-w-0">
-        <div v-if="playerStore.currentSong">
-          <div class="text-base font-semibold text-main truncate">{{ playerStore.currentSong.name }}</div>
-          <div class="text-sm text-secondary truncate mt-1">{{ playerStore.currentSong.artist }}</div>
+      <!-- 上层：封面 + 歌曲信息 + 主控制 -->
+      <div class="player-top">
+        <!-- 封面 - 圆形 -->
+        <div 
+          class="relative cursor-pointer"
+          @click="playerStore.showLyric = !playerStore.showLyric"
+        >
+          <img
+            v-if="playerStore.currentSong"
+            :src="playerStore.currentSong.pic"
+            class="cover-circle"
+          />
+          <div v-else class="cover-circle bg-tertiary" />
         </div>
-        <div v-else class="text-sm text-secondary">暂无播放</div>
-      </div>
-      
-      <!-- 控制按钮 -->
-      <div class="flex items-center gap-3">
-        <!-- 上一曲 -->
-        <button class="control-btn" @click="playerStore.prev()">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
-          </svg>
-        </button>
         
-        <!-- 播放/暂停 -->
-        <button class="play-btn-main" @click="playerStore.toggle()">
-          <Pause v-if="playerStore.isPlaying" theme="filled" size="20" />
-          <Play v-else theme="filled" size="20" />
-        </button>
+        <!-- 歌曲信息 -->
+        <div class="flex-1 min-w-0">
+          <div v-if="playerStore.currentSong">
+            <div class="text-base font-semibold text-main truncate">{{ playerStore.currentSong.name }}</div>
+            <div class="text-sm text-secondary truncate mt-1">{{ playerStore.currentSong.artist }}</div>
+          </div>
+          <div v-else class="text-sm text-secondary">暂无播放</div>
+        </div>
         
-        <!-- 下一曲 -->
-        <button class="control-btn" @click="playerStore.next()">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
-          </svg>
-        </button>
+        <!-- 主控制按钮 -->
+        <div class="flex items-center gap-3">
+          <!-- 上一曲 -->
+          <button class="control-btn" @click="playerStore.prev()">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+            </svg>
+          </button>
+          
+          <!-- 播放/暂停 -->
+          <button class="play-btn-main" @click="playerStore.toggle()">
+            <Pause v-if="playerStore.isPlaying" theme="filled" size="20" />
+            <Play v-else theme="filled" size="20" />
+          </button>
+          
+          <!-- 下一曲 -->
+          <button class="control-btn" @click="playerStore.next()">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+            </svg>
+          </button>
+        </div>
       </div>
       
       <!-- 进度条 - 极细 -->
@@ -353,70 +356,61 @@ onUnmounted(() => {
         class="progress-line"
         :style="{ '--progress': (playerStore.currentTime / playerStore.duration * 100) + '%' }"
       ></div>
-    </div>
-    
-    <!-- 功能栏 -->
-    <div class="player-function-bar">
-      <!-- 播放模式 -->
-      <button 
-        class="function-btn"
-        @click="playerStore.togglePlayMode()"
-        :title="currentPlayMode.title"
-      >
-        <!-- 顺序播放 -->
-        <svg v-if="playerStore.playMode === 'order'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="5" y1="7" x2="15" y2="7"/>
-          <polyline points="15 4 18 7 15 10"/>
-          <line x1="5" y1="17" x2="15" y2="17"/>
-          <polyline points="15 14 18 17 15 20"/>
-        </svg>
-        <!-- 列表循环 -->
-        <svg v-else-if="playerStore.playMode === 'loop'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="17 1 21 5 17 9"/>
-          <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
-          <polyline points="7 23 3 19 7 15"/>
-          <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
-        </svg>
-        <!-- 单曲循环 -->
-        <svg v-else-if="playerStore.playMode === 'single'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="17 1 21 5 17 9"/>
-          <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
-          <polyline points="7 23 3 19 7 15"/>
-          <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
-          <text x="12" y="14" font-size="6" font-weight="600" fill="currentColor" stroke="none" text-anchor="middle">1</text>
-        </svg>
-        <!-- 随机播放 -->
-        <ShuffleOne v-else-if="playerStore.playMode === 'shuffle'" theme="filled" size="20" />
-        <span class="text-xs">{{ currentPlayMode.label }}</span>
-      </button>
       
-      <!-- 音质选择 -->
-      <button 
-        class="function-btn"
-        @click="showQualityMenu = true"
-      >
-        <span :class="qualities.find(q => q.value === playerStore.quality)?.color" class="text-sm font-bold">
-          {{ qualities.find(q => q.value === playerStore.quality)?.icon }}
-        </span>
-      </button>
-      
-      <!-- 歌词 -->
-      <button 
-        class="function-btn"
-        @click="playerStore.showLyric = !playerStore.showLyric"
-        title="歌词"
-      >
-        <Text theme="outline" size="20" />
-      </button>
-      
-      <!-- 播放列表 -->
-      <button 
-        class="function-btn"
-        @click="playerStore.togglePlaylist"
-        title="播放列表"
-      >
-        <List theme="outline" size="20" />
-      </button>
+      <!-- 下层：功能按钮 -->
+      <div class="player-bottom">
+        <!-- 播放模式 -->
+        <button 
+          class="function-btn"
+          @click="playerStore.togglePlayMode()"
+          :title="currentPlayMode.title"
+        >
+          <!-- 顺序播放 -->
+          <svg v-if="playerStore.playMode === 'order'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="7" x2="15" y2="7"/>
+            <polyline points="15 4 18 7 15 10"/>
+            <line x1="5" y1="17" x2="15" y2="17"/>
+            <polyline points="15 14 18 17 15 20"/>
+          </svg>
+          <!-- 列表循环 -->
+          <svg v-else-if="playerStore.playMode === 'loop'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="17 1 21 5 17 9"/>
+            <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+            <polyline points="7 23 3 19 7 15"/>
+            <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+          </svg>
+          <!-- 单曲循环 -->
+          <svg v-else-if="playerStore.playMode === 'single'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="17 1 21 5 17 9"/>
+            <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+            <polyline points="7 23 3 19 7 15"/>
+            <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+            <text x="12" y="14" font-size="6" font-weight="600" fill="currentColor" stroke="none" text-anchor="middle">1</text>
+          </svg>
+          <!-- 随机播放 -->
+          <ShuffleOne v-else-if="playerStore.playMode === 'shuffle'" theme="filled" size="20" />
+          <span class="text-xs">{{ currentPlayMode.label }}</span>
+        </button>
+        
+        <!-- 音质选择 -->
+        <button 
+          class="function-btn"
+          @click="showQualityMenu = true"
+        >
+          <span :class="qualities.find(q => q.value === playerStore.quality)?.color" class="text-sm font-bold">
+            {{ qualities.find(q => q.value === playerStore.quality)?.icon }}
+          </span>
+        </button>
+        
+        <!-- 播放列表 -->
+        <button 
+          class="function-btn"
+          @click="playerStore.togglePlaylist"
+          title="播放列表"
+        >
+          <List theme="outline" size="20" />
+        </button>
+      </div>
     </div>
     
     <!-- Safe Area -->
@@ -623,26 +617,53 @@ onUnmounted(() => {
   transition: width 0.1s ease;
 }
 
-/* 功能栏 */
-.player-function-bar {
-  margin-top: 12px;
-  height: 44px;
+/* 扩展胶囊 - 合并版 */
+.player-capsule-extended {
   background: rgba(var(--color-bg-view-rgb), 0.95);
   backdrop-filter: blur(30px) saturate(200%);
   -webkit-backdrop-filter: blur(30px) saturate(200%);
-  border-radius: 22px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 28px;
+  box-shadow: 
+    0 10px 40px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  padding: 0 16px;
+  padding: 12px 20px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+:global(.dark) .player-capsule-extended {
+  background: rgba(30, 30, 30, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 播放时浮动动画 */
+.player-capsule-extended.playing {
+  animation: float 2s ease-in-out infinite;
+}
+
+/* 上层 */
+.player-top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 48px;
+}
+
+/* 下层功能栏 */
+.player-bottom {
   display: flex;
   align-items: center;
   justify-content: space-around;
-  transition: all 0.3s ease;
+  height: 44px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-:global(.dark) .player-function-bar {
-  background: rgba(30, 30, 30, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+:global(.dark) .player-bottom {
+  border-top-color: rgba(255, 255, 255, 0.05);
 }
 
 /* 功能按钮 */

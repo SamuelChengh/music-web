@@ -314,6 +314,7 @@ onUnmounted(() => {
             v-if="playerStore.currentSong"
             :src="playerStore.currentSong.pic"
             class="cover-circle"
+            :class="{ 'rotating': playerStore.isPlaying }"
           />
           <div v-else class="cover-circle bg-tertiary" />
         </div>
@@ -564,8 +565,17 @@ onUnmounted(() => {
   transition: transform 0.3s ease;
 }
 
+.cover-circle.rotating {
+  animation: rotate-cover 12s linear infinite;
+}
+
 .cover-circle:hover {
-  transform: scale(1.1) rotate(10deg);
+  transform: scale(1.1);
+}
+
+@keyframes rotate-cover {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* 控制按钮 */

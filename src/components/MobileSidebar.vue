@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { Home, ChartHistogram, People, Like, Videocamera, Broadcast, Music } from '@icon-park/vue-next';
 
@@ -42,32 +41,6 @@ const handleNavigate = (path: string) => {
   router.push(path);
   emit('close');
 };
-
-const touchStartX = ref(0);
-const touchDeltaX = ref(0);
-const isDragging = ref(false);
-
-const handleTouchStart = (e: TouchEvent) => {
-  touchStartX.value = e.touches[0].clientX;
-  isDragging.value = true;
-};
-
-const handleTouchMove = (e: TouchEvent) => {
-  if (!isDragging.value) return;
-  touchDeltaX.value = e.touches[0].clientX - touchStartX.value;
-};
-
-const handleTouchEnd = () => {
-  if (touchDeltaX.value > 60) {
-    emit('close');
-  }
-  touchDeltaX.value = 0;
-  isDragging.value = false;
-};
-
-const drawerStyle = computed(() => ({
-  transform: `translateX(${Math.max(0, -touchDeltaX.value * 0.3)}px)`
-}));
 </script>
 
 <template>
@@ -81,13 +54,7 @@ const drawerStyle = computed(() => ({
       </Transition>
       
       <Transition name="slide-right">
-        <div 
-          class="sidebar-drawer"
-          :style="drawerStyle"
-          @touchstart="handleTouchStart"
-          @touchmove="handleTouchMove"
-          @touchend="handleTouchEnd"
-        >
+        <div class="sidebar-drawer">
           <div class="drawer-header">
             <div class="logo-container">
               <div class="logo-icon">
@@ -167,8 +134,8 @@ const drawerStyle = computed(() => ({
 
 .sidebar-drawer {
   position: relative;
-  height: calc(100% - 100px);
-  width: 280px;
+  height: 100%;
+  width: 220px;
   max-width: 75%;
   background: rgba(var(--color-bg-view-rgb), 0.88);
   backdrop-filter: blur(40px);

@@ -15,7 +15,7 @@ interface Song {
 
 const playerStore = usePlayerStore();
 const rankTags = ref<{ name: string; pic: string }[]>([]);
-const currentRank = ref('热歌榜');
+const currentRank = ref('新歌榜');
 const rankList = ref<Song[]>([]);
 const loading = ref(false);
 

@@ -328,23 +328,23 @@ onUnmounted(() => {
         </div>
         
         <!-- 主控制按钮 -->
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2">
           <!-- 上一曲 -->
           <button class="control-btn" @click="playerStore.prev()">
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
               <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
             </svg>
           </button>
           
 <!-- 播放/暂停 -->
            <button class="control-btn play-btn" @click="playerStore.toggle()">
-             <Pause v-if="playerStore.isPlaying" theme="filled" size="22" />
-             <Play v-else theme="filled" size="22" />
+             <Pause v-if="playerStore.isPlaying" theme="filled" size="18" />
+             <Play v-else theme="filled" size="18" />
            </button>
           
           <!-- 下一曲 -->
           <button class="control-btn" @click="playerStore.next()">
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
               <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
             </svg>
           </button>
@@ -367,21 +367,21 @@ onUnmounted(() => {
           :title="currentPlayMode.title"
         >
           <!-- 顺序播放 -->
-          <svg v-if="playerStore.playMode === 'order'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg v-if="playerStore.playMode === 'order'" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="5" y1="7" x2="15" y2="7"/>
             <polyline points="15 4 18 7 15 10"/>
             <line x1="5" y1="17" x2="15" y2="17"/>
             <polyline points="15 14 18 17 15 20"/>
           </svg>
           <!-- 列表循环 -->
-          <svg v-else-if="playerStore.playMode === 'loop'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg v-else-if="playerStore.playMode === 'loop'" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="17 1 21 5 17 9"/>
             <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
             <polyline points="7 23 3 19 7 15"/>
             <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
           </svg>
           <!-- 单曲循环 -->
-          <svg v-else-if="playerStore.playMode === 'single'" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg v-else-if="playerStore.playMode === 'single'" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="17 1 21 5 17 9"/>
             <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
             <polyline points="7 23 3 19 7 15"/>
@@ -389,16 +389,16 @@ onUnmounted(() => {
             <text x="12" y="14" font-size="6" font-weight="600" fill="currentColor" stroke="none" text-anchor="middle">1</text>
           </svg>
           <!-- 随机播放 -->
-          <ShuffleOne v-else-if="playerStore.playMode === 'shuffle'" theme="filled" size="20" />
+          <ShuffleOne v-else-if="playerStore.playMode === 'shuffle'" theme="filled" size="16" />
           <span class="text-xs">{{ currentPlayMode.label }}</span>
         </button>
         
         <!-- 音质选择 -->
         <button 
           class="function-btn"
-          @click="showQualityMenu = true"
+          @click.stop="showQualityMenu = true"
         >
-          <span :class="qualities.find(q => q.value === playerStore.quality)?.color" class="text-sm font-bold">
+          <span :class="qualities.find(q => q.value === playerStore.quality)?.color" class="text-xs font-bold">
             {{ qualities.find(q => q.value === playerStore.quality)?.icon }}
           </span>
         </button>
@@ -409,7 +409,7 @@ onUnmounted(() => {
           @click="playerStore.togglePlaylist"
           title="播放列表"
         >
-          <List theme="outline" size="20" />
+          <List theme="outline" size="16" />
         </button>
       </div>
     </div>
@@ -422,7 +422,8 @@ onUnmounted(() => {
     <Transition name="slide-up">
       <div 
         v-if="showQualityMenu"
-        class="fixed inset-0 z-[100] lg:hidden"
+        class="fixed inset-0 lg:hidden"
+        style="z-index: 100"
       >
         <div 
           class="absolute inset-0 bg-black/50"
@@ -480,12 +481,17 @@ onUnmounted(() => {
 
 .slide-up-enter-active,
 .slide-up-leave-active {
-  transition: all 0.3s ease;
+  transition: opacity 0.3s ease;
 }
 
 .slide-up-enter-from,
 .slide-up-leave-to {
   opacity: 0;
+}
+
+.slide-up-enter-active .quality-panel,
+.slide-up-leave-active .quality-panel {
+  transition: transform 0.3s ease;
 }
 
 .slide-up-enter-from .quality-panel,
@@ -550,8 +556,8 @@ onUnmounted(() => {
 
 /* 封面 - 圆形 */
 .cover-circle {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   object-fit: cover;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
@@ -564,8 +570,8 @@ onUnmounted(() => {
 
 /* 控制按钮 */
 .control-btn {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -586,8 +592,8 @@ onUnmounted(() => {
 /* 播放按钮 - 主题色突出 */
 .play-btn {
   color: var(--color-primary);
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
 }
 
 .play-btn:hover {
@@ -601,13 +607,13 @@ onUnmounted(() => {
   background: rgba(var(--color-bg-view-rgb), 0.98);
   backdrop-filter: blur(30px) saturate(200%);
   -webkit-backdrop-filter: blur(30px) saturate(200%);
-  border-radius: 28px;
+  border-radius: 24px;
   box-shadow: 
     0 12px 50px rgba(0, 0, 0, 0.18),
     0 4px 12px rgba(0, 0, 0, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
   border: 1px solid rgba(0, 0, 0, 0.08);
-  padding: 12px 20px 16px;
+  padding: 8px 14px 12px;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
@@ -630,8 +636,8 @@ onUnmounted(() => {
 .player-top {
   display: flex;
   align-items: center;
-  gap: 16px;
-  height: 48px;
+  gap: 12px;
+  height: 40px;
 }
 
 /* 下层功能栏 */
@@ -639,25 +645,19 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-around;
-  height: 44px;
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-:global(.dark) .player-bottom {
-  border-top-color: rgba(255, 255, 255, 0.05);
+  height: 32px;
+  margin-top: 4px;
 }
 
 /* 功能按钮 */
 .function-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  border-radius: 16px;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 14px;
   color: var(--color-primary);
-  font-size: 13px;
+  font-size: 12px;
   transition: all 0.3s ease;
 }
 
@@ -674,15 +674,15 @@ onUnmounted(() => {
 .progress-section {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 0 4px;
+  gap: 10px;
+  padding: 4px 0 2px;
 }
 
 .time-display {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--color-text-secondary);
   font-weight: 500;
-  min-width: 32px;
+  min-width: 28px;
 }
 
 .progress-slider {

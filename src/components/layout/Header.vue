@@ -197,7 +197,7 @@ getHotSearch().then(res => {
                 class="w-6 h-6 rounded-full border-2 transition-transform hover:scale-110"
                 :style="{ backgroundColor: c.hex }"
                 :class="themeStore.color === c.value ? 'border-main scale-110' : 'border-transparent'"
-                @click="themeStore.setColor(c.value as any)"
+                @click="themeStore.setColor(c.value as any); closeThemeMenu()"
               />
             </div>
           </div>

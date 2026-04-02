@@ -112,7 +112,7 @@ onMounted(() => {
                     class="theme-color-btn"
                     :style="{ backgroundColor: c.hex }"
                     :class="themeStore.color === c.value ? 'active' : ''"
-                    @click="themeStore.setColor(c.value as any)"
+                    @click="themeStore.setColor(c.value as any); showMobileThemeMenu = false"
                   />
                 </div>
               </div>

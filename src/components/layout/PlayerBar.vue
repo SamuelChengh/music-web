@@ -60,6 +60,18 @@ const handleTimeUpdate = () => {
   }
 };
 
+const handleDurationChange = () => {
+  if (audioRef.value && audioRef.value.duration) {
+    playerStore.setDuration(audioRef.value.duration);
+  }
+};
+
+const handleCanPlay = () => {
+  if (audioRef.value && audioRef.value.duration) {
+    playerStore.setDuration(audioRef.value.duration);
+  }
+};
+
 const handleEnded = () => {
   if (playerStore.playMode === 'single') {
     if (audioRef.value) {
@@ -77,10 +89,19 @@ watch(() => playerStore.currentSong, async (song) => {
       audioRef.value.pause();
       audioRef.value.currentTime = 0;
     }
+    
+    playerStore.setDuration(0);
+    
     const { url } = await getSongUrl(song.rid, playerStore.quality);
     if (audioRef.value) {
       audioRef.value.src = url;
       audioRef.value.play();
+      
+      setTimeout(() => {
+        if (audioRef.value && audioRef.value.duration) {
+          playerStore.setDuration(audioRef.value.duration);
+        }
+      }, 100);
     }
     
     const lyricData = await getLyric(song.rid, 'lineLyric');
@@ -100,6 +121,8 @@ watch(() => playerStore.isPlaying, (playing) => {
 
 watch(() => playerStore.quality, async () => {
   if (playerStore.currentSong) {
+    playerStore.setDuration(0);
+    
     const { url } = await getSongUrl(playerStore.currentSong.rid, playerStore.quality);
     if (audioRef.value) {
       const currentTime = audioRef.value.currentTime;
@@ -108,6 +131,12 @@ watch(() => playerStore.quality, async () => {
       if (playerStore.isPlaying) {
         audioRef.value.play();
       }
+      
+      setTimeout(() => {
+        if (audioRef.value && audioRef.value.duration) {
+          playerStore.setDuration(audioRef.value.duration);
+        }
+      }, 100);
     }
   }
 });
@@ -138,6 +167,8 @@ onUnmounted(() => {
     @timeupdate="handleTimeUpdate"
     @ended="handleEnded"
     @loadedmetadata="() => audioRef && playerStore.setDuration(audioRef.duration)"
+    @durationchange="handleDurationChange"
+    @canplay="handleCanPlay"
   />
   
   <div class="hidden lg:flex h-24 bg-main border-t border-default items-center px-md relative lg:h-player">

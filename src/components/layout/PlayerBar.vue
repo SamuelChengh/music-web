@@ -3,7 +3,7 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { usePlayerStore, useQueueStore } from '../../stores';
 import { getSongUrl, getLyric } from '../../api';
 import { 
-  Play, Pause, List, Text, Download, Close, ShuffleOne
+  Play, Pause, List, Text, Download, Close, ShuffleOne, Music
 } from '@icon-park/vue-next';
 import { ElTooltip } from 'element-plus';
 import PlayerSlider from './PlayerSlider.vue';
@@ -16,6 +16,12 @@ const queueStore = useQueueStore();
 const audioRef = ref<HTMLAudioElement | null>(null);
 const showQualityMenu = ref(false);
 const qualityMenuRef = ref<HTMLElement | null>(null);
+
+// 音质选择框下拉手势状态
+const touchStartY = ref(0);
+const touchDeltaY = ref(0);
+const isDragging = ref(false);
+const isClosing = ref(false);
 
 // 锁定 body 滚动，防止滚动穿透
 const bodyRef = ref(document.body);
@@ -65,6 +71,46 @@ const selectQuality = (q: typeof qualities[0]) => {
   playerStore.setQuality(q.value);
   showQualityMenu.value = false;
 };
+
+const qualityDrawerTransform = computed(() => {
+  if (isClosing.value) return 'translateY(100%)';
+  if (isDragging.value && touchDeltaY.value > 0) {
+    return `translateY(${touchDeltaY.value}px)`;
+  }
+  return 'translateY(0)';
+});
+
+const handleQualityTouchStart = (e: TouchEvent) => {
+  touchStartY.value = e.touches[0].clientY;
+  isDragging.value = true;
+  isClosing.value = false;
+};
+
+const handleQualityTouchMove = (e: TouchEvent) => {
+  if (!isDragging.value) return;
+  const currentY = e.touches[0].clientY;
+  touchDeltaY.value = Math.max(0, currentY - touchStartY.value);
+};
+
+const handleQualityTouchEnd = () => {
+  if (touchDeltaY.value > 100) {
+    isClosing.value = true;
+    setTimeout(() => {
+      showQualityMenu.value = false;
+      isClosing.value = false;
+    }, 350);
+  }
+  touchDeltaY.value = 0;
+  isDragging.value = false;
+};
+
+watch(() => showQualityMenu.value, (show) => {
+  if (show) {
+    touchDeltaY.value = 0;
+    isDragging.value = false;
+    isClosing.value = false;
+  }
+});
 
 const formatTime = (seconds: number) => {
   if (!seconds || isNaN(seconds)) return '0:00';
@@ -512,49 +558,66 @@ watch(showQualityMenu, (show) => {
   </div>
   
   <Teleport to="body">
-    <Transition name="slide-up">
+    <Transition name="fade">
       <div 
         v-if="showQualityMenu"
-        class="fixed inset-0 lg:hidden"
-        style="z-index: 100"
-      >
-        <div 
-          class="absolute inset-0 bg-black/50"
-          @click="showQualityMenu = false"
-        />
-        <div class="quality-panel absolute bottom-0 left-0 right-0 bg-view rounded-t-2xl safe-area-bottom">
-          <div class="flex items-center justify-between p-md border-b border-default">
-            <span class="text-base text-main font-medium">音质选择</span>
-            <button 
-              class="p-sm rounded-full hover:bg-tertiary text-secondary"
-              @click="showQualityMenu = false"
-            >
-              <Close theme="outline" size="20" />
-            </button>
+        class="quality-overlay"
+        @click="showQualityMenu = false"
+        @touchmove.prevent
+      />
+    </Transition>
+    
+<div 
+  v-if="showQualityMenu"
+  ref="qualityMenuRef"
+  class="quality-drawer"
+  :class="{ 'is-dragging': isDragging, 'is-closing': isClosing }"
+  :style="{ transform: qualityDrawerTransform }"
+>
+  <div 
+    class="drawer-handle"
+    @touchstart="handleQualityTouchStart"
+    @touchmove="handleQualityTouchMove"
+    @touchend="handleQualityTouchEnd"
+  >
+    <div class="handle-bar"></div>
+  </div>
+  
+  <div 
+    class="drawer-header"
+    @touchstart="handleQualityTouchStart"
+    @touchmove="handleQualityTouchMove"
+    @touchend="handleQualityTouchEnd"
+  >
+    <div class="header-title">
+      <Music theme="filled" size="18" class="text-primary" />
+      <span class="text-sm text-main font-medium">音质选择</span>
+    </div>
+  </div>
+  
+  <div class="drawer-content">
+        <div
+          v-for="q in qualities"
+          :key="q.value"
+          class="quality-item"
+          :class="playerStore.quality === q.value ? 'is-active' : ''"
+          @click="selectQuality(q)"
+        >
+          <span :class="q.color" class="quality-icon">{{ q.icon }}</span>
+          <div class="quality-info">
+            <div class="quality-name">{{ q.label }}</div>
+            <div class="quality-bitrate">{{ q.bitrate }}</div>
           </div>
-          <div class="p-md">
-            <div
-              v-for="q in qualities"
-              :key="q.value"
-              class="flex items-center gap-md p-md rounded-xl cursor-pointer transition-colors mb-sm"
-              :class="playerStore.quality === q.value ? 'bg-active' : 'hover:bg-tertiary'"
-              @click="selectQuality(q)"
-            >
-              <span :class="q.color" class="text-sm font-bold w-12">{{ q.icon }}</span>
-              <div class="flex-1">
-                <div class="text-main font-medium">{{ q.label }}</div>
-                <div class="text-xs text-secondary">{{ q.bitrate }}</div>
-              </div>
-              <span v-if="playerStore.quality === q.value" class="text-primary">
-                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
-                </svg>
-              </span>
-            </div>
-          </div>
+          <span v-if="playerStore.quality === q.value" class="check-icon">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+            </svg>
+          </span>
         </div>
       </div>
-    </Transition>
+      
+      <div class="safe-area-bottom"></div>
+    </div>
   </Teleport>
   
   <LyricPanel v-if="playerStore.showLyric" />
@@ -600,12 +663,138 @@ watch(showQualityMenu, (show) => {
   padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
-/* 音质弹窗增强样式 */
-.quality-panel {
-  background: var(--color-bg-view);
-  box-shadow: 
-    0 -8px 40px rgba(0, 0, 0, 0.2),
-    0 -2px 8px rgba(0, 0, 0, 0.1);
+.quality-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 90;
+}
+
+.quality-drawer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 60vh;
+  background: rgba(var(--color-bg-view-rgb), 0.92);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-radius: 24px 24px 0 0;
+  border-top: 1px solid rgba(var(--color-primary-rgb), 0.25);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15), 
+              0 0 30px rgba(var(--color-primary-rgb), 0.1);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  overflow: hidden;
+  transform: translateY(0);
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1), 
+              box-shadow 0.2s ease;
+  animation: slide-in 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateY(100%);
+    opacity: 0.8;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.quality-drawer.is-dragging {
+  transition: none;
+  box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.25), 
+              0 0 40px rgba(var(--color-primary-rgb), 0.15);
+}
+
+.quality-drawer.is-closing {
+  transform: translateY(100%);
+}
+
+.quality-drawer .drawer-handle {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0 8px;
+}
+
+.quality-drawer .handle-bar {
+  width: 44px;
+  height: 5px;
+  background: rgba(var(--color-primary-rgb), 0.35);
+  border-radius: 3px;
+}
+
+.quality-drawer .drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(var(--color-border), 0.5);
+}
+
+.quality-drawer .header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quality-drawer .drawer-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.quality-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  margin: 4px 12px;
+  border-radius: 12px;
+  background: rgba(var(--color-bg-view-rgb), 0.5);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.quality-item:hover {
+  background: rgba(var(--color-bg-tertiary), 0.5);
+}
+
+.quality-item.is-active {
+  background: rgba(var(--color-primary-rgb), 0.1);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.3);
+}
+
+.quality-icon {
+  font-size: 14px;
+  font-weight: 700;
+  min-width: 48px;
+  text-align: center;
+}
+
+.quality-info {
+  flex: 1;
+}
+
+.quality-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-main);
+  margin-bottom: 2px;
+}
+
+.quality-bitrate {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.check-icon {
+  color: var(--color-primary);
 }
 
 :global(.dark) .quality-panel {

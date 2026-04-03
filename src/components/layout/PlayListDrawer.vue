@@ -36,6 +36,90 @@ const upgradeToPriority = (index: number) => {
   queueStore.upgradePriority(index);
 };
 
+const pendingDeleteIndex = ref<number | null>(null);
+const deleteTimer = ref<NodeJS.Timeout | null>(null);
+
+const pendingUpgradeIndex = ref<number | null>(null);
+const upgradeTimer = ref<NodeJS.Timeout | null>(null);
+
+const pendingDowngradeIndex = ref<number | null>(null);
+const downgradeTimer = ref<NodeJS.Timeout | null>(null);
+
+const handleDeleteClick = (index: number) => {
+  if (pendingDeleteIndex.value === index) {
+    removeSong(index);
+    clearDeletePending();
+  } else {
+    pendingDeleteIndex.value = index;
+    
+    if (deleteTimer.value) {
+      clearTimeout(deleteTimer.value);
+    }
+    
+    deleteTimer.value = setTimeout(() => {
+      clearDeletePending();
+    }, 3000);
+  }
+};
+
+const clearDeletePending = () => {
+  pendingDeleteIndex.value = null;
+  if (deleteTimer.value) {
+    clearTimeout(deleteTimer.value);
+    deleteTimer.value = null;
+  }
+};
+
+const handleUpgradeClick = (index: number) => {
+  if (pendingUpgradeIndex.value === index) {
+    queueStore.upgradePriority(index);
+    clearUpgradePending();
+  } else {
+    pendingUpgradeIndex.value = index;
+    
+    if (upgradeTimer.value) {
+      clearTimeout(upgradeTimer.value);
+    }
+    
+    upgradeTimer.value = setTimeout(() => {
+      clearUpgradePending();
+    }, 3000);
+  }
+};
+
+const clearUpgradePending = () => {
+  pendingUpgradeIndex.value = null;
+  if (upgradeTimer.value) {
+    clearTimeout(upgradeTimer.value);
+    upgradeTimer.value = null;
+  }
+};
+
+const handleDowngradeClick = (index: number) => {
+  if (pendingDowngradeIndex.value === index) {
+    queueStore.downgradePriority(index);
+    clearDowngradePending();
+  } else {
+    pendingDowngradeIndex.value = index;
+    
+    if (downgradeTimer.value) {
+      clearTimeout(downgradeTimer.value);
+    }
+    
+    downgradeTimer.value = setTimeout(() => {
+      clearDowngradePending();
+    }, 3000);
+  }
+};
+
+const clearDowngradePending = () => {
+  pendingDowngradeIndex.value = null;
+  if (downgradeTimer.value) {
+    clearTimeout(downgradeTimer.value);
+    downgradeTimer.value = null;
+  }
+};
+
 const clearAll = () => {
   playerStore.clearPlaylist();
 };
@@ -200,19 +284,21 @@ const { isMobile } = useIsMobile();
               <el-tooltip content="降级为普通队列" placement="top">
                 <button 
                   class="downgrade-btn"
-                  @click.stop="downgradeSong(song.originalIndex)"
+                  :class="{ 'pending-action': pendingDowngradeIndex === song.originalIndex }"
+                  @click.stop="handleDowngradeClick(song.originalIndex)"
                 >
                   <Down theme="outline" size="16" />
+                  <span v-if="pendingDowngradeIndex === song.originalIndex" class="action-text">降级</span>
                 </button>
               </el-tooltip>
-              <el-tooltip content="移除" placement="top">
-                <button 
-                  class="remove-btn"
-                  @click.stop="removeSong(song.originalIndex)"
-                >
-                  <Delete theme="outline" size="16" />
-                </button>
-              </el-tooltip>
+              <button
+                class="remove-btn"
+                :class="{ 'pending-delete': pendingDeleteIndex === song.originalIndex }"
+                @click.stop="handleDeleteClick(song.originalIndex)"
+              >
+                <Delete theme="outline" size="16" />
+                <span v-if="pendingDeleteIndex === song.originalIndex" class="delete-text">删除</span>
+              </button>
             </div>
           </div>
 
@@ -247,19 +333,21 @@ const { isMobile } = useIsMobile();
               <el-tooltip content="升级为下一首播放" placement="top">
                 <button
                   class="upgrade-btn"
-                  @click.stop="upgradeToPriority(song.originalIndex)"
+                  :class="{ 'pending-action': pendingUpgradeIndex === song.originalIndex }"
+                  @click.stop="handleUpgradeClick(song.originalIndex)"
                 >
                   <Up theme="outline" size="16" />
+                  <span v-if="pendingUpgradeIndex === song.originalIndex" class="action-text">升级</span>
                 </button>
               </el-tooltip>
-              <el-tooltip content="移除" placement="top">
-                <button
-                  class="remove-btn"
-                  @click.stop="removeSong(song.originalIndex)"
-                >
-                  <Delete theme="outline" size="16" />
-                </button>
-              </el-tooltip>
+              <button
+                class="remove-btn"
+                :class="{ 'pending-delete': pendingDeleteIndex === song.originalIndex }"
+                @click.stop="handleDeleteClick(song.originalIndex)"
+              >
+                <Delete theme="outline" size="16" />
+                <span v-if="pendingDeleteIndex === song.originalIndex" class="delete-text">删除</span>
+              </button>
             </div>
           </div>
         </template>
@@ -550,40 +638,49 @@ const { isMobile } = useIsMobile();
 
 .upgrade-btn,
 .downgrade-btn {
-  width: 28px;
+  min-width: 28px;
   height: 28px;
+  padding: 0 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 4px;
   border-radius: 8px;
   color: var(--color-primary);
   transition: all 0.2s ease;
 }
 
-.upgrade-btn:hover,
-.downgrade-btn:hover {
-  background: rgba(var(--color-primary-rgb), 0.1);
+.upgrade-btn.pending-action,
+.downgrade-btn.pending-action {
+  background: rgba(var(--color-primary-rgb), 0.15);
+}
+
+.action-text {
+  font-size: 11px;
+  font-weight: 500;
 }
 
 .remove-btn {
-  width: 28px;
+  min-width: 28px;
   height: 28px;
+  padding: 0 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 4px;
   border-radius: 8px;
   color: var(--color-text-secondary);
-  opacity: 0;
   transition: all 0.2s ease;
 }
 
-.song-item:hover .remove-btn {
-  opacity: 1;
-}
-
-.remove-btn:hover {
+.remove-btn.pending-delete {
   color: #ff4757;
   background: rgba(255, 71, 87, 0.1);
+}
+
+.delete-text {
+  font-size: 11px;
+  font-weight: 500;
 }
 
 .drawer-overlay {

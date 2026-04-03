@@ -2,7 +2,7 @@
 import { ref, watch, nextTick } from 'vue';
 import { usePlayerStore } from '../stores';
 import { getLyric } from '../api';
-import { Close, Play, Pause } from '@icon-park/vue-next';
+import { Close } from '@icon-park/vue-next';
 import { ElTooltip } from 'element-plus';
 import PlayerSlider from './layout/PlayerSlider.vue';
 import LikeButton from './LikeButton.vue';
@@ -175,8 +175,12 @@ watch(() => playerStore.showLyric, async (show) => {
             </button>
             
             <button class="play-btn-mini" @click="playerStore.toggle()">
-              <Pause v-if="playerStore.isPlaying" theme="filled" size="24" />
-              <Play v-else theme="filled" size="24" />
+              <svg v-if="playerStore.isPlaying" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6 4h4v16H6zm8 0h4v16h-4z"/>
+              </svg>
+              <svg v-else class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
             </button>
             
             <button class="mini-btn" @click="playerStore.next()">
@@ -471,7 +475,7 @@ watch(() => playerStore.showLyric, async (show) => {
 }
 
 
-/* 关闭按钮 - 毛玻璃样式 */
+/* 关闭按钮 - 主题色毛玻璃样式 */
 .close-btn-lyric {
   position: absolute;
   top: 20px;
@@ -482,17 +486,21 @@ watch(() => playerStore.showLyric, async (show) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-main);
   
-  /* 毛玻璃效果 - 增强 */
-  background: rgba(var(--color-bg-view-rgb), 0.5);
+  /* 常态就使用主题色 */
+  color: var(--color-primary);
+  
+  /* 背景改为主题色半透明 */
+  background: rgba(var(--color-primary-rgb), 0.15);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   
-  /* 边框和阴影 - 增加层次感 */
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  /* 边框改为主题色半透明 */
+  border: 1px solid rgba(var(--color-primary-rgb), 0.25);
+  
+  /* 阴影增强主题色效果 */
   box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.15),
+    0 4px 12px rgba(var(--color-primary-rgb), 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
   
   transition: all 0.3s ease;
@@ -500,8 +508,9 @@ watch(() => playerStore.showLyric, async (show) => {
 }
 
 .close-btn-lyric:hover {
-  color: var(--color-primary);
-  background: rgba(var(--color-primary-rgb), 0.3);
+  /* hover时颜色保持主题色，背景加深 */
+  background: rgba(var(--color-primary-rgb), 0.25);
+  border-color: rgba(var(--color-primary-rgb), 0.4);
   transform: scale(1.1);
   box-shadow: 
     0 6px 20px rgba(var(--color-primary-rgb), 0.25),
@@ -510,16 +519,21 @@ watch(() => playerStore.showLyric, async (show) => {
 }
 
 :global(.dark) .close-btn-lyric {
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  /* 深色模式下背景和边框更明显 */
+  background: rgba(var(--color-primary-rgb), 0.2);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.3);
   box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.3),
+    0 4px 12px rgba(var(--color-primary-rgb), 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 :global(.dark) .close-btn-lyric:hover {
-  background: rgba(var(--color-primary-rgb), 0.25);
-  border-color: rgba(var(--color-primary-rgb), 0.3);
+  background: rgba(var(--color-primary-rgb), 0.3);
+  border-color: rgba(var(--color-primary-rgb), 0.5);
+  box-shadow: 
+    0 6px 20px rgba(var(--color-primary-rgb), 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 /* 进度条区域 */

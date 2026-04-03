@@ -157,8 +157,15 @@ watch(() => playerStore.showLyric, async (show) => {
           </div>
         </div>
         
-        <!-- 底部迷你播放器 - 控制按钮 + 进度条 -->
+        <!-- 底部迷你播放器 - 进度条 + 控制按钮（无背景） -->
         <div class="mini-player">
+          <!-- 进度条 -->
+          <div class="mini-progress">
+            <span class="mini-time">{{ formatTime(playerStore.currentTime) }}</span>
+            <PlayerSlider class="mini-slider" />
+            <span class="mini-time">{{ formatTime(playerStore.duration) }}</span>
+          </div>
+          
           <!-- 控制按钮 -->
           <div class="mini-controls">
             <button class="mini-btn" @click="playerStore.prev()">
@@ -177,13 +184,6 @@ watch(() => playerStore.showLyric, async (show) => {
                 <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
               </svg>
             </button>
-          </div>
-          
-          <!-- 进度条 -->
-          <div class="mini-progress">
-            <span class="mini-time">{{ formatTime(playerStore.currentTime) }}</span>
-            <PlayerSlider class="mini-slider" />
-            <span class="mini-time">{{ formatTime(playerStore.duration) }}</span>
           </div>
         </div>
       </div>
@@ -384,23 +384,23 @@ watch(() => playerStore.showLyric, async (show) => {
   color: rgba(255, 255, 255, 0.5);
 }
 
-/* 底部迷你播放器 - 固定底部 */
+/* 底部迷你播放器 - 固定底部（无背景） */
 .mini-player {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 100px;
-  padding: 16px 24px;
-  padding-bottom: calc(28px + env(safe-area-inset-bottom, 0));
+  height: auto;
+  padding: 16px 24px 20px;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom, 0));
   z-index: 5;
-  background: rgba(var(--color-bg-view-rgb), 0.3);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  
+  /* 移除背景颜色和毛玻璃效果 */
+  background: transparent;
 }
 
 :global(.dark) .mini-player {
-  background: rgba(0, 0, 0, 0.2);
+  background: transparent;
 }
 
 .mini-controls {
@@ -471,37 +471,55 @@ watch(() => playerStore.showLyric, async (show) => {
 }
 
 
-/* 关闭按钮 - 透明圆形 */
+/* 关闭按钮 - 毛玻璃样式 */
 .close-btn-lyric {
   position: absolute;
   top: 20px;
   right: 16px;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--color-text-main);
-  background: rgba(var(--color-bg-view-rgb), 0.3);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  
+  /* 毛玻璃效果 - 增强 */
+  background: rgba(var(--color-bg-view-rgb), 0.5);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  
+  /* 边框和阴影 - 增加层次感 */
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  
   transition: all 0.3s ease;
   z-index: 10;
 }
 
 .close-btn-lyric:hover {
   color: var(--color-primary);
-  background: rgba(var(--color-primary-rgb), 0.2);
+  background: rgba(var(--color-primary-rgb), 0.3);
   transform: scale(1.1);
+  box-shadow: 
+    0 6px 20px rgba(var(--color-primary-rgb), 0.25),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 :global(.dark) .close-btn-lyric {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 :global(.dark) .close-btn-lyric:hover {
-  background: rgba(var(--color-primary-rgb), 0.2);
+  background: rgba(var(--color-primary-rgb), 0.25);
+  border-color: rgba(var(--color-primary-rgb), 0.3);
 }
 
 /* 进度条区域 */
@@ -509,7 +527,7 @@ watch(() => playerStore.showLyric, async (show) => {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-top: 12px;
+  margin-bottom: 12px;
 }
 
 .mini-time {

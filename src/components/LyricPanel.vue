@@ -5,6 +5,7 @@ import { getLyric } from '../api';
 import { Close, Play, Pause } from '@icon-park/vue-next';
 import { ElTooltip } from 'element-plus';
 import PlayerSlider from './layout/PlayerSlider.vue';
+import LikeButton from './LikeButton.vue';
 
 const playerStore = usePlayerStore();
 const lyricRefs = ref<HTMLElement[]>([]);
@@ -57,7 +58,15 @@ watch(() => playerStore.showLyric, async (show) => {
         class="fixed right-0 top-0 bottom-24 left-0 bg-view border-l border-default flex flex-col z-40 lg:right-0 lg:left-auto lg:w-[400px]"
       >
         <div class="h-12 flex items-center justify-between px-md border-b border-default">
-          <span class="text-sm text-main font-medium">歌词</span>
+          <div class="flex items-center gap-sm">
+            <span class="text-sm text-main font-medium">歌词</span>
+            <LikeButton 
+              v-if="playerStore.currentSong"
+              :song="playerStore.currentSong"
+              size="medium"
+              show-tooltip
+            />
+          </div>
           <el-tooltip content="关闭" placement="top">
             <button 
               class="w-6 h-6 rounded flex items-center justify-center hover:bg-tertiary text-primary hover:text-primary-hover"

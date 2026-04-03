@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
 import { getRankList, getRankTags } from '../api';
-import { usePlayerStore } from '../stores';
+import { usePlayerStore, useFavoritesStore } from '../stores';
+import LikeButton from '../components/LikeButton.vue';
 
 interface Song {
   rid: number;
@@ -12,6 +13,7 @@ interface Song {
 }
 
 const playerStore = usePlayerStore();
+const favoritesStore = useFavoritesStore();
 const rankTags = ref<{ name: string; pic: string }[]>([]);
 const currentRank = ref('新歌榜');
 const rankList = ref<Song[]>([]);
@@ -85,7 +87,7 @@ const getRankClass = (index: number) => {
         <div
           v-for="(song, index) in rankList"
           :key="song.rid"
-          class="song-row-simple"
+          class="song-row-simple group"
           @click="playSong(song, index)"
         >
           <div class="rank-badge" :class="getRankClass(index)">
@@ -107,6 +109,12 @@ const getRankClass = (index: number) => {
           <div v-if="song.info" class="text-xs text-secondary hidden lg:block max-w-[200px] truncate mr-2">
             {{ song.info }}
           </div>
+          <LikeButton
+            :song="song"
+            size="small"
+            :show-tooltip="false"
+            :class="favoritesStore.isFavorite(song.rid) ? '' : 'opacity-0 group-hover:opacity-100'"
+          />
         </div>
       </div>
     </div>

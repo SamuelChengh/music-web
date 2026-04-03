@@ -2,7 +2,9 @@
 import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { getPlaylistInfo, getPlaylistSongs } from '../api';
-import { usePlayerStore } from '../stores';
+import { usePlayerStore, useFavoritesStore } from '../stores';
+import LikeButton from '../components/LikeButton.vue';
+import { Play } from '@icon-park/vue-next';
 
 interface Song {
   rid: number;
@@ -13,6 +15,7 @@ interface Song {
 
 const route = useRoute();
 const playerStore = usePlayerStore();
+const favoritesStore = useFavoritesStore();
 
 const playlistInfo = ref<any>(null);
 const songs = ref<Song[]>([]);
@@ -81,7 +84,7 @@ const getRankClass = (index: number) => {
           <div
             v-for="(song, index) in songs"
             :key="song.rid"
-            class="song-row-simple"
+            class="song-row-simple group"
             @click="playSong(song, index)"
           >
             <div class="rank-badge" :class="getRankClass(index)">
@@ -96,6 +99,12 @@ const getRankClass = (index: number) => {
                 {{ song.artist }}
               </div>
             </div>
+            <LikeButton
+              :song="song"
+              size="small"
+              :show-tooltip="false"
+              :class="favoritesStore.isFavorite(song.rid) ? '' : 'opacity-0 group-hover:opacity-100'"
+            />
           </div>
         </div>
       </template>

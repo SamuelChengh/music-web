@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useThemeStore } from './stores';
+import { useThemeStore, useFavoritesStore } from './stores';
 import LeftSidebar from './components/layout/LeftSidebar.vue';
 import AppHeader from './components/layout/Header.vue';
 import PlayerBar from './components/layout/PlayerBar.vue';
@@ -11,6 +11,7 @@ import { Music, Moon, Sunny, TShirt, Search, Home, Left } from '@icon-park/vue-n
 
 const router = useRouter();
 const themeStore = useThemeStore();
+const favoritesStore = useFavoritesStore();
 const showMobileSidebar = ref(false);
 const showMobileThemeMenu = ref(false);
 const searchKeyword = ref('');
@@ -38,6 +39,7 @@ const goToSearch = () => {
 
 onMounted(() => {
   themeStore.init();
+  favoritesStore.init();
 });
 </script>
 

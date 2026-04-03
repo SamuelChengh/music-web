@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
-import { usePlayerStore } from '../../stores';
+import { usePlayerStore, useFavoritesStore } from '../../stores';
 import { Close, Delete, Music } from '@icon-park/vue-next';
 import { ElTooltip } from 'element-plus';
+import LikeButton from '../LikeButton.vue';
 
 const playerStore = usePlayerStore();
+const favoritesStore = useFavoritesStore();
 const listRef = ref<HTMLDivElement | null>(null);
 const drawerRef = ref<HTMLDivElement | null>(null);
 const touchStartY = ref(0);
@@ -144,7 +146,7 @@ const isMobile = computed(() => window.innerWidth < 768);
         <div
           v-for="(song, index) in playerStore.playlist"
           :key="song.rid"
-          class="song-item"
+          class="song-item group"
           :class="{ 'is-playing': playerStore.currentIndex === index }"
           @click="playSong(index)"
         >
@@ -160,6 +162,12 @@ const isMobile = computed(() => window.innerWidth < 768);
             <div class="mini-wave-bar"></div>
             <div class="mini-wave-bar"></div>
           </div>
+          <LikeButton
+            :song="song"
+            size="small"
+            :show-tooltip="false"
+            :class="favoritesStore.isFavorite(song.rid) ? '' : 'opacity-0 group-hover:opacity-100'"
+          />
           <el-tooltip content="移除" placement="top">
             <button 
               class="remove-btn"

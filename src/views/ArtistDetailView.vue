@@ -2,9 +2,10 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { getArtistSongs, getArtistInfo } from '../api';
-import { usePlayerStore } from '../stores';
+import { usePlayerStore, useFavoritesStore } from '../stores';
 import { Play } from '@icon-park/vue-next';
 import { ElTooltip } from 'element-plus';
+import LikeButton from '../components/LikeButton.vue';
 
 interface Song {
   rid: number;
@@ -21,6 +22,7 @@ interface Artist {
 
 const route = useRoute();
 const playerStore = usePlayerStore();
+const favoritesStore = useFavoritesStore();
 const artistId = ref(Number(route.params.id));
 const artistInfo = ref<Artist | null>(null);
 const loading = ref(true);
@@ -128,6 +130,12 @@ const playSong = (song: Song, index: number) => {
             <div class="text-lg md:text-lg font-medium text-main truncate group-hover:text-primary transition-colors">{{ song.name }}</div>
             <div class="text-sm md:text-sm text-secondary truncate mt-1">{{ song.artist || artistInfo.name }}</div>
           </div>
+          <LikeButton
+            :song="song"
+            size="small"
+            :show-tooltip="false"
+            :class="favoritesStore.isFavorite(song.rid) ? '' : 'opacity-0 group-hover:opacity-100'"
+          />
           <el-tooltip content="播放" placement="top">
             <button class="opacity-0 group-hover:opacity-100 p-2 md:p-2.5 gradient-bg text-white rounded-full transition-all">
               <Play theme="filled" size="16" />

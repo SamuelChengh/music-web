@@ -8,6 +8,7 @@ import {
 import { ElTooltip } from 'element-plus';
 import PlayerSlider from './PlayerSlider.vue';
 import LyricPanel from '../LyricPanel.vue';
+import LikeButton from '../LikeButton.vue';
 
 const playerStore = usePlayerStore();
 const audioRef = ref<HTMLAudioElement | null>(null);
@@ -188,7 +189,14 @@ onUnmounted(() => {
       </div>
       
       <div class="px-sm flex-1 min-w-0 hidden lg:block" v-if="playerStore.currentSong">
-        <div class="text-sm text-main truncate">{{ playerStore.currentSong.name }}</div>
+        <div class="flex items-center gap-sm">
+          <div class="text-sm text-main truncate">{{ playerStore.currentSong.name }}</div>
+          <LikeButton 
+            :song="playerStore.currentSong"
+            size="medium"
+            :show-tooltip="true"
+          />
+        </div>
         <div class="text-xs text-secondary truncate">{{ playerStore.currentSong.artist }}</div>
       </div>
       <div v-else class="px-sm flex-1 hidden lg:block">
@@ -363,7 +371,14 @@ onUnmounted(() => {
         <!-- 歌曲信息 -->
         <div class="flex-1 min-w-0">
           <div v-if="playerStore.currentSong">
-            <div class="text-base font-semibold text-main truncate">{{ playerStore.currentSong.name }}</div>
+            <div class="flex items-center gap-sm">
+              <div class="text-base font-semibold text-main truncate">{{ playerStore.currentSong.name }}</div>
+              <LikeButton 
+                :song="playerStore.currentSong"
+                size="small"
+                :show-tooltip="false"
+              />
+            </div>
             <div class="text-sm text-secondary truncate mt-1">{{ playerStore.currentSong.artist }}</div>
           </div>
           <div v-else class="text-sm text-secondary">暂无播放</div>

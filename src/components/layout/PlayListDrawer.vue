@@ -140,6 +140,23 @@ const normalQueueItems = computed(() => {
     .filter(item => item.priority === 'normal');
 });
 
+const displayQueueItems = computed(() => {
+  const items = [];
+  
+  if (queueStore.currentIndex >= 0 && queueStore.currentIndex < queueStore.playlist.length) {
+    const currentSong = queueStore.playlist[queueStore.currentIndex];
+    items.push({ ...currentSong, originalIndex: queueStore.currentIndex });
+  }
+  
+  queueStore.playlist.forEach((item, index) => {
+    if (index !== queueStore.currentIndex && item.priority === 'normal') {
+      items.push({ ...item, originalIndex: index });
+    }
+  });
+  
+  return items;
+});
+
 const currentSongItem = computed(() => {
   if (queueStore.currentIndex >= 0 && queueStore.currentIndex < queueStore.playlist.length) {
     return queueStore.playlist[queueStore.currentIndex];
@@ -281,16 +298,14 @@ const { isMobile } = useIsMobile();
                 :show-tooltip="false"
                 :class="favoritesStore.isFavorite(song.rid) || isMobile ? '' : 'opacity-0 group-hover:opacity-100'"
               />
-              <el-tooltip content="降级为普通队列" placement="top">
-                <button 
-                  class="downgrade-btn"
-                  :class="{ 'pending-action': pendingDowngradeIndex === song.originalIndex }"
-                  @click.stop="handleDowngradeClick(song.originalIndex)"
-                >
-                  <Down theme="outline" size="16" />
-                  <span v-if="pendingDowngradeIndex === song.originalIndex" class="action-text">降级</span>
-                </button>
-              </el-tooltip>
+              <button 
+                class="downgrade-btn"
+                :class="{ 'pending-action': pendingDowngradeIndex === song.originalIndex }"
+                @click.stop="handleDowngradeClick(song.originalIndex)"
+              >
+                <Down theme="outline" size="16" />
+                <span v-if="pendingDowngradeIndex === song.originalIndex" class="action-text">降级</span>
+              </button>
               <button
                 class="remove-btn"
                 :class="{ 'pending-delete': pendingDeleteIndex === song.originalIndex }"
@@ -303,13 +318,16 @@ const { isMobile } = useIsMobile();
           </div>
 
           <!-- 播放队列 -->
-          <div v-if="normalQueueItems.length > 0" class="queue-section">
+          <div v-if="displayQueueItems.length > 0" class="queue-section">
             <div class="section-label">播放队列</div>
             <div
-              v-for="song in normalQueueItems"
+              v-for="song in displayQueueItems"
               :key="song.rid"
               class="song-item group"
-              :class="{ 'is-playing': queueStore.currentIndex === song.originalIndex }"
+              :class="{ 
+                'is-playing': queueStore.currentIndex === song.originalIndex,
+                'priority-item': song.priority === 'high'
+              }"
               @click="playSong(song.originalIndex)"
             >
               <div class="song-cover">
@@ -330,16 +348,14 @@ const { isMobile } = useIsMobile();
                 :show-tooltip="false"
                 :class="favoritesStore.isFavorite(song.rid) || isMobile ? '' : 'opacity-0 group-hover:opacity-100'"
               />
-              <el-tooltip content="升级为下一首播放" placement="top">
-                <button
-                  class="upgrade-btn"
-                  :class="{ 'pending-action': pendingUpgradeIndex === song.originalIndex }"
-                  @click.stop="handleUpgradeClick(song.originalIndex)"
-                >
-                  <Up theme="outline" size="16" />
-                  <span v-if="pendingUpgradeIndex === song.originalIndex" class="action-text">升级</span>
-                </button>
-              </el-tooltip>
+              <button
+                class="upgrade-btn"
+                :class="{ 'pending-action': pendingUpgradeIndex === song.originalIndex }"
+                @click.stop="handleUpgradeClick(song.originalIndex)"
+              >
+                <Up theme="outline" size="16" />
+                <span v-if="pendingUpgradeIndex === song.originalIndex" class="action-text">升级</span>
+              </button>
               <button
                 class="remove-btn"
                 :class="{ 'pending-delete': pendingDeleteIndex === song.originalIndex }"

@@ -41,14 +41,17 @@ const playAll = () => {
         <h1 class="text-xl md:text-2xl font-bold text-main">我喜欢</h1>
       </div>
       
-      <div v-if="favorites.length > 0" class="flex items-center justify-between mb-md md:mb-lg">
-        <div class="text-sm md:text-secondary">共 {{ totalCount }} 首歌曲</div>
+      <div v-if="favorites.length > 0" class="mb-md md:mb-lg flex items-center justify-between">
+        <div class="text-sm text-secondary">共 {{ totalCount }} 首歌曲</div>
         <button 
-          class="px-sm py-xs md:px-md md:py-sm gradient-bg text-white rounded-full text-xs md:text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-sm"
+          class="play-all-btn"
           @click="playAll"
         >
-          <Play theme="filled" size="14" />
-          播放全部
+          <div class="play-icon-wrapper">
+            <Play theme="outline" size="16" />
+          </div>
+          <span class="play-text">播放全部</span>
+          <span class="play-count">{{ totalCount }}</span>
         </button>
       </div>
       
@@ -99,3 +102,94 @@ const playAll = () => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.play-all-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 20px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, rgba(var(--color-primary-rgb), 0.8) 100%);
+  border-radius: 14px;
+  border: none;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.3),
+              0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.play-all-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.play-all-btn:hover::before {
+  opacity: 1;
+}
+
+.play-all-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(var(--color-primary-rgb), 0.4),
+              0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.play-all-btn:active {
+  transform: translateY(0);
+}
+
+.play-icon-wrapper {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transition: background 0.3s ease;
+}
+
+.play-all-btn:hover .play-icon-wrapper {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.play-text {
+  flex: 1;
+}
+
+.play-count {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.15);
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+  .play-all-btn {
+    padding: 8px 14px;
+    border-radius: 12px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .play-icon-wrapper {
+    width: 22px;
+    height: 22px;
+  }
+
+  .play-count {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+}
+</style>

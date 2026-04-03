@@ -9,11 +9,16 @@ import { ElTooltip } from 'element-plus';
 import PlayerSlider from './PlayerSlider.vue';
 import LyricPanel from '../LyricPanel.vue';
 import LikeButton from '../LikeButton.vue';
+import { useScrollLock } from '@vueuse/core';
 
 const playerStore = usePlayerStore();
 const audioRef = ref<HTMLAudioElement | null>(null);
 const showQualityMenu = ref(false);
 const qualityMenuRef = ref<HTMLElement | null>(null);
+
+// 锁定 body 滚动，防止滚动穿透
+const bodyRef = ref(document.body);
+const isLocked = useScrollLock(bodyRef);
 
 const qualities = [
   { label: '标准', value: 'standard' as const, bitrate: '128K', icon: '128', color: 'text-gray-400' },
@@ -159,6 +164,15 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.removeEventListener('click', closeQualityMenu);
+});
+
+// 监听音质菜单显示状态，锁定/解锁背景滚动
+watch(showQualityMenu, (show) => {
+  if (show) {
+    isLocked.value = true;
+  } else {
+    isLocked.value = false;
+  }
 });
 </script>
 

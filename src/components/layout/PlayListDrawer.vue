@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
 import { usePlayerStore, useFavoritesStore } from '../../stores';
 import { Close, Delete, Music } from '@icon-park/vue-next';
 import { ElTooltip } from 'element-plus';
 import LikeButton from '../LikeButton.vue';
 import { useIsMobile } from '../../composables/useIsMobile';
+import { useScrollLock } from '@vueuse/core';
 
 const playerStore = usePlayerStore();
 const favoritesStore = useFavoritesStore();
@@ -14,6 +15,10 @@ const touchStartY = ref(0);
 const touchDeltaY = ref(0);
 const isDragging = ref(false);
 const isClosing = ref(false);
+
+// 锁定 body 滚动，防止滚动穿透
+const bodyRef = ref(document.body);
+const isLocked = useScrollLock(bodyRef);
 
 const playSong = (index: number) => {
   playerStore.playAt(index);
@@ -65,6 +70,12 @@ watch(() => playerStore.showPlaylist, (show) => {
     touchDeltaY.value = 0;
     isDragging.value = false;
     isClosing.value = false;
+    
+    // 锁定背景滚动
+    isLocked.value = true;
+  } else {
+    // 解锁背景滚动
+    isLocked.value = false;
   }
 });
 

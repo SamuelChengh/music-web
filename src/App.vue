@@ -58,7 +58,7 @@ onMounted(() => {
             class="logo-icon-glow"
             @click="showMobileSidebar = true"
           >
-            <Music theme="filled" size="20" />
+            <Music theme="filled" size="18" />
           </div>
           
           <Transition name="fade-scale">

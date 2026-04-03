@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useScrollLock } from '@vueuse/core';
-import { Home, ChartHistogram, People, Like, Videocamera, Broadcast, Music } from '@icon-park/vue-next';
+import { Home, ChartHistogram, People, Like, Videocamera, Broadcast, Music, Mail, Copy, Send } from '@icon-park/vue-next';
 
 const emit = defineEmits<{
   (e: 'close'): void;
@@ -23,6 +23,59 @@ onMounted(() => {
 onUnmounted(() => {
   isLocked.value = false;
 });
+
+// 联系我功能
+const showContactCard = ref(false);
+const showToastMessage = ref('');
+const emailAddress = 'lgchengh@163.com';
+
+const toggleContactCard = () => {
+  showContactCard.value = !showContactCard.value;
+};
+
+const copyEmail = async () => {
+  try {
+    // 优先使用现代 Clipboard API
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(emailAddress);
+      showToast('邮箱已复制到剪贴板');
+      return;
+    }
+    
+    // Fallback：使用传统方法
+    const textArea = document.createElement('textarea');
+    textArea.value = emailAddress;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    const successful = document.execCommand('copy');
+    document.body.removeChild(textArea);
+    
+    if (successful) {
+      showToast('邮箱已复制到剪贴板');
+    } else {
+      showToast('复制失败,请手动复制');
+    }
+  } catch (err) {
+    console.error('复制失败:', err);
+    showToast('复制失败,请手动复制');
+  }
+};
+
+const sendEmail = () => {
+  window.location.href = `mailto:${emailAddress}`;
+};
+
+const showToast = (message: string) => {
+  showToastMessage.value = message;
+  setTimeout(() => {
+    showToastMessage.value = '';
+  }, 2500);
+};
 
 const menuGroups = [
   {
@@ -72,16 +125,14 @@ const handleNavigate = (path: string) => {
       <Transition name="slide-right">
         <div class="sidebar-drawer">
           <div class="drawer-header">
-            <div class="logo-container">
+            <div class="logo-container" @click.stop="toggleContactCard">
               <div class="logo-icon">
                 <Music theme="filled" size="22" class="logo-music" />
               </div>
               <span class="logo-text">TheH音乐</span>
-            </div>
-            <div class="header-decoration">
-              <div class="glow-dot"></div>
-              <div class="glow-dot"></div>
-              <div class="glow-dot"></div>
+              <div class="contact-indicator">
+                <Mail theme="filled" size="20" class="mail-badge" />
+              </div>
             </div>
           </div>
           
@@ -123,6 +174,39 @@ const handleNavigate = (path: string) => {
             <div class="footer-subtext">请支持正版音乐</div>
           </div>
         </div>
+      </Transition>
+      
+      <!-- Toast 提示（移到 sidebar-drawer 外部） -->
+      <Transition name="toast">
+        <div v-if="showToastMessage" class="toast-message">
+          {{ showToastMessage }}
+        </div>
+      </Transition>
+      
+      <!-- 联系卡片（移到 sidebar-drawer 外部，不受 backdrop-filter 影响） -->
+      <Transition name="contact-card">
+        <div v-if="showContactCard" class="contact-card" @click.stop>
+          <div class="contact-header">
+            <Mail theme="filled" size="20" class="contact-icon" />
+            <span class="contact-title">联系我</span>
+          </div>
+          <div class="email-display">{{ emailAddress }}</div>
+          <div class="contact-actions">
+            <button class="action-btn copy-btn" @click="copyEmail">
+              <Copy theme="outline" size="16" />
+              <span>复制邮箱</span>
+            </button>
+            <button class="action-btn send-btn" @click="sendEmail">
+              <Send theme="outline" size="16" />
+              <span>发送邮件</span>
+            </button>
+          </div>
+        </div>
+      </Transition>
+      
+      <!-- 点击外部关闭（全屏遮罩，移到 sidebar-drawer 外部） -->
+      <Transition name="fade">
+        <div v-if="showContactCard" class="contact-overlay" @click="showContactCard = false"></div>
       </Transition>
       
       </div>
@@ -174,9 +258,20 @@ const handleNavigate = (path: string) => {
 }
 
 .logo-container {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.logo-container:hover {
+  transform: scale(1.02);
+}
+
+.logo-container:active {
+  transform: scale(0.98);
 }
 
 .logo-icon {
@@ -454,5 +549,219 @@ const handleNavigate = (path: string) => {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(var(--color-primary-rgb), 0.5);
+}
+
+/* ========== 联系提示徽章 ========== */
+.contact-indicator {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--color-primary-rgb), 0.15);
+  border-radius: 10px;
+  border: 1px solid rgba(var(--color-primary-rgb), 0.3);
+  color: var(--color-primary);
+  transition: all 0.25s ease;
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+.contact-indicator:hover {
+  background: rgba(var(--color-primary-rgb), 0.25);
+  transform: scale(1.05);
+}
+
+.mail-badge {
+  color: var(--color-primary);
+}
+
+/* ========== 联系卡片容器 ========== */
+.contact-card {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 110;
+  width: 260px;
+  max-width: 85%;
+  padding: 20px 16px;
+  background: rgba(var(--color-bg-view-rgb), 0.92);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border-radius: 20px;
+  border: 1px solid rgba(var(--color-primary-rgb), 0.3);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2),
+              0 0 40px rgba(var(--color-primary-rgb), 0.15),
+              inset 0 1px 2px rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+/* ========== 联系卡片头部 ========== */
+.contact-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(var(--color-primary-rgb), 0.2);
+}
+
+.contact-icon {
+  color: var(--color-primary);
+  opacity: 0.9;
+}
+
+.contact-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-main);
+  letter-spacing: 0.5px;
+}
+
+/* ========== 邮箱显示 ========== */
+.email-display {
+  font-size: 14px;
+  color: var(--color-text-main);
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  background: rgba(var(--color-bg-tertiary), 0.5);
+  border-radius: 10px;
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+  word-break: keep-all;
+  line-height: 1.8;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', monospace;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* ========== 操作按钮组 ========== */
+.contact-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.action-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 10px;
+  background: rgba(var(--color-bg-tertiary), 0.3);
+  border-radius: 10px;
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.action-btn:hover {
+  background: rgba(var(--color-primary-rgb), 0.12);
+  border-color: rgba(var(--color-primary-rgb), 0.4);
+  color: var(--color-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.15);
+}
+
+.copy-btn:hover {
+  background: rgba(var(--color-primary-rgb), 0.15);
+}
+
+.send-btn:hover {
+  background: rgba(var(--color-primary-rgb), 0.18);
+  border-color: rgba(var(--color-primary-rgb), 0.5);
+  box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.2);
+}
+
+/* ========== 联系卡片展开动画 ========== */
+.contact-card-enter-active {
+  animation: contact-expand 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.contact-card-leave-active {
+  animation: contact-collapse 0.25s ease-in;
+}
+
+@keyframes contact-expand {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes contact-collapse {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+}
+
+/* ========== 遮罩层 ========== */
+.contact-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 105;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  cursor: pointer;
+}
+
+/* ========== Toast 提示 ========== */
+.toast-message {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  background: rgba(var(--color-primary-rgb), 0.85);
+  color: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  font-size: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  z-index: 200;
+  max-width: 80%;
+  text-align: center;
+}
+
+.toast-enter-active {
+  animation: toast-in 0.3s ease-out;
+}
+
+.toast-leave-active {
+  animation: toast-out 0.2s ease-in;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes toast-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 </style>

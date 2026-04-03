@@ -125,14 +125,11 @@ const handleNavigate = (path: string) => {
       <Transition name="slide-right">
         <div class="sidebar-drawer">
           <div class="drawer-header">
-            <div class="logo-container" @click.stop="toggleContactCard">
+            <div class="logo-container">
               <div class="logo-icon">
                 <Music theme="filled" size="22" class="logo-music" />
               </div>
               <span class="logo-text">TheH音乐</span>
-              <div class="contact-indicator">
-                <Mail theme="filled" size="20" class="mail-badge" />
-              </div>
             </div>
           </div>
           
@@ -162,16 +159,26 @@ const handleNavigate = (path: string) => {
           </nav>
           
           <div class="drawer-footer">
-            <div class="footer-divider">
-              <div class="divider-line"></div>
-              <div class="divider-dot"></div>
-              <div class="divider-line"></div>
+            <div class="footer-content">
+              <!-- 左侧：邮箱图标 -->
+              <div class="footer-contact" @click.stop="toggleContactCard">
+                <div class="contact-icon-wrapper">
+                  <Mail theme="filled" size="20" class="contact-icon-footer" />
+                </div>
+              </div>
+              
+              <!-- 分隔线 -->
+              <div class="footer-divider-vertical"></div>
+              
+              <!-- 右侧：免责声明 -->
+              <div class="footer-info">
+                <div class="footer-text">
+                  <span class="text-icon">⚠️</span>
+                  <span>本项目仅供学习使用</span>
+                </div>
+                <div class="footer-subtext">请支持正版音乐</div>
+              </div>
             </div>
-            <div class="footer-text">
-              <span class="text-icon">⚠️</span>
-              <span>本项目仅供学习使用</span>
-            </div>
-            <div class="footer-subtext">请支持正版音乐</div>
           </div>
         </div>
       </Transition>
@@ -262,16 +269,6 @@ const handleNavigate = (path: string) => {
   display: flex;
   align-items: center;
   gap: 12px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.logo-container:hover {
-  transform: scale(1.02);
-}
-
-.logo-container:active {
-  transform: scale(0.98);
 }
 
 .logo-icon {
@@ -469,36 +466,67 @@ const handleNavigate = (path: string) => {
 }
 
 .drawer-footer {
-  padding: 20px;
+  padding: 16px 20px;
   border-top: 1px solid rgba(var(--color-border), 0.4);
   background: rgba(var(--color-bg-view-rgb), 0.5);
 }
 
-.footer-divider {
+.footer-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 左侧：邮箱图标 */
+.footer-contact {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
 }
 
-.divider-line {
-  width: 40px;
-  height: 1px;
-  background: rgba(var(--color-primary-rgb), 0.3);
+.contact-icon-wrapper {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--color-primary-rgb), 0.15);
+  border-radius: 8px;
+  border: 1px solid rgba(var(--color-primary-rgb), 0.25);
+  transition: all 0.25s ease;
 }
 
-.divider-dot {
-  width: 6px;
-  height: 6px;
-  background: rgba(var(--color-primary-rgb), 0.5);
-  border-radius: 50%;
+.footer-contact:hover .contact-icon-wrapper {
+  background: rgba(var(--color-primary-rgb), 0.25);
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.2);
+}
+
+.contact-icon-footer {
+  color: var(--color-primary);
+}
+
+/* 分隔线 */
+.footer-divider-vertical {
+  width: 1px;
+  height: 32px;
+  background: rgba(var(--color-primary-rgb), 0.2);
+  flex-shrink: 0;
+}
+
+/* 右侧：免责声明 */
+.footer-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .footer-text {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 6px;
   font-size: 11px;
   color: var(--color-text-secondary);
@@ -509,10 +537,8 @@ const handleNavigate = (path: string) => {
 }
 
 .footer-subtext {
-  text-align: center;
   font-size: 10px;
   color: var(--color-text-description);
-  margin-top: 4px;
 }
 
 .fade-enter-active,
@@ -582,31 +608,6 @@ const handleNavigate = (path: string) => {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(var(--color-primary-rgb), 0.5);
-}
-
-/* ========== 联系提示徽章 ========== */
-.contact-indicator {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(var(--color-primary-rgb), 0.15);
-  border-radius: 10px;
-  border: 1px solid rgba(var(--color-primary-rgb), 0.3);
-  color: var(--color-primary);
-  transition: all 0.25s ease;
-  margin-left: 8px;
-  cursor: pointer;
-}
-
-.contact-indicator:hover {
-  background: rgba(var(--color-primary-rgb), 0.25);
-  transform: scale(1.05);
-}
-
-.mail-badge {
-  color: var(--color-primary);
 }
 
 /* ========== 联系卡片容器 ========== */

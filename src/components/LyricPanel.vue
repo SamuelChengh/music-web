@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, nextTick, computed } from 'vue';
+import { ref, watch, nextTick, computed, onUnmounted } from 'vue';
 import { usePlayerStore } from '../stores';
 import { getLyric } from '../api';
 import { Close } from '@icon-park/vue-next';
@@ -15,6 +15,96 @@ const touchStartY = ref(0);
 const touchDeltaY = ref(0);
 const isDragging = ref(false);
 
+// 用户手动滚动检测（防止自动滚动冲突）
+const isUserScrolling = ref(false);
+let scrollTimeout: number | null = null;
+
+// 清理定时器
+onUnmounted(() => {
+  if (scrollTimeout) {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = null;
+  }
+});
+
+// 检测歌词容器滚动
+const handleLyricScroll = () => {
+  isUserScrolling.value = true;
+  if (scrollTimeout) {
+    clearTimeout(scrollTimeout);
+  }
+  scrollTimeout = window.setTimeout(() => {
+    isUserScrolling.value = false;
+    scrollTimeout = null;
+  }, 300);
+};
+
+// 解析歌词时间字符串为秒数
+const parseLyricTime = (timeStr: string): number => {
+  const match = timeStr.match(/(\d+):(\d+)\.?(\d*)/);
+  if (match) {
+    const minutes = parseInt(match[1]) || 0;
+    const seconds = parseFloat(match[2] + '.' + (match[3] || '0'));
+    return minutes * 60 + seconds;
+  }
+  return 0;
+};
+
+// 跳转到指定时间点
+const seekToTime = (time: number) => {
+  playerStore.setCurrentTime(time);
+  const audio = document.querySelector('audio');
+  if (audio) {
+    audio.currentTime = time;
+  }
+};
+
+// 点击歌词行跳转
+const handleLyricClick = (index: number, event: MouseEvent | TouchEvent) => {
+  const lyricItem = playerStore.lyric[index];
+  if (!lyricItem) return;
+  
+  const timeInSeconds = parseLyricTime(lyricItem.time);
+  seekToTime(timeInSeconds);
+  
+  // 创建涟漪效果（移动端和PC端）
+  createRipple(event, index);
+};
+
+// 创建涟漪动画效果
+const createRipple = (event: MouseEvent | TouchEvent, index: number) => {
+  const lyricElement = lyricRefs.value[index];
+  if (!lyricElement) return;
+  
+  // 创建涟漪元素
+  const ripple = document.createElement('span');
+  ripple.className = 'lyric-click-ripple';
+  
+  // 计算涟漪位置
+  const rect = lyricElement.getBoundingClientRect();
+  let clientX: number, clientY: number;
+  
+  if (event instanceof MouseEvent) {
+    clientX = event.clientX;
+    clientY = event.clientY;
+  } else {
+    clientX = event.touches[0].clientX;
+    clientY = event.touches[0].clientY;
+  }
+  
+  const x = clientX - rect.left;
+  const y = clientY - rect.top;
+  
+  ripple.style.left = `${x}px`;
+  ripple.style.top = `${y}px`;
+  
+  // 添加涟漪到歌词元素
+  lyricElement.appendChild(ripple);
+  
+  // 600ms后移除涟漪
+  setTimeout(() => ripple.remove(), 600);
+};
+
 // 计算歌词面板位移（用于拖拽跟随）
 const lyricTransform = computed(() => {
   if (isDragging.value && touchDeltaY.value > 0) {
@@ -27,7 +117,6 @@ const lyricTransform = computed(() => {
 const handleTouchStart = (e: TouchEvent) => {
   touchStartY.value = e.touches[0].clientY;
   isDragging.value = true;
-  isClosing.value = false;
 };
 
 const handleTouchMove = (e: TouchEvent) => {
@@ -62,6 +151,9 @@ const formatTime = (seconds: number) => {
 };
 
 watch(() => playerStore.currentLyricIndex, async (index) => {
+  // 如果用户正在手动滚动，则不触发自动滚动
+  if (isUserScrolling.value) return;
+  
   await nextTick();
   const el = lyricRefs.value[index];
   if (el) {
@@ -124,7 +216,7 @@ watch(() => playerStore.showLyric, async (show) => {
           </el-tooltip>
         </div>
         
-        <div class="flex-1 overflow-y-auto px-md py-lg text-center">
+        <div class="flex-1 overflow-y-auto px-md py-lg text-center" @scroll="handleLyricScroll">
           <div v-if="playerStore.lyric.length === 0" class="flex items-center justify-center h-full text-secondary text-sm">
             暂无歌词
           </div>
@@ -133,10 +225,16 @@ watch(() => playerStore.showLyric, async (show) => {
               v-for="(item, index) in playerStore.lyric"
               :key="index"
               :ref="(el) => { if (el) lyricRefs[index] = el as HTMLElement }"
-              class="transition-all duration-300 py-sm"
-              :class="index === playerStore.currentLyricIndex ? 'text-primary font-medium text-xl' : 'text-secondary text-sm'"
+              class="lyric-line-wrapper"
+              @click="handleLyricClick(index, $event)"
             >
-              {{ item.lineLyric || '♪' }}
+              <span class="lyric-time-hint">{{ formatTime(parseLyricTime(item.time)) }}</span>
+              <div
+                class="lyric-line-pc"
+                :class="index === playerStore.currentLyricIndex ? 'active' : ''"
+              >
+                {{ item.lineLyric || '♪' }}
+              </div>
             </div>
           </div>
         </div>
@@ -201,7 +299,7 @@ watch(() => playerStore.showLyric, async (show) => {
         </div>
         
         <!-- 歌词容器 -->
-        <div class="lyric-container-extended">
+        <div class="lyric-container-extended" @scroll="handleLyricScroll">
           <div v-if="playerStore.lyric.length === 0" class="no-lyric">
             暂无歌词
           </div>
@@ -210,10 +308,16 @@ watch(() => playerStore.showLyric, async (show) => {
               v-for="(item, index) in playerStore.lyric"
               :key="index"
               :ref="(el) => { if (el) lyricRefs[index] = el as HTMLElement }"
-              class="lyric-line"
-              :class="{ active: index === playerStore.currentLyricIndex }"
+              class="lyric-line-wrapper-mobile"
+              @click="handleLyricClick(index, $event)"
             >
-              {{ item.lineLyric || '♪' }}
+              <span class="lyric-time-hint-mobile">{{ formatTime(parseLyricTime(item.time)) }}</span>
+              <div
+                class="lyric-line"
+                :class="{ active: index === playerStore.currentLyricIndex }"
+              >
+                {{ item.lineLyric || '♪' }}
+              </div>
             </div>
           </div>
         </div>
@@ -410,6 +514,116 @@ watch(() => playerStore.showLyric, async (show) => {
   text-shadow: 0 2px 20px rgba(var(--color-primary-rgb), 0.6);
   transform: scale(1.05);
   opacity: 1;
+}
+
+/* 移动端歌词行包装器 */
+.lyric-line-wrapper-mobile {
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* 移动端时间戳提示 */
+.lyric-time-hint-mobile {
+  position: absolute;
+  left: -50px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  color: var(--color-primary);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.lyric-line-wrapper-mobile:hover .lyric-time-hint-mobile {
+  opacity: 1;
+}
+
+/* 移动端歌词行点击反馈 */
+.lyric-line-wrapper-mobile:active .lyric-line {
+  transform: scale(0.98);
+}
+
+/* PC端歌词行包装器 */
+.lyric-line-wrapper {
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* PC端歌词行样式 */
+.lyric-line-pc {
+  transition: all 0.3s ease;
+  padding: 0.5rem 0;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+}
+
+.lyric-line-pc:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+  color: var(--color-text-main);
+}
+
+.lyric-line-pc.active {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--color-primary);
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.lyric-line-wrapper:active .lyric-line-pc {
+  transform: scale(0.98);
+}
+
+/* PC端时间戳提示 */
+.lyric-time-hint {
+  position: absolute;
+  left: -60px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  color: var(--color-primary);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.lyric-line-wrapper:hover .lyric-time-hint {
+  opacity: 1;
+}
+
+/* 涟漪动画效果 */
+.lyric-click-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(var(--color-primary-rgb), 0.3);
+  transform: translate(-50%, -50%);
+  animation: ripple-expand 0.6s ease-out;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes ripple-expand {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 0.8;
+  }
+  100% {
+    width: 80px;
+    height: 80px;
+    opacity: 0;
+  }
+}
+
+:global(.dark) .lyric-click-ripple {
+  background: rgba(var(--color-primary-rgb), 0.4);
 }
 
 :global(.dark) .lyric-line {

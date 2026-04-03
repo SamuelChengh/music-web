@@ -270,6 +270,9 @@ const isActive = (path: string) => {
   padding: 1rem;
   border-top: 1px solid rgba(var(--color-border), 0.4);
   background: rgba(var(--color-bg-view-rgb), 0.5);
+  height: 96px;
+  display: flex;
+  align-items: center;
 }
 
 .footer-content {

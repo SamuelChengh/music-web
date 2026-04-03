@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, nextTick } from 'vue';
+import { ref, watch, nextTick, computed } from 'vue';
 import { usePlayerStore } from '../stores';
 import { getLyric } from '../api';
 import { Close } from '@icon-park/vue-next';
@@ -9,6 +9,55 @@ import LikeButton from './LikeButton.vue';
 
 const playerStore = usePlayerStore();
 const lyricRefs = ref<HTMLElement[]>([]);
+
+// 下滑关闭状态
+const touchStartY = ref(0);
+const touchDeltaY = ref(0);
+const isDragging = ref(false);
+const isClosing = ref(false);
+
+// 计算歌词面板位移
+const lyricTransform = computed(() => {
+  if (isClosing.value) return 'translateY(100%)';
+  if (isDragging.value && touchDeltaY.value > 0) {
+    return `translateY(${touchDeltaY.value}px)`;
+  }
+  return 'translateY(0)';
+});
+
+// 触摸处理函数
+const handleTouchStart = (e: TouchEvent) => {
+  touchStartY.value = e.touches[0].clientY;
+  isDragging.value = true;
+  isClosing.value = false;
+};
+
+const handleTouchMove = (e: TouchEvent) => {
+  if (!isDragging.value) return;
+  const currentY = e.touches[0].clientY;
+  touchDeltaY.value = Math.max(0, currentY - touchStartY.value);
+};
+
+const handleTouchEnd = () => {
+  if (touchDeltaY.value > 100) {
+    isClosing.value = true;
+    setTimeout(() => {
+      playerStore.showLyric = false;
+      isClosing.value = false;
+    }, 350);
+  }
+  touchDeltaY.value = 0;
+  isDragging.value = false;
+};
+
+// 关闭歌词面板（点击倒三角按钮）
+const closeLyricPanel = () => {
+  isClosing.value = true;
+  setTimeout(() => {
+    playerStore.showLyric = false;
+    isClosing.value = false;
+  }, 350);
+};
 
 // 格式化时间
 const formatTime = (seconds: number) => {
@@ -28,6 +77,11 @@ watch(() => playerStore.currentLyricIndex, async (index) => {
 
 watch(() => playerStore.showLyric, async (show) => {
   if (show && playerStore.currentSong) {
+    // 重置下滑关闭状态
+    touchDeltaY.value = 0;
+    isDragging.value = false;
+    isClosing.value = false;
+    
     const hasLyric = playerStore.lyric && playerStore.lyric.length > 0;
     if (!hasLyric) {
       try {
@@ -109,6 +163,8 @@ watch(() => playerStore.showLyric, async (show) => {
       <div 
         v-if="playerStore.showLyric"
         class="lg:hidden lyric-fullscreen"
+        :class="{ 'is-closing': isClosing }"
+        :style="{ transform: lyricTransform }"
       >
         <!-- 模糊背景图片 -->
         <img
@@ -120,14 +176,21 @@ watch(() => playerStore.showLyric, async (show) => {
         <!-- 渐变遮罩层 -->
         <div class="lyric-gradient-overlay"></div>
         
-        <!-- 顶部：封面 + 关闭按钮 -->
-        <div class="lyric-header-vertical">
-          <!-- 关闭按钮 - 右上角 -->
+        <!-- 顶部：左上角倒三角 + 封面 + 歌曲信息（绑定触摸事件） -->
+        <div 
+          class="lyric-header-vertical"
+          @touchstart="handleTouchStart"
+          @touchmove="handleTouchMove"
+          @touchend="handleTouchEnd"
+        >
+          <!-- 左上角倒三角按钮 -->
           <button 
-            class="close-btn-lyric"
-            @click="playerStore.showLyric = false"
+            class="down-arrow-btn-lyric"
+            @click="closeLyricPanel"
           >
-            <Close theme="outline" size="20" />
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 16l-6-6h12z"/>
+            </svg>
           </button>
           
           <!-- 封面 -->
@@ -137,6 +200,12 @@ watch(() => playerStore.showLyric, async (show) => {
             class="cover-small"
           />
           <div v-else class="cover-small bg-tertiary" />
+          
+          <!-- 歌曲信息 -->
+          <div v-if="playerStore.currentSong" class="song-info-lyric">
+            <div class="song-name-lyric">{{ playerStore.currentSong.name }}</div>
+            <div class="song-artist-lyric">{{ playerStore.currentSong.artist }}</div>
+          </div>
         </div>
         
         <!-- 歌词容器 -->
@@ -234,6 +303,13 @@ watch(() => playerStore.showLyric, async (show) => {
   z-index: 40;
   animation: fadeIn 0.5s ease;
   overflow: hidden;
+  
+  /* 过渡动画 */
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.lyric-fullscreen.is-closing {
+  transform: translateY(100%) !important;
 }
 
 /* 模糊背景图片 */
@@ -277,13 +353,13 @@ watch(() => playerStore.showLyric, async (show) => {
   to { opacity: 1; }
 }
 
-/* 歌词头部 - 固定顶部（完全透明） */
+/* 歌词头部 - 固定顶部（高度160px，包含歌曲信息） */
 .lyric-header-vertical {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 100px;
+  height: 160px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -318,7 +394,7 @@ watch(() => playerStore.showLyric, async (show) => {
 /* 歌词容器 - 独立滚动区域 */
 .lyric-container-extended {
   position: absolute;
-  top: 100px;
+  top: 160px;
   bottom: calc(100px + env(safe-area-inset-bottom, 0));
   left: 0;
   right: 0;
@@ -475,30 +551,25 @@ watch(() => playerStore.showLyric, async (show) => {
 }
 
 
-/* 关闭按钮 - 主题色毛玻璃样式 */
-.close-btn-lyric {
+/* 左上角倒三角按钮 */
+.down-arrow-btn-lyric {
   position: absolute;
   top: 20px;
-  right: 16px;
-  width: 36px;
-  height: 36px;
+  left: 16px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   
-  /* 常态就使用主题色 */
   color: var(--color-primary);
-  
-  /* 背景改为主题色半透明 */
   background: rgba(var(--color-primary-rgb), 0.15);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   
-  /* 边框改为主题色半透明 */
   border: 1px solid rgba(var(--color-primary-rgb), 0.25);
   
-  /* 阴影增强主题色效果 */
   box-shadow: 
     0 4px 12px rgba(var(--color-primary-rgb), 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -507,33 +578,58 @@ watch(() => playerStore.showLyric, async (show) => {
   z-index: 10;
 }
 
-.close-btn-lyric:hover {
-  /* hover时颜色保持主题色，背景加深 */
+.down-arrow-btn-lyric:hover {
   background: rgba(var(--color-primary-rgb), 0.25);
   border-color: rgba(var(--color-primary-rgb), 0.4);
   transform: scale(1.1);
-  box-shadow: 
-    0 6px 20px rgba(var(--color-primary-rgb), 0.25),
-    0 2px 8px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
-:global(.dark) .close-btn-lyric {
-  /* 深色模式下背景和边框更明显 */
+:global(.dark) .down-arrow-btn-lyric {
   background: rgba(var(--color-primary-rgb), 0.2);
   border: 1px solid rgba(var(--color-primary-rgb), 0.3);
-  box-shadow: 
-    0 4px 12px rgba(var(--color-primary-rgb), 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-:global(.dark) .close-btn-lyric:hover {
+:global(.dark) .down-arrow-btn-lyric:hover {
   background: rgba(var(--color-primary-rgb), 0.3);
   border-color: rgba(var(--color-primary-rgb), 0.5);
-  box-shadow: 
-    0 6px 20px rgba(var(--color-primary-rgb), 0.3),
-    0 2px 8px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* 歌曲信息 */
+.song-info-lyric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.song-name-lyric {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-main);
+  text-align: center;
+  max-width: 280px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.song-artist-lyric {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  text-align: center;
+  max-width: 280px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:global(.dark) .song-name-lyric {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+:global(.dark) .song-artist-lyric {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 /* 进度条区域 */

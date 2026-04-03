@@ -329,12 +329,12 @@ const isActive = (path: string) => {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.75rem;
+  font-size: 0.625rem;
   color: var(--color-text-secondary);
 }
 
 .text-icon {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
 }
 
 .footer-subtext {

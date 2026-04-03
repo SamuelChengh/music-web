@@ -1,9 +1,24 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { Home, ChartHistogram, People, Like, Videocamera, Broadcast, Music, Mail, Copy, Send } from '@icon-park/vue-next';
 
 const route = useRoute();
+
+// 响应式屏幕检测
+const isDesktop = ref(false);
+const checkScreenSize = () => {
+  isDesktop.value = window.innerWidth >= 1024; // lg breakpoint
+};
+
+onMounted(() => {
+  checkScreenSize();
+  window.addEventListener('resize', checkScreenSize);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkScreenSize);
+});
 
 // 联系我功能
 const showContactCard = ref(false);
@@ -136,17 +151,18 @@ const isActive = (path: string) => {
   </aside>
   
   <!-- 使用 Teleport 将弹出层传送到 body，避免 backdrop-filter 影响 fixed 定位 -->
+  <!-- 只在 PC 端（≥1024px）时渲染 -->
   <Teleport to="body">
     <!-- Toast 提示 -->
     <Transition name="toast">
-      <div v-if="showToastMessage" class="toast-message">
+      <div v-if="showToastMessage && isDesktop" class="toast-message">
         {{ showToastMessage }}
       </div>
     </Transition>
     
     <!-- 联系卡片 -->
     <Transition name="contact-card">
-      <div v-if="showContactCard" class="contact-card" @click.stop>
+      <div v-if="showContactCard && isDesktop" class="contact-card" @click.stop>
         <div class="contact-header">
           <Mail theme="filled" size="20" class="contact-icon" />
           <span class="contact-title">联系我</span>
@@ -167,7 +183,7 @@ const isActive = (path: string) => {
     
     <!-- 点击外部关闭 -->
     <Transition name="fade">
-      <div v-if="showContactCard" class="contact-overlay" @click="showContactCard = false"></div>
+      <div v-if="showContactCard && isDesktop" class="contact-overlay" @click="showContactCard = false"></div>
     </Transition>
   </Teleport>
 </template>

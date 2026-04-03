@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useThemeStore, useFavoritesStore, usePlayerStore } from './stores';
 import LeftSidebar from './components/layout/LeftSidebar.vue';
@@ -16,6 +16,14 @@ const playerStore = usePlayerStore();
 const showMobileSidebar = ref(false);
 const showMobileThemeMenu = ref(false);
 const searchKeyword = ref('');
+const isDesktop = ref(false);
+
+const checkScreenSize = () => {
+  isDesktop.value = window.innerWidth >= 1024;
+  if (isDesktop.value && showMobileSidebar.value) {
+    showMobileSidebar.value = false;
+  }
+};
 
 const themeColors = [
   { value: 'green', hex: '#00A878' },
@@ -39,15 +47,21 @@ const goToSearch = () => {
 };
 
 onMounted(() => {
+  checkScreenSize();
+  window.addEventListener('resize', checkScreenSize);
   themeStore.init();
   favoritesStore.init();
   playerStore.init();
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkScreenSize);
 });
 </script>
 
 <template>
   <div class="flex h-screen bg-view">
-    <LeftSidebar class="hidden lg:flex" />
+    <LeftSidebar v-if="isDesktop" />
     
     <div class="flex-1 flex flex-col min-w-0">
       <AppHeader class="hidden md:flex" />

@@ -56,20 +56,34 @@ const downloadSong = async () => {
   window.location.href = downloadUrl;
 };
 
-watch(() => playerStore.currentSong, async (song) => {
+watch(() => playerStore.currentSong, async (song, oldSong) => {
   if (song) {
-    if (audioRef.value) {
-      audioRef.value.pause();
-      audioRef.value.currentTime = 0;
-    }
-    const { url } = await getSongUrl(song.rid, playerStore.quality, 'mp3');
-    if (audioRef.value) {
-      audioRef.value.src = url;
-      audioRef.value.play();
-    }
+    // 判断是否切换到了新歌曲（基于 rid）
+    const isSameSong = oldSong && oldSong.rid === song.rid;
     
-    const lyricData = await getLyric(song.rid, 'lineLyric');
-    playerStore.setLyric(lyricData);
+    if (isSameSong) {
+      // 同一首歌：恢复播放进度，不重新加载
+      if (audioRef.value) {
+        audioRef.value.currentTime = playerStore.currentTime;
+        if (playerStore.isPlaying) {
+          audioRef.value.play();
+        }
+      }
+    } else {
+      // 不同歌曲：重新加载
+      if (audioRef.value) {
+        audioRef.value.pause();
+        audioRef.value.currentTime = 0;
+      }
+      const { url } = await getSongUrl(song.rid, playerStore.quality, 'mp3');
+      if (audioRef.value) {
+        audioRef.value.src = url;
+        audioRef.value.play();
+      }
+      
+      const lyricData = await getLyric(song.rid, 'lineLyric');
+      playerStore.setLyric(lyricData);
+    }
   }
 }, { immediate: true });
 

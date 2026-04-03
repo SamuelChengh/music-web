@@ -43,10 +43,17 @@ export const usePlayerStore = defineStore('player', () => {
   });
 
   const setSong = (song: Song, autoPlay = true) => {
+    // 判断是否切换到了新歌曲
+    const isSameSong = currentSong.value && currentSong.value.rid === song.rid;
+    
     currentSong.value = song;
     isPlaying.value = autoPlay;
-    currentTime.value = 0;
-    duration.value = song.duration || 0;
+    
+    // 只在切换歌曲时重置 currentTime 和 duration
+    if (!isSameSong) {
+      currentTime.value = 0;
+      duration.value = song.duration || 0;
+    }
     
     if (!playlist.value.find(s => s.rid === song.rid)) {
       playlist.value.push(song);
@@ -59,10 +66,19 @@ export const usePlayerStore = defineStore('player', () => {
   const playSongList = (songs: Song[], startIndex = 0) => {
     playlist.value = [...songs];
     currentIndex.value = startIndex;
-    currentSong.value = songs[startIndex];
+    
+    // 判断是否切换到了新歌曲
+    const targetSong = songs[startIndex];
+    const isSameSong = currentSong.value && currentSong.value.rid === targetSong.rid;
+    
+    currentSong.value = targetSong;
     isPlaying.value = true;
-    currentTime.value = 0;
-    duration.value = songs[startIndex].duration || 0;
+    
+    // 只在切换歌曲时重置 currentTime 和 duration
+    if (!isSameSong) {
+      currentTime.value = 0;
+      duration.value = targetSong.duration || 0;
+    }
   };
 
   const play = () => {
@@ -160,10 +176,19 @@ export const usePlayerStore = defineStore('player', () => {
 
   const playAt = (index: number) => {
     if (index >= 0 && index < playlist.value.length) {
+      // 判断是否切换到了新歌曲
+      const targetSong = playlist.value[index];
+      const isSameSong = currentSong.value && currentSong.value.rid === targetSong.rid;
+      
       currentIndex.value = index;
-      currentSong.value = playlist.value[index];
+      currentSong.value = targetSong;
       isPlaying.value = true;
-      currentTime.value = 0;
+      
+      // 只在切换歌曲时重置 currentTime 和 duration
+      if (!isSameSong) {
+        currentTime.value = 0;
+        duration.value = targetSong.duration || 0;
+      }
     }
   };
 

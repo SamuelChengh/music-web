@@ -77,12 +77,15 @@ const getRankClass = (index: number) => {
             <h1 class="playlist-name-compact line-clamp-2">
               {{ playlistInfo.name }}
             </h1>
-            <button class="play-all-btn-compact" @click="playAll">
+            <button 
+              class="play-all-btn"
+              @click="playAll"
+            >
               <div class="play-icon-wrapper">
-                <Play theme="outline" size="14" />
+                <Play theme="outline" size="16" />
               </div>
               <span class="play-text">播放全部</span>
-              <span class="song-count-badge">{{ songs.length }}</span>
+              <span class="play-count">{{ songs.length }}</span>
             </button>
           </div>
         </div>
@@ -163,28 +166,45 @@ const getRankClass = (index: number) => {
   margin: 0;
 }
 
-.play-all-btn-compact {
+.play-all-btn {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 8px 14px;
-  background: linear-gradient(135deg, var(--color-primary) 0%, rgba(var(--color-primary-rgb), 0.85) 100%);
-  border-radius: 20px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, rgba(var(--color-primary-rgb), 0.8) 100%);
+  border-radius: 12px;
   border: none;
   color: white;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 3px 12px rgba(var(--color-primary-rgb), 0.25);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.3),
+              0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
 }
 
-.play-all-btn-compact:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 5px 16px rgba(var(--color-primary-rgb), 0.35);
+.play-all-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-.play-all-btn-compact:active {
+.play-all-btn:hover::before {
+  opacity: 1;
+}
+
+.play-all-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(var(--color-primary-rgb), 0.4),
+              0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.play-all-btn:active {
   transform: translateY(0);
 }
 
@@ -196,20 +216,24 @@ const getRankClass = (index: number) => {
   justify-content: center;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 50%;
+  transition: background 0.3s ease;
+}
+
+.play-all-btn:hover .play-icon-wrapper {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .play-text {
   flex: 1;
 }
 
-.song-count-badge {
-  font-size: 11px;
+.play-count {
+  font-size: 10px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.8);
   background: rgba(255, 255, 255, 0.15);
-  padding: 2px 8px;
-  border-radius: 10px;
-  margin-left: 2px;
+  padding: 2px 6px;
+  border-radius: 8px;
 }
 
 @media (max-width: 768px) {
@@ -231,17 +255,6 @@ const getRankClass = (index: number) => {
   
   .playlist-name-compact {
     font-size: 15px;
-  }
-  
-  .play-all-btn-compact {
-    padding: 6px 14px;
-    font-size: 12px;
-    gap: 5px;
-  }
-  
-  .song-count-badge {
-    font-size: 10px;
-    padding: 2px 6px;
   }
 }
 

@@ -78,8 +78,10 @@ const getRankClass = (index: number) => {
               {{ playlistInfo.name }}
             </h1>
             <button class="play-all-btn-compact" @click="playAll">
-              <Play theme="outline" size="14" />
-              <span>播放全部</span>
+              <div class="play-icon-wrapper">
+                <Play theme="outline" size="14" />
+              </div>
+              <span class="play-text">播放全部</span>
               <span class="song-count-badge">{{ songs.length }}</span>
             </button>
           </div>
@@ -162,10 +164,10 @@ const getRankClass = (index: number) => {
 }
 
 .play-all-btn-compact {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
+  padding: 8px 14px;
   background: linear-gradient(135deg, var(--color-primary) 0%, rgba(var(--color-primary-rgb), 0.85) 100%);
   border-radius: 20px;
   border: none;
@@ -184,6 +186,20 @@ const getRankClass = (index: number) => {
 
 .play-all-btn-compact:active {
   transform: translateY(0);
+}
+
+.play-icon-wrapper {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+}
+
+.play-text {
+  flex: 1;
 }
 
 .song-count-badge {

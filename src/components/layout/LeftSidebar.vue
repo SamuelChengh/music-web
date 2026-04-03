@@ -77,7 +77,7 @@ const menuGroups = [
   {
     title: '推荐',
     items: [
-      { name: '发现音乐', path: '/', icon: Home },
+      { name: '发现音乐', path: '/discover', icon: Home },
       { name: '排行榜', path: '/rank', icon: ChartHistogram },
       { name: '歌手', path: '/artist', icon: People },
     ]
@@ -99,7 +99,7 @@ const menuGroups = [
 ];
 
 const isActive = (path: string) => {
-  if (path === '/') return route.path === '/';
+  if (path === '/discover') return route.path === '/discover';
   return route.path.startsWith(path);
 };
 </script>

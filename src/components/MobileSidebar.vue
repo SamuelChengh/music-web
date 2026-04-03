@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { useScrollLock } from '@vueuse/core';
 import { Home, ChartHistogram, People, Like, Videocamera, Broadcast, Music } from '@icon-park/vue-next';
 
 const emit = defineEmits<{
@@ -7,6 +9,20 @@ const emit = defineEmits<{
 }>();
 
 const router = useRouter();
+
+// 锁定 body 滚动，防止滚动穿透
+const bodyRef = ref(document.body);
+const isLocked = useScrollLock(bodyRef);
+
+// 组件挂载时锁定滚动
+onMounted(() => {
+  isLocked.value = true;
+});
+
+// 组件卸载时解锁滚动
+onUnmounted(() => {
+  isLocked.value = false;
+});
 
 const menuGroups = [
   {
@@ -212,6 +228,10 @@ const handleNavigate = (path: string) => {
   flex: 1;
   overflow-y: auto;
   padding: 16px 12px;
+  
+  /* 防止滚动穿透 */
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .menu-group {
@@ -244,7 +264,7 @@ const handleNavigate = (path: string) => {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 14px 16px;
+  padding: 8px 16px;
   border-radius: 14px;
   background: rgba(var(--color-bg-view-rgb), 0.6);
   border: 1px solid transparent;

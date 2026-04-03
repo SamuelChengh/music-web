@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router';
 import { getPlaylistInfo, getPlaylistSongs } from '../api';
 import { usePlayerStore, useFavoritesStore } from '../stores';
 import LikeButton from '../components/LikeButton.vue';
+import { useIsMobile } from '../composables/useIsMobile';
 import { Play } from '@icon-park/vue-next';
 
 interface Song {
@@ -16,6 +17,7 @@ interface Song {
 const route = useRoute();
 const playerStore = usePlayerStore();
 const favoritesStore = useFavoritesStore();
+const { isMobile } = useIsMobile();
 
 const playlistInfo = ref<any>(null);
 const songs = ref<Song[]>([]);
@@ -103,7 +105,7 @@ const getRankClass = (index: number) => {
               :song="song"
               size="small"
               :show-tooltip="false"
-              :class="favoritesStore.isFavorite(song.rid) ? '' : 'opacity-0 group-hover:opacity-100'"
+              :class="favoritesStore.isFavorite(song.rid) || isMobile ? '' : 'opacity-0 group-hover:opacity-100'"
             />
           </div>
         </div>

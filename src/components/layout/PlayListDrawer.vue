@@ -4,6 +4,7 @@ import { usePlayerStore, useFavoritesStore } from '../../stores';
 import { Close, Delete, Music } from '@icon-park/vue-next';
 import { ElTooltip } from 'element-plus';
 import LikeButton from '../LikeButton.vue';
+import { useIsMobile } from '../../composables/useIsMobile';
 
 const playerStore = usePlayerStore();
 const favoritesStore = useFavoritesStore();
@@ -67,7 +68,7 @@ watch(() => playerStore.showPlaylist, (show) => {
   }
 });
 
-const isMobile = computed(() => window.innerWidth < 768);
+const { isMobile } = useIsMobile();
 </script>
 
 <template>
@@ -162,12 +163,12 @@ const isMobile = computed(() => window.innerWidth < 768);
             <div class="mini-wave-bar"></div>
             <div class="mini-wave-bar"></div>
           </div>
-          <LikeButton
-            :song="song"
-            size="small"
-            :show-tooltip="false"
-            :class="favoritesStore.isFavorite(song.rid) ? '' : 'opacity-0 group-hover:opacity-100'"
-          />
+<LikeButton
+             :song="song"
+             size="small"
+             :show-tooltip="false"
+             :class="favoritesStore.isFavorite(song.rid) || isMobile ? '' : 'opacity-0 group-hover:opacity-100'"
+           />
           <el-tooltip content="移除" placement="top">
             <button 
               class="remove-btn"

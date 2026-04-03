@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router';
 import { searchSongs, getHotSearch } from '../api';
 import { usePlayerStore, useFavoritesStore } from '../stores';
 import LikeButton from '../components/LikeButton.vue';
+import { useIsMobile } from '../composables/useIsMobile';
 
 interface Song {
   rid: number;
@@ -15,6 +16,7 @@ interface Song {
 const route = useRoute();
 const playerStore = usePlayerStore();
 const favoritesStore = useFavoritesStore();
+const { isMobile } = useIsMobile();
 
 const keyword = ref('');
 const searchResults = ref<Song[]>([]);
@@ -100,7 +102,7 @@ const playSong = (song: Song, index: number) => {
             :song="song"
             size="small"
             :show-tooltip="false"
-            :class="favoritesStore.isFavorite(song.rid) ? '' : 'opacity-0 group-hover:opacity-100'"
+            :class="favoritesStore.isFavorite(song.rid) || isMobile ? '' : 'opacity-0 group-hover:opacity-100'"
           />
         </div>
       </div>

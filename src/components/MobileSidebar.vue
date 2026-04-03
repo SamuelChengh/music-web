@@ -261,7 +261,7 @@ const handleNavigate = (path: string) => {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   cursor: pointer;
   transition: transform 0.2s ease;
 }
@@ -292,8 +292,41 @@ const handleNavigate = (path: string) => {
 .logo-text {
   font-size: 16px;
   font-weight: 600;
-  color: var(--color-text-main);
-  letter-spacing: 0.5px;
+  
+  /* 渐变文字效果 */
+  background: linear-gradient(
+    to right,
+    var(--color-primary) 0%,
+    rgba(var(--color-primary-rgb), 0.7) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  
+  /* 增大字间距提升呼吸感 */
+  letter-spacing: 1px;
+  
+  /* 为渐变文字添加阴影效果 */
+  position: relative;
+}
+
+/* 伪元素实现阴影效果（兼容方案） */
+.logo-text::before {
+  content: 'TheH音乐';
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: -1;
+  background: linear-gradient(
+    to right,
+    var(--color-primary) 0%,
+    rgba(var(--color-primary-rgb), 0.7) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: blur(1px);
+  opacity: 0.2;
 }
 
 .header-decoration {

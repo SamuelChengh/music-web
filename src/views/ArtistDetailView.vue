@@ -2,9 +2,8 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { getArtistSongs, getArtistInfo } from '../api';
-import { usePlayerStore, useFavoritesStore } from '../stores';
-import { Play } from '@icon-park/vue-next';
-import { ElTooltip } from 'element-plus';
+import { usePlayerStore, useFavoritesStore, useQueueStore } from '../stores';
+import SongRowMobile from '../components/SongRowMobile.vue';
 import LikeButton from '../components/LikeButton.vue';
 import { useIsMobile } from '../composables/useIsMobile';
 
@@ -24,6 +23,7 @@ interface Artist {
 const route = useRoute();
 const playerStore = usePlayerStore();
 const favoritesStore = useFavoritesStore();
+const queueStore = useQueueStore();
 const { isMobile } = useIsMobile();
 const artistId = ref(Number(route.params.id));
 const artistInfo = ref<Artist | null>(null);
@@ -96,8 +96,12 @@ watch(() => route.params.id, (newId) => {
   loadData();
 });
 
-const playSong = (song: Song, index: number) => {
-  playerStore.playSongList(allSongs.value, index);
+const playSong = (song: Song) => {
+  if (!queueStore.playlist.find(s => s.rid === song.rid)) {
+    queueStore.addToQueue(song);
+  }
+  const queueIndex = queueStore.playlist.findIndex(s => s.rid === song.rid);
+  playerStore.playAt(queueIndex);
 };
 </script>
 
@@ -117,43 +121,55 @@ const playSong = (song: Song, index: number) => {
       </div>
 
       <h2 class="text-lg md:text-lg font-semibold mb-sm text-main">热门歌曲</h2>
+      
       <div class="flex flex-col">
-        <div
-          v-for="(song, index) in songs"
-          :key="song.rid"
-          class="flex items-center gap-sm md:gap-md py-sm rounded-xl md:rounded-2xl hover:bg-active cursor-pointer group transition-all duration-200 mb-xs"
-          @click="playSong(song, index)"
-        >
-          <div class="w-8 md:w-10 text-center font-bold text-lg md:text-xl" :class="index < 3 ? 'text-primary' : 'text-secondary'">
-            {{ index + 1 }}
+        <!-- 移动端歌曲列表 -->
+        <div class="md:hidden">
+          <SongRowMobile
+            v-for="song in songs"
+            :key="song.rid"
+            :song="song"
+            @play="playSong"
+          />
+        </div>
+        
+        <!-- PC端歌曲列表 -->
+        <div class="hidden md:block">
+          <div
+            v-for="song in songs"
+            :key="song.rid"
+            class="song-row-simple group"
+            @click="playSong(song)"
+          >
+            <img :src="song.pic" class="song-cover-simple" />
+            <div class="flex-1 min-w-0">
+              <div class="text-base md:text-lg font-medium text-main truncate">
+                {{ song.name }}
+              </div>
+              <div class="text-sm md:text-base text-secondary truncate mt-0.5">
+                {{ song.artist }}
+              </div>
+            </div>
+            <LikeButton
+              :song="song"
+              size="small"
+              :show-tooltip="false"
+              :class="favoritesStore.isFavorite(song.rid) || isMobile ? '' : 'opacity-0 group-hover:opacity-100'"
+            />
           </div>
-          <img :src="song.pic" class="w-11 h-11 md:w-14 md:h-14 rounded-lg md:rounded-xl object-cover shadow-sm group-hover:scale-105 transition-transform" />
-          <div class="flex-1 min-w-0">
-            <div class="text-lg md:text-lg font-medium text-main truncate group-hover:text-primary transition-colors">{{ song.name }}</div>
-            <div class="text-sm md:text-sm text-secondary truncate mt-1">{{ song.artist || artistInfo.name }}</div>
-          </div>
-<LikeButton
-             :song="song"
-             size="small"
-             :show-tooltip="false"
-             :class="favoritesStore.isFavorite(song.rid) || isMobile ? '' : 'opacity-0 group-hover:opacity-100'"
-           />
-          <el-tooltip content="播放" placement="top">
-            <button class="opacity-0 group-hover:opacity-100 p-2 md:p-2.5 gradient-bg text-white rounded-full transition-all">
-              <Play theme="filled" size="16" />
-            </button>
-          </el-tooltip>
         </div>
       </div>
 
-      <div class="py-lg text-center">
-        <div v-if="loadingMore" class="text-secondary">加载中...</div>
-        <div v-else-if="!hasMore && allSongs.length > 0" class="text-secondary">加载完毕</div>
+      <div v-if="loadingMore" class="text-center py-md text-secondary">
+        加载更多...
+      </div>
+      <div v-else-if="!hasMore && songs.length > 0" class="text-center py-md text-tertiary text-sm">
+        没有更多了
       </div>
     </div>
 
-    <div v-else class="text-center py-xl text-secondary">
-      歌手不存在
+    <div v-else class="empty-state-simple">
+      <div class="text-sm">歌手不存在</div>
     </div>
   </div>
 </template>

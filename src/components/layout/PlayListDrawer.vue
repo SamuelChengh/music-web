@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
-import { usePlayerStore, useFavoritesStore } from '../../stores';
-import { Close, Delete, Music } from '@icon-park/vue-next';
+import { ref, watch, computed } from 'vue';
+import { usePlayerStore, useFavoritesStore, useQueueStore } from '../../stores';
+import { Close, Delete, Music, Down } from '@icon-park/vue-next';
 import { ElTooltip } from 'element-plus';
 import LikeButton from '../LikeButton.vue';
 import { useIsMobile } from '../../composables/useIsMobile';
@@ -9,6 +9,7 @@ import { useScrollLock } from '@vueuse/core';
 
 const playerStore = usePlayerStore();
 const favoritesStore = useFavoritesStore();
+const queueStore = useQueueStore();
 const listRef = ref<HTMLDivElement | null>(null);
 const drawerRef = ref<HTMLDivElement | null>(null);
 const touchStartY = ref(0);
@@ -16,7 +17,6 @@ const touchDeltaY = ref(0);
 const isDragging = ref(false);
 const isClosing = ref(false);
 
-// 锁定 body 滚动，防止滚动穿透
 const bodyRef = ref(document.body);
 const isLocked = useScrollLock(bodyRef);
 
@@ -28,9 +28,36 @@ const removeSong = (index: number) => {
   playerStore.removeFromList(index);
 };
 
-const clearList = () => {
+const downgradeSong = (index: number) => {
+  queueStore.downgradePriority(index);
+};
+
+const clearAll = () => {
   playerStore.clearPlaylist();
 };
+
+const clearPriority = () => {
+  queueStore.clearPriorityQueue();
+};
+
+const priorityQueueItems = computed(() => {
+  return queueStore.playlist
+    .map((item, index) => ({ ...item, originalIndex: index }))
+    .filter(item => item.priority === 'high' && item.originalIndex !== queueStore.currentIndex);
+});
+
+const normalQueueItems = computed(() => {
+  return queueStore.playlist
+    .map((item, index) => ({ ...item, originalIndex: index }))
+    .filter(item => item.priority === 'normal');
+});
+
+const currentSongItem = computed(() => {
+  if (queueStore.currentIndex >= 0 && queueStore.currentIndex < queueStore.playlist.length) {
+    return queueStore.playlist[queueStore.currentIndex];
+  }
+  return null;
+});
 
 const drawerTransform = computed(() => {
   if (isClosing.value) return 'translateY(100%)';
@@ -70,11 +97,8 @@ watch(() => playerStore.showPlaylist, (show) => {
     touchDeltaY.value = 0;
     isDragging.value = false;
     isClosing.value = false;
-    
-    // 锁定背景滚动
     isLocked.value = true;
   } else {
-    // 解锁背景滚动
     isLocked.value = false;
   }
 });
@@ -117,12 +141,17 @@ const { isMobile } = useIsMobile();
         <div class="header-title">
           <Music theme="filled" size="18" class="text-primary" />
           <span class="text-sm text-main font-medium">播放列表</span>
-          <span class="text-xs text-secondary">({{ playerStore.playlist.length }})</span>
+          <span class="text-xs text-secondary">({{ queueStore.totalCount }})</span>
         </div>
         <div class="header-actions">
-          <el-tooltip v-if="playerStore.playlist.length > 0" content="清空播放列表" placement="top">
-            <button class="action-btn" @click="clearList">
-              清空
+          <el-tooltip v-if="priorityQueueItems.length > 0" content="清空下一首播放" placement="top">
+            <button class="action-btn priority-btn" @click="clearPriority">
+              清空优先
+            </button>
+          </el-tooltip>
+          <el-tooltip v-if="queueStore.totalCount > 0" content="清空全部队列" placement="top">
+            <button class="action-btn" @click="clearAll">
+              清空全部
             </button>
           </el-tooltip>
           <el-tooltip content="关闭" placement="top">
@@ -134,45 +163,133 @@ const { isMobile } = useIsMobile();
       </div>
       
       <div ref="listRef" class="drawer-content">
-        <div v-if="playerStore.playlist.length === 0" class="empty-state">
+        <div v-if="queueStore.totalCount === 0" class="empty-state">
           <Music theme="outline" size="48" class="text-description" />
           <span class="text-secondary text-sm">播放列表为空</span>
         </div>
         
-        <div
-          v-for="(song, index) in playerStore.playlist"
-          :key="song.rid"
-          class="song-item group"
-          :class="{ 'is-playing': playerStore.currentIndex === index }"
-          @click="playSong(index)"
-        >
-          <div class="song-cover">
-            <img :src="song.pic" class="cover-thumb" />
-          </div>
-          <div class="song-info">
-            <div class="song-name">{{ song.name }}</div>
-            <div class="song-artist">{{ song.artist }}</div>
-          </div>
-          <div v-if="playerStore.currentIndex === index" class="song-playing-indicator">
-            <div class="mini-wave-bar"></div>
-            <div class="mini-wave-bar"></div>
-            <div class="mini-wave-bar"></div>
-          </div>
-<LikeButton
-             :song="song"
-             size="small"
-             :show-tooltip="false"
-             :class="favoritesStore.isFavorite(song.rid) || isMobile ? '' : 'opacity-0 group-hover:opacity-100'"
-           />
-          <el-tooltip content="移除" placement="top">
-            <button 
-              class="remove-btn"
-              @click.stop="removeSong(index)"
+        <template v-else>
+          <!-- 当前播放 -->
+          <div v-if="currentSongItem" class="queue-section">
+            <div class="section-label">当前播放</div>
+            <div
+              class="song-item group is-playing"
+              @click="playSong(queueStore.currentIndex)"
             >
-              <Delete theme="outline" size="16" />
-            </button>
-          </el-tooltip>
-        </div>
+              <div class="song-cover">
+                <img :src="currentSongItem.pic" class="cover-thumb" />
+              </div>
+              <div class="song-info">
+                <div class="song-name">{{ currentSongItem.name }}</div>
+                <div class="song-artist">{{ currentSongItem.artist }}</div>
+              </div>
+              <div class="song-playing-indicator">
+                <div class="mini-wave-bar"></div>
+                <div class="mini-wave-bar"></div>
+                <div class="mini-wave-bar"></div>
+              </div>
+              <LikeButton
+                :song="currentSongItem"
+                size="small"
+                :show-tooltip="false"
+              />
+              <el-tooltip content="移除" placement="top">
+                <button 
+                  class="remove-btn"
+                  @click.stop="removeSong(queueStore.currentIndex)"
+                >
+                  <Delete theme="outline" size="16" />
+                </button>
+              </el-tooltip>
+            </div>
+          </div>
+
+          <!-- 下一首播放 -->
+          <div v-if="priorityQueueItems.length > 0" class="queue-section priority-section">
+            <div class="section-label priority-label">
+              <span>下一首播放</span>
+              <span class="count-badge">{{ priorityQueueItems.length }}</span>
+            </div>
+            <div
+              v-for="song in priorityQueueItems"
+              :key="song.rid"
+              class="song-item group priority-item"
+              @click="playSong(song.originalIndex)"
+            >
+              <div class="song-cover">
+                <img :src="song.pic" class="cover-thumb" />
+              </div>
+              <div class="song-info">
+                <div class="song-name">
+                  <span class="priority-icon">⚡</span>
+                  {{ song.name }}
+                </div>
+                <div class="song-artist">{{ song.artist }}</div>
+              </div>
+              <LikeButton
+                :song="song"
+                size="small"
+                :show-tooltip="false"
+                :class="favoritesStore.isFavorite(song.rid) || isMobile ? '' : 'opacity-0 group-hover:opacity-100'"
+              />
+              <el-tooltip content="降级为普通队列" placement="top">
+                <button 
+                  class="downgrade-btn"
+                  @click.stop="downgradeSong(song.originalIndex)"
+                >
+                  <Down theme="outline" size="16" />
+                </button>
+              </el-tooltip>
+              <el-tooltip content="移除" placement="top">
+                <button 
+                  class="remove-btn"
+                  @click.stop="removeSong(song.originalIndex)"
+                >
+                  <Delete theme="outline" size="16" />
+                </button>
+              </el-tooltip>
+            </div>
+          </div>
+
+          <!-- 播放队列 -->
+          <div v-if="normalQueueItems.length > 0" class="queue-section">
+            <div class="section-label">播放队列</div>
+            <div
+              v-for="song in normalQueueItems"
+              :key="song.rid"
+              class="song-item group"
+              :class="{ 'is-playing': queueStore.currentIndex === song.originalIndex }"
+              @click="playSong(song.originalIndex)"
+            >
+              <div class="song-cover">
+                <img :src="song.pic" class="cover-thumb" />
+              </div>
+              <div class="song-info">
+                <div class="song-name">{{ song.name }}</div>
+                <div class="song-artist">{{ song.artist }}</div>
+              </div>
+              <div v-if="queueStore.currentIndex === song.originalIndex" class="song-playing-indicator">
+                <div class="mini-wave-bar"></div>
+                <div class="mini-wave-bar"></div>
+                <div class="mini-wave-bar"></div>
+              </div>
+              <LikeButton
+                :song="song"
+                size="small"
+                :show-tooltip="false"
+                :class="favoritesStore.isFavorite(song.rid) || isMobile ? '' : 'opacity-0 group-hover:opacity-100'"
+              />
+              <el-tooltip content="移除" placement="top">
+                <button 
+                  class="remove-btn"
+                  @click.stop="removeSong(song.originalIndex)"
+                >
+                  <Delete theme="outline" size="16" />
+                </button>
+              </el-tooltip>
+            </div>
+          </div>
+        </template>
       </div>
     </div>
   </Teleport>
@@ -283,6 +400,15 @@ const { isMobile } = useIsMobile();
   background: rgba(var(--color-primary-rgb), 0.1);
 }
 
+.action-btn.priority-btn {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.action-btn.priority-btn:hover {
+  background: rgba(245, 158, 11, 0.2);
+}
+
 .close-btn {
   width: 28px;
   height: 28px;
@@ -315,6 +441,40 @@ const { isMobile } = useIsMobile();
   padding: 48px 0;
 }
 
+.queue-section {
+  margin-bottom: 8px;
+}
+
+.section-label {
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: rgba(var(--color-bg-tertiary), 0.3);
+}
+
+.section-label.priority-label {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  background: #f59e0b;
+  border-radius: 10px;
+}
+
 .song-item {
   display: flex;
   align-items: center;
@@ -337,6 +497,16 @@ const { isMobile } = useIsMobile();
   background: rgba(var(--color-primary-rgb), 0.1);
   border: 1px solid rgba(var(--color-primary-rgb), 0.3);
   box-shadow: 0 0 15px rgba(var(--color-primary-rgb), 0.1);
+}
+
+.song-item.priority-item {
+  background: rgba(245, 158, 11, 0.05);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.song-item.priority-item:hover {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
 }
 
 .song-cover {
@@ -363,11 +533,19 @@ const { isMobile } = useIsMobile();
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .song-item.is-playing .song-name {
   color: var(--color-primary);
   font-weight: 500;
+}
+
+.priority-icon {
+  font-size: 12px;
+  color: #f59e0b;
 }
 
 .song-artist {
@@ -396,6 +574,7 @@ const { isMobile } = useIsMobile();
 .mini-wave-bar:nth-child(2) { animation-delay: 0.2s; height: 60%; }
 .mini-wave-bar:nth-child(3) { animation-delay: 0.4s; height: 80%; }
 
+.downgrade-btn,
 .remove-btn {
   width: 28px;
   height: 28px;
@@ -408,8 +587,14 @@ const { isMobile } = useIsMobile();
   transition: all 0.2s ease;
 }
 
+.song-item:hover .downgrade-btn,
 .song-item:hover .remove-btn {
   opacity: 1;
+}
+
+.downgrade-btn:hover {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
 }
 
 .remove-btn:hover {
@@ -447,7 +632,7 @@ const { isMobile } = useIsMobile();
     right: 0;
     left: auto;
     bottom: 80px;
-    width: 320px;
+    width: 340px;
     max-height: calc(100vh - 160px);
     border-radius: 20px 0 0 20px;
     border-left: 1px solid rgba(var(--color-primary-rgb), 0.2);

@@ -2,7 +2,8 @@
 import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { searchSongs, getHotSearch } from '../api';
-import { usePlayerStore, useFavoritesStore } from '../stores';
+import { usePlayerStore, useFavoritesStore, useQueueStore } from '../stores';
+import SongRowMobile from '../components/SongRowMobile.vue';
 import LikeButton from '../components/LikeButton.vue';
 import { useIsMobile } from '../composables/useIsMobile';
 
@@ -16,6 +17,7 @@ interface Song {
 const route = useRoute();
 const playerStore = usePlayerStore();
 const favoritesStore = useFavoritesStore();
+const queueStore = useQueueStore();
 const { isMobile } = useIsMobile();
 
 const keyword = ref('');
@@ -56,8 +58,12 @@ watch(() => route.query.q, (newQ) => {
   }
 });
 
-const playSong = (song: Song, index: number) => {
-  playerStore.playSongList(searchResults.value, index);
+const playSong = (song: Song) => {
+  if (!queueStore.playlist.find(s => s.rid === song.rid)) {
+    queueStore.addToQueue(song);
+  }
+  const queueIndex = queueStore.playlist.findIndex(s => s.rid === song.rid);
+  playerStore.playAt(queueIndex);
 };
 </script>
 
@@ -76,43 +82,59 @@ const playSong = (song: Song, index: number) => {
       </div>
 
       <div v-else-if="searchResults.length > 0" class="flex flex-col">
-        <div
-          v-for="(song, index) in searchResults"
-          :key="song.rid"
-          class="song-row-simple group"
-          @click="playSong(song, index)"
-        >
-          <div class="rank-badge">
-            {{ index + 1 }}
-          </div>
-          <img 
-            :src="song.pic" 
-            class="song-cover-simple"
-            @error="($event.target as HTMLImageElement).style.display = 'none'"
-          />
-          <div class="flex-1 min-w-0">
-            <div class="text-base md:text-lg font-medium text-main truncate">
-              {{ song.name }}
-            </div>
-            <div class="text-sm md:text-base text-secondary truncate mt-0.5">
-              {{ song.artist }}
-            </div>
-          </div>
-          <LikeButton
+        <!-- 移动端歌曲列表 -->
+        <div class="md:hidden">
+          <SongRowMobile
+            v-for="song in searchResults"
+            :key="song.rid"
             :song="song"
-            size="small"
-            :show-tooltip="false"
-            :class="favoritesStore.isFavorite(song.rid) || isMobile ? '' : 'opacity-0 group-hover:opacity-100'"
+            @play="playSong"
           />
+        </div>
+        
+        <!-- PC端歌曲列表 -->
+        <div class="hidden md:block">
+          <div
+            v-for="song in searchResults"
+            :key="song.rid"
+            class="song-row-simple group"
+            @click="playSong(song)"
+          >
+            <img :src="song.pic" class="song-cover-simple" />
+            <div class="flex-1 min-w-0">
+              <div class="text-base md:text-lg font-medium text-main truncate">
+                {{ song.name }}
+              </div>
+              <div class="text-sm md:text-base text-secondary truncate mt-0.5">
+                {{ song.artist }}
+              </div>
+            </div>
+            <LikeButton
+              :song="song"
+              size="small"
+              :show-tooltip="false"
+              :class="favoritesStore.isFavorite(song.rid) || isMobile ? '' : 'opacity-0 group-hover:opacity-100'"
+            />
+          </div>
         </div>
       </div>
 
-      <div v-else-if="keyword" class="empty-state-simple">
-        <div class="text-sm">未找到相关歌曲</div>
+      <div v-else-if="keyword && !searching" class="text-center py-xl text-secondary">
+        未找到相关结果
       </div>
 
-      <div v-else class="empty-state-simple">
-        <div class="text-sm">在上方搜索框输入关键词搜索歌曲</div>
+      <div v-if="hotSearch.length > 0 && !keyword" class="mt-md">
+        <h3 class="text-base font-semibold text-main mb-sm">热门搜索</h3>
+        <div class="flex flex-wrap gap-2">
+          <button
+            v-for="(tag, index) in hotSearch"
+            :key="index"
+            class="hot-tag"
+            @click="keyword = tag; doSearch(tag)"
+          >
+            {{ tag }}
+          </button>
+        </div>
       </div>
     </div>
   </div>

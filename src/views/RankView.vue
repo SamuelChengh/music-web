@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
 import { getRankList, getRankTags } from '../api';
-import { usePlayerStore, useFavoritesStore } from '../stores';
+import { usePlayerStore, useFavoritesStore, useQueueStore } from '../stores';
+import SongRowMobile from '../components/SongRowMobile.vue';
 import LikeButton from '../components/LikeButton.vue';
 import { useIsMobile } from '../composables/useIsMobile';
 
@@ -15,6 +16,7 @@ interface Song {
 
 const playerStore = usePlayerStore();
 const favoritesStore = useFavoritesStore();
+const queueStore = useQueueStore();
 const { isMobile } = useIsMobile();
 const rankTags = ref<{ name: string; pic: string }[]>([]);
 const currentRank = ref('新歌榜');
@@ -45,8 +47,12 @@ const loadRank = async (rankName: string) => {
 
 watch(currentRank, loadRank, { immediate: true });
 
-const playSong = (song: Song, index: number) => {
-  playerStore.playSongList(rankList.value, index);
+const playSong = (song: Song) => {
+  if (!queueStore.playlist.find(s => s.rid === song.rid)) {
+    queueStore.addToQueue(song);
+  }
+  const queueIndex = queueStore.playlist.findIndex(s => s.rid === song.rid);
+  playerStore.playAt(queueIndex);
 };
 
 const handleImageError = (e: Event) => {
@@ -80,43 +86,56 @@ const getRankClass = (index: number) => {
           {{ rank }}
         </button>
       </div>
-
+      
       <div v-if="loading" class="text-center py-xl text-secondary">
         加载中...
       </div>
-
+      
       <div v-else class="flex flex-col">
-        <div
-          v-for="(song, index) in rankList"
-          :key="song.rid"
-          class="song-row-simple group"
-          @click="playSong(song, index)"
-        >
-          <div class="rank-badge" :class="getRankClass(index)">
-            {{ index + 1 }}
-          </div>
-          <img 
-            :src="song.pic" 
-            class="song-cover-simple"
-            @error="handleImageError"
+        <!-- 移动端歌曲列表 -->
+        <div class="md:hidden">
+          <SongRowMobile
+            v-for="(song, index) in rankList"
+            :key="song.rid"
+            :song="song"
+            :rank="index + 1"
+            :show-rank="true"
+            :rank-class="getRankClass(index)"
+            @play="playSong"
           />
-          <div class="flex-1 min-w-0">
-            <div class="text-base md:text-lg font-medium text-main truncate">
-              {{ song.name }}
+        </div>
+        
+        <!-- PC端歌曲列表 -->
+        <div class="hidden md:block">
+          <div
+            v-for="(song, index) in rankList"
+            :key="song.rid"
+            class="song-row-simple group"
+            @click="playSong(song)"
+          >
+            <div class="rank-badge" :class="getRankClass(index)">
+              {{ index + 1 }}
             </div>
-            <div class="text-sm md:text-base text-secondary truncate mt-0.5">
-              {{ song.artist }}
+            <img 
+              :src="song.pic" 
+              class="song-cover-simple"
+              @error="handleImageError"
+            />
+            <div class="flex-1 min-w-0">
+              <div class="text-base md:text-lg font-medium text-main truncate">
+                {{ song.name }}
+              </div>
+              <div class="text-sm md:text-base text-secondary truncate mt-0.5">
+                {{ song.artist }}
+              </div>
             </div>
+            <LikeButton
+              :song="song"
+              size="small"
+              :show-tooltip="false"
+              :class="favoritesStore.isFavorite(song.rid) || isMobile ? '' : 'opacity-0 group-hover:opacity-100'"
+            />
           </div>
-          <div v-if="song.info" class="text-xs text-secondary hidden lg:block max-w-[200px] truncate mr-2">
-            {{ song.info }}
-          </div>
-<LikeButton
-             :song="song"
-             size="small"
-             :show-tooltip="false"
-             :class="favoritesStore.isFavorite(song.rid) || isMobile ? '' : 'opacity-0 group-hover:opacity-100'"
-           />
         </div>
       </div>
     </div>

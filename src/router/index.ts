@@ -48,6 +48,11 @@ const router = createRouter({
       name: 'favorites',
       component: () => import('../views/FavoritesView.vue'),
     },
+    {
+      path: '/queue-test',
+      name: 'queue-test',
+      component: () => import('../views/QueueTestView.vue'),
+    },
   ],
 });
 

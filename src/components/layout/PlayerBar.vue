@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
-import { usePlayerStore } from '../../stores';
+import { usePlayerStore, useQueueStore } from '../../stores';
 import { getSongUrl, getLyric } from '../../api';
 import { 
   Play, Pause, List, Text, Download, Close, ShuffleOne
@@ -12,6 +12,7 @@ import LikeButton from '../LikeButton.vue';
 import { useScrollLock } from '@vueuse/core';
 
 const playerStore = usePlayerStore();
+const queueStore = useQueueStore();
 const audioRef = ref<HTMLAudioElement | null>(null);
 const showQualityMenu = ref(false);
 const qualityMenuRef = ref<HTMLElement | null>(null);
@@ -40,6 +41,18 @@ const currentPlayMode = computed(() => {
 
 const currentQualityLabel = computed(() => {
   return qualities.find(q => q.value === playerStore.quality)?.label || '高音质';
+});
+
+const nextSong = computed(() => {
+  const next = queueStore.getNextSong();
+  return next ? next.song : null;
+});
+
+const hasNextPrioritySong = computed(() => {
+  return queueStore.priorityCount > 0 && 
+    queueStore.playlist.some((item, index) => 
+      item.priority === 'high' && index !== queueStore.currentIndex
+    );
 });
 
 const closeQualityMenu = (e: MouseEvent) => {
@@ -245,6 +258,18 @@ watch(showQualityMenu, (show) => {
             </svg>
           </button>
         </el-tooltip>
+        
+        <!-- 下一首预览 -->
+        <div v-if="nextSong" class="next-song-preview" @click="() => {
+          const next = queueStore.getNextSong();
+          if (next) playerStore.playAt(next.index);
+        }">
+          <span class="text-xs text-secondary">下一首:</span>
+          <span class="text-xs truncate max-w-32" :class="hasNextPrioritySong ? 'text-amber-500 font-medium' : 'text-main'">
+            {{ nextSong.name }}
+            <span v-if="hasNextPrioritySong" class="ml-1">⚡</span>
+          </span>
+        </div>
         
         <el-tooltip :content="currentPlayMode.title" placement="top">
           <button 
@@ -794,5 +819,28 @@ watch(showQualityMenu, (show) => {
 
 .progress-slider {
   flex: 1;
+}
+
+/* 下一首预览（PC端） */
+.next-song-preview {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  margin-left: 8px;
+  border-radius: 16px;
+  background: rgba(var(--color-bg-tertiary), 0.5);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  max-width: 200px;
+}
+
+.next-song-preview:hover {
+  background: rgba(var(--color-primary-rgb), 0.1);
+  transform: translateY(-1px);
+}
+
+.next-song-preview:active {
+  transform: scale(0.98);
 }
 </style>

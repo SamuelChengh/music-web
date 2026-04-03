@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useFavoritesStore, usePlayerStore } from '../stores';
-import { Like, Play } from '@icon-park/vue-next';
+import { useFavoritesStore, usePlayerStore, useQueueStore } from '../stores';
+import { Play } from '@icon-park/vue-next';
+import SongRowMobile from '../components/SongRowMobile.vue';
 import LikeButton from '../components/LikeButton.vue';
 
 interface Song {
@@ -13,12 +14,17 @@ interface Song {
 
 const favoritesStore = useFavoritesStore();
 const playerStore = usePlayerStore();
+const queueStore = useQueueStore();
 
 const favorites = computed(() => favoritesStore.sortedFavorites);
 const totalCount = computed(() => favoritesStore.totalCount);
 
-const playSong = (song: Song, index: number) => {
-  playerStore.playSongList(favorites.value, index);
+const playSong = (song: Song) => {
+  if (!queueStore.playlist.find(s => s.rid === song.rid)) {
+    queueStore.addToQueue(song);
+  }
+  const queueIndex = queueStore.playlist.findIndex(s => s.rid === song.rid);
+  playerStore.playAt(queueIndex);
 };
 
 const playAll = () => {
@@ -47,30 +53,43 @@ const playAll = () => {
       </div>
       
       <div v-if="favorites.length > 0" class="flex flex-col">
-        <div
-          v-for="(song, index) in favorites"
-          :key="song.rid"
-          class="song-row-simple group"
-          @click="playSong(song, index)"
-        >
-          <img 
-            :src="song.pic" 
-            class="song-cover-simple"
-            @error="($event.target as HTMLImageElement).style.display = 'none'"
-          />
-          <div class="flex-1 min-w-0">
-            <div class="text-base md:text-lg font-medium text-main truncate">
-              {{ song.name }}
-            </div>
-            <div class="text-sm md:text-base text-secondary truncate mt-0.5">
-              {{ song.artist }}
-            </div>
-          </div>
-          <LikeButton
+        <!-- 移动端歌曲列表 -->
+        <div class="md:hidden">
+          <SongRowMobile
+            v-for="song in favorites"
+            :key="song.rid"
             :song="song"
-            size="small"
-            :show-tooltip="false"
+            @play="playSong"
           />
+        </div>
+        
+        <!-- PC端歌曲列表 -->
+        <div class="hidden md:block">
+          <div
+            v-for="song in favorites"
+            :key="song.rid"
+            class="song-row-simple group"
+            @click="playSong(song)"
+          >
+            <img 
+              :src="song.pic" 
+              class="song-cover-simple"
+              @error="($event.target as HTMLImageElement).style.display = 'none'"
+            />
+            <div class="flex-1 min-w-0">
+              <div class="text-base md:text-lg font-medium text-main truncate">
+                {{ song.name }}
+              </div>
+              <div class="text-sm md:text-base text-secondary truncate mt-0.5">
+                {{ song.artist }}
+              </div>
+            </div>
+            <LikeButton
+              :song="song"
+              size="small"
+              :show-tooltip="false"
+            />
+          </div>
         </div>
       </div>
       

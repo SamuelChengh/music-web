@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
+import { useQueueStore } from './queue';
+import { useHistoryStore } from './history';
 
 export interface Song {
   rid: number;
@@ -21,9 +23,10 @@ const playModeLabels: Record<PlayMode, string> = {
 };
 
 export const usePlayerStore = defineStore('player', () => {
+  const queueStore = useQueueStore();
+  const historyStore = useHistoryStore();
+
   const currentSong = ref<Song | null>(null);
-  const playlist = ref<Song[]>([]);
-  const currentIndex = ref(-1);
   const isPlaying = ref(false);
   const currentTime = ref(0);
   const duration = ref(0);
@@ -37,47 +40,54 @@ export const usePlayerStore = defineStore('player', () => {
   const shuffledIndices = ref<number[]>([]);
   const shuffleIndex = ref(-1);
 
+  const playStartTime = ref<number>(0);
+  const songStartRid = ref<number>(0);
+
+  const playlist = computed(() => queueStore.playlist);
+  const currentIndex = computed(() => queueStore.currentIndex);
+
   const progress = computed(() => {
     if (!duration.value) return 0;
     return (currentTime.value / duration.value) * 100;
   });
 
   const setSong = (song: Song, autoPlay = true) => {
-    // 判断是否切换到了新歌曲
     const isSameSong = currentSong.value && currentSong.value.rid === song.rid;
-    
+
     currentSong.value = song;
     isPlaying.value = autoPlay;
-    
-    // 只在切换歌曲时重置 currentTime 和 duration
+
     if (!isSameSong) {
       currentTime.value = 0;
       duration.value = song.duration || 0;
+      playStartTime.value = Date.now();
+      songStartRid.value = song.rid;
     }
-    
-    if (!playlist.value.find(s => s.rid === song.rid)) {
-      playlist.value.push(song);
-      currentIndex.value = playlist.value.length - 1;
+
+    if (!queueStore.playlist.find(s => s.rid === song.rid)) {
+      queueStore.addToQueue(song);
+      const index = queueStore.playlist.findIndex(s => s.rid === song.rid);
+      queueStore.setCurrentIndex(index);
     } else {
-      currentIndex.value = playlist.value.findIndex(s => s.rid === song.rid);
+      const index = queueStore.playlist.findIndex(s => s.rid === song.rid);
+      queueStore.setCurrentIndex(index);
     }
   };
 
   const playSongList = (songs: Song[], startIndex = 0) => {
-    playlist.value = [...songs];
-    currentIndex.value = startIndex;
-    
-    // 判断是否切换到了新歌曲
+    queueStore.playSongList(songs, startIndex);
+
     const targetSong = songs[startIndex];
     const isSameSong = currentSong.value && currentSong.value.rid === targetSong.rid;
-    
+
     currentSong.value = targetSong;
     isPlaying.value = true;
-    
-    // 只在切换歌曲时重置 currentTime 和 duration
+
     if (!isSameSong) {
       currentTime.value = 0;
       duration.value = targetSong.duration || 0;
+      playStartTime.value = Date.now();
+      songStartRid.value = targetSong.rid;
     }
   };
 
@@ -131,10 +141,10 @@ export const usePlayerStore = defineStore('player', () => {
     volume.value = Math.max(0, Math.min(1, vol));
   };
 
-const setQuality = (q: 'exhigh' | 'lossless' | 'hires' | 'standard') => {
-  quality.value = q;
-  localStorage.setItem('player-quality', q);
-};
+  const setQuality = (q: 'exhigh' | 'lossless' | 'hires' | 'standard') => {
+    quality.value = q;
+    localStorage.setItem('player-quality', q);
+  };
 
   const setLyric = (l: { time: string; lineLyric: string }[]) => {
     lyric.value = l;
@@ -145,63 +155,60 @@ const setQuality = (q: 'exhigh' | 'lossless' | 'hires' | 'standard') => {
   };
 
   const addToPlaylist = (song: Song) => {
-    if (!playlist.value.find(s => s.rid === song.rid)) {
-      playlist.value.push(song);
-    }
+    queueStore.addToQueue(song);
   };
 
   const clearPlaylist = () => {
-    playlist.value = [];
-    currentIndex.value = -1;
+    queueStore.clearQueue();
     currentSong.value = null;
     isPlaying.value = false;
     showPlaylist.value = false;
+    currentTime.value = 0;
+    duration.value = 0;
   };
 
   const removeFromList = (index: number) => {
-    playlist.value.splice(index, 1);
-    if (index < currentIndex.value) {
-      currentIndex.value--;
-    } else if (index === currentIndex.value) {
-      if (playlist.value.length > 0) {
-        const newIndex = Math.min(index, playlist.value.length - 1);
-        currentSong.value = playlist.value[newIndex];
-        currentIndex.value = newIndex;
+    queueStore.removeFromQueue(index);
+
+    if (index === queueStore.currentIndex) {
+      if (queueStore.playlist.length > 0) {
+        currentSong.value = queueStore.currentSong;
       } else {
         currentSong.value = null;
-        currentIndex.value = -1;
         isPlaying.value = false;
       }
     }
   };
 
   const playAt = (index: number) => {
-    if (index >= 0 && index < playlist.value.length) {
-      // 判断是否切换到了新歌曲
-      const targetSong = playlist.value[index];
+    if (index >= 0 && index < queueStore.playlist.length) {
+      const targetSong = queueStore.playlist[index];
       const isSameSong = currentSong.value && currentSong.value.rid === targetSong.rid;
-      
-      currentIndex.value = index;
+
+      queueStore.setCurrentIndex(index);
       currentSong.value = targetSong;
       isPlaying.value = true;
-      
-      // 只在切换歌曲时重置 currentTime 和 duration
+
       if (!isSameSong) {
         currentTime.value = 0;
         duration.value = targetSong.duration || 0;
+        playStartTime.value = Date.now();
+        songStartRid.value = targetSong.rid;
       }
     }
   };
 
   const prev = () => {
-    if (playlist.value.length === 0) return;
-    let newIndex = currentIndex.value - 1;
-    if (newIndex < 0) newIndex = playlist.value.length - 1;
-    playAt(newIndex);
+    if (queueStore.playlist.length === 0) return;
+
+    const prevResult = queueStore.getPrevSong();
+    if (prevResult) {
+      playAt(prevResult.index);
+    }
   };
 
   const shufflePlaylist = () => {
-    const indices = playlist.value.map((_, i) => i);
+    const indices = queueStore.playlist.map((_, i) => i);
     for (let i = indices.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [indices[i], indices[j]] = [indices[j], indices[i]];
@@ -211,8 +218,8 @@ const setQuality = (q: 'exhigh' | 'lossless' | 'hires' | 'standard') => {
   };
 
   const next = () => {
-    if (playlist.value.length === 0) return;
-    
+    if (queueStore.playlist.length === 0) return;
+
     if (playMode.value === 'shuffle') {
       shuffleIndex.value++;
       if (shuffleIndex.value >= shuffledIndices.value.length) {
@@ -222,86 +229,111 @@ const setQuality = (q: 'exhigh' | 'lossless' | 'hires' | 'standard') => {
       return;
     }
 
-    let newIndex = currentIndex.value + 1;
-    if (newIndex >= playlist.value.length) {
-      if (playMode.value === 'loop') {
-        newIndex = 0;
+    const nextResult = queueStore.getNextSong();
+    if (nextResult) {
+      if (playMode.value === 'loop' || queueStore.currentIndex < queueStore.playlist.length - 1) {
+        playAt(nextResult.index);
       } else {
         isPlaying.value = false;
-        return;
       }
     }
-    playAt(newIndex);
   };
 
   const togglePlaylist = () => {
     showPlaylist.value = !showPlaylist.value;
   };
 
-const togglePlayMode = () => {
-  const modes: PlayMode[] = ['order', 'loop', 'single', 'shuffle'];
-  const currentIdx = modes.indexOf(playMode.value);
-  const nextIdx = (currentIdx + 1) % modes.length;
-  playMode.value = modes[nextIdx];
-  
-  localStorage.setItem('player-playMode', playMode.value);
-  
-  if (playMode.value === 'shuffle') {
-    shufflePlaylist();
-  }
-};
+  const togglePlayMode = () => {
+    const modes: PlayMode[] = ['order', 'loop', 'single', 'shuffle'];
+    const currentIdx = modes.indexOf(playMode.value);
+    const nextIdx = (currentIdx + 1) % modes.length;
+    playMode.value = modes[nextIdx];
 
-const getPlayModeLabel = () => {
-  return playModeLabels[playMode.value];
-};
+    localStorage.setItem('player-playMode', playMode.value);
 
-const init = () => {
-  const savedPlayMode = localStorage.getItem('player-playMode') as PlayMode;
-  if (savedPlayMode && ['order', 'loop', 'single', 'shuffle'].includes(savedPlayMode)) {
-    playMode.value = savedPlayMode;
-  }
-  
-  const savedQuality = localStorage.getItem('player-quality') as 'exhigh' | 'lossless' | 'hires' | 'standard';
-  if (savedQuality && ['exhigh', 'lossless', 'hires', 'standard'].includes(savedQuality)) {
-    quality.value = savedQuality;
-  }
-};
+    if (playMode.value === 'shuffle') {
+      shufflePlaylist();
+    }
+  };
 
-return {
-  currentSong,
-  playlist,
-  currentIndex,
-  isPlaying,
-  currentTime,
-  duration,
-  volume,
-  quality,
-  showLyric,
-  showPlaylist,
-  lyric,
-  currentLyricIndex,
-  progress,
-  playMode,
-  setSong,
-  playSongList,
-  play,
-  pause,
-  toggle,
-  setCurrentTime,
-  setDuration,
-  setVolume,
-  setQuality,
-  setLyric,
-  setCurrentLyricIndex,
-  addToPlaylist,
-  clearPlaylist,
-  removeFromList,
-  playAt,
-  prev,
-  next,
-  togglePlaylist,
-  togglePlayMode,
-  getPlayModeLabel,
-  init,
-};
+  const getPlayModeLabel = () => {
+    return playModeLabels[playMode.value];
+  };
+
+  const recordPlayHistory = () => {
+    if (currentSong.value && songStartRid.value === currentSong.value.rid) {
+      const playDuration = (Date.now() - playStartTime.value) / 1000;
+      historyStore.recordHistory(currentSong.value, playDuration);
+    }
+  };
+
+  watch(currentSong, (newSong, oldSong) => {
+    if (oldSong && oldSong.rid !== newSong?.rid) {
+      recordPlayHistory();
+    }
+  });
+
+  watch(isPlaying, (playing) => {
+    if (!playing && currentSong.value) {
+      recordPlayHistory();
+    }
+  });
+
+  const init = () => {
+    const savedPlayMode = localStorage.getItem('player-playMode') as PlayMode;
+    if (savedPlayMode && ['order', 'loop', 'single', 'shuffle'].includes(savedPlayMode)) {
+      playMode.value = savedPlayMode;
+    }
+
+    const savedQuality = localStorage.getItem('player-quality') as 'exhigh' | 'lossless' | 'hires' | 'standard';
+    if (savedQuality && ['exhigh', 'lossless', 'hires', 'standard'].includes(savedQuality)) {
+      quality.value = savedQuality;
+    }
+
+    queueStore.init();
+    historyStore.init();
+
+    if (queueStore.currentSong) {
+      currentSong.value = queueStore.currentSong;
+      duration.value = queueStore.currentSong.duration || 0;
+    }
+  };
+
+  return {
+    currentSong,
+    playlist,
+    currentIndex,
+    isPlaying,
+    currentTime,
+    duration,
+    volume,
+    quality,
+    showLyric,
+    showPlaylist,
+    lyric,
+    currentLyricIndex,
+    progress,
+    playMode,
+    setSong,
+    playSongList,
+    play,
+    pause,
+    toggle,
+    setCurrentTime,
+    setDuration,
+    setVolume,
+    setQuality,
+    setLyric,
+    setCurrentLyricIndex,
+    addToPlaylist,
+    clearPlaylist,
+    removeFromList,
+    playAt,
+    prev,
+    next,
+    togglePlaylist,
+    togglePlayMode,
+    getPlayModeLabel,
+    init,
+  };
 });

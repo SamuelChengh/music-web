@@ -2,7 +2,8 @@
 import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { getPlaylistInfo, getPlaylistSongs } from '../api';
-import { usePlayerStore, useFavoritesStore } from '../stores';
+import { usePlayerStore, useFavoritesStore, useQueueStore } from '../stores';
+import SongRowMobile from '../components/SongRowMobile.vue';
 import LikeButton from '../components/LikeButton.vue';
 import { useIsMobile } from '../composables/useIsMobile';
 import { Play } from '@icon-park/vue-next';
@@ -17,6 +18,7 @@ interface Song {
 const route = useRoute();
 const playerStore = usePlayerStore();
 const favoritesStore = useFavoritesStore();
+const queueStore = useQueueStore();
 const { isMobile } = useIsMobile();
 
 const playlistInfo = ref<any>(null);
@@ -39,8 +41,12 @@ onMounted(loadData);
 
 watch(() => route.params.id, loadData);
 
-const playSong = (song: Song, index: number) => {
-  playerStore.playSongList(songs.value, index);
+const playSong = (song: Song) => {
+  if (!queueStore.playlist.find(s => s.rid === song.rid)) {
+    queueStore.addToQueue(song);
+  }
+  const queueIndex = queueStore.playlist.findIndex(s => s.rid === song.rid);
+  playerStore.playAt(queueIndex);
 };
 
 const playAll = () => {
@@ -83,30 +89,46 @@ const getRankClass = (index: number) => {
         </button>
 
         <div class="flex flex-col">
-          <div
-            v-for="(song, index) in songs"
-            :key="song.rid"
-            class="song-row-simple group"
-            @click="playSong(song, index)"
-          >
-            <div class="rank-badge" :class="getRankClass(index)">
-              {{ index + 1 }}
-            </div>
-            <img :src="song.pic" class="song-cover-simple" />
-            <div class="flex-1 min-w-0">
-              <div class="text-base md:text-lg font-medium text-main truncate">
-                {{ song.name }}
-              </div>
-              <div class="text-sm md:text-base text-secondary truncate mt-0.5">
-                {{ song.artist }}
-              </div>
-            </div>
-            <LikeButton
+          <!-- 移动端歌曲列表 -->
+          <div class="md:hidden">
+            <SongRowMobile
+              v-for="(song, index) in songs"
+              :key="song.rid"
               :song="song"
-              size="small"
-              :show-tooltip="false"
-              :class="favoritesStore.isFavorite(song.rid) || isMobile ? '' : 'opacity-0 group-hover:opacity-100'"
+              :rank="index + 1"
+              :show-rank="true"
+              :rank-class="getRankClass(index)"
+              @play="playSong"
             />
+          </div>
+          
+          <!-- PC端歌曲列表 -->
+          <div class="hidden md:block">
+            <div
+              v-for="(song, index) in songs"
+              :key="song.rid"
+              class="song-row-simple group"
+              @click="playSong(song)"
+            >
+              <div class="rank-badge" :class="getRankClass(index)">
+                {{ index + 1 }}
+              </div>
+              <img :src="song.pic" class="song-cover-simple" />
+              <div class="flex-1 min-w-0">
+                <div class="text-base md:text-lg font-medium text-main truncate">
+                  {{ song.name }}
+                </div>
+                <div class="text-sm md:text-base text-secondary truncate mt-0.5">
+                  {{ song.artist }}
+                </div>
+              </div>
+              <LikeButton
+                :song="song"
+                size="small"
+                :show-tooltip="false"
+                :class="favoritesStore.isFavorite(song.rid) || isMobile ? '' : 'opacity-0 group-hover:opacity-100'"
+              />
+            </div>
           </div>
         </div>
       </template>

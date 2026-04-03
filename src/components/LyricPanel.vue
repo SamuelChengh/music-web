@@ -183,7 +183,7 @@ watch(() => playerStore.showLyric, async (show) => {
           @touchmove="handleTouchMove"
           @touchend="handleTouchEnd"
         >
-          <!-- 左上角倒三角按钮 -->
+          <!-- 右上角倒三角按钮 -->
           <button 
             class="down-arrow-btn-lyric"
             @click="closeLyricPanel"
@@ -401,20 +401,6 @@ watch(() => playerStore.showLyric, async (show) => {
   overflow-y: auto;
   padding: 16px 32px;
   z-index: 4;
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent,
-    black 5%,
-    black 95%,
-    transparent
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    transparent,
-    black 5%,
-    black 95%,
-    transparent
-  );
 }
 
 .lyric-content {
@@ -551,47 +537,46 @@ watch(() => playerStore.showLyric, async (show) => {
 }
 
 
-/* 左上角倒三角按钮 */
+/* 右上角倒三角按钮 - 简洁风格 */
 .down-arrow-btn-lyric {
   position: absolute;
   top: 20px;
-  left: 16px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  right: 16px;
+  
+  /* 去掉圆形背景，只保留图标 */
+  width: auto;
+  height: auto;
+  padding: 8px;
+  
   display: flex;
   align-items: center;
   justify-content: center;
   
-  color: var(--color-primary);
-  background: rgba(var(--color-primary-rgb), 0.15);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  color: var(--color-text-secondary);
+  background: transparent;
   
-  border: 1px solid rgba(var(--color-primary-rgb), 0.25);
-  
-  box-shadow: 
-    0 4px 12px rgba(var(--color-primary-rgb), 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  /* 去掉边框、阴影、毛玻璃效果 */
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   
   transition: all 0.3s ease;
   z-index: 10;
 }
 
 .down-arrow-btn-lyric:hover {
-  background: rgba(var(--color-primary-rgb), 0.25);
-  border-color: rgba(var(--color-primary-rgb), 0.4);
+  color: var(--color-primary);
   transform: scale(1.1);
 }
 
 :global(.dark) .down-arrow-btn-lyric {
-  background: rgba(var(--color-primary-rgb), 0.2);
-  border: 1px solid rgba(var(--color-primary-rgb), 0.3);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 :global(.dark) .down-arrow-btn-lyric:hover {
-  background: rgba(var(--color-primary-rgb), 0.3);
-  border-color: rgba(var(--color-primary-rgb), 0.5);
+  color: var(--color-primary);
 }
 
 /* 歌曲信息 */

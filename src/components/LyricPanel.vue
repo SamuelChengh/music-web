@@ -14,11 +14,9 @@ const lyricRefs = ref<HTMLElement[]>([]);
 const touchStartY = ref(0);
 const touchDeltaY = ref(0);
 const isDragging = ref(false);
-const isClosing = ref(false);
 
-// 计算歌词面板位移
+// 计算歌词面板位移（用于拖拽跟随）
 const lyricTransform = computed(() => {
-  if (isClosing.value) return 'translateY(100%)';
   if (isDragging.value && touchDeltaY.value > 0) {
     return `translateY(${touchDeltaY.value}px)`;
   }
@@ -40,23 +38,19 @@ const handleTouchMove = (e: TouchEvent) => {
 
 const handleTouchEnd = () => {
   if (touchDeltaY.value > 100) {
-    isClosing.value = true;
-    setTimeout(() => {
-      playerStore.showLyric = false;
-      isClosing.value = false;
-    }, 350);
+    // 立即关闭，不等待动画
+    playerStore.showLyric = false;
+    isDragging.value = false;
+  } else {
+    touchDeltaY.value = 0;
+    isDragging.value = false;
   }
-  touchDeltaY.value = 0;
-  isDragging.value = false;
 };
 
 // 关闭歌词面板（点击倒三角按钮）
 const closeLyricPanel = () => {
-  isClosing.value = true;
-  setTimeout(() => {
-    playerStore.showLyric = false;
-    isClosing.value = false;
-  }, 350);
+  // 立即关闭，不等待动画
+  playerStore.showLyric = false;
 };
 
 // 格式化时间
@@ -80,7 +74,6 @@ watch(() => playerStore.showLyric, async (show) => {
     // 重置下滑关闭状态
     touchDeltaY.value = 0;
     isDragging.value = false;
-    isClosing.value = false;
     
     const hasLyric = playerStore.lyric && playerStore.lyric.length > 0;
     if (!hasLyric) {
@@ -163,7 +156,6 @@ watch(() => playerStore.showLyric, async (show) => {
       <div 
         v-if="playerStore.showLyric"
         class="lg:hidden lyric-fullscreen"
-        :class="{ 'is-closing': isClosing }"
         :style="{ transform: lyricTransform }"
       >
         <!-- 模糊背景图片 -->
@@ -188,7 +180,7 @@ watch(() => playerStore.showLyric, async (show) => {
             class="down-arrow-btn-lyric"
             @click="closeLyricPanel"
           >
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 16l-6-6h12z"/>
             </svg>
           </button>
@@ -303,13 +295,6 @@ watch(() => playerStore.showLyric, async (show) => {
   z-index: 40;
   animation: fadeIn 0.5s ease;
   overflow: hidden;
-  
-  /* 过渡动画 */
-  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-.lyric-fullscreen.is-closing {
-  transform: translateY(100%) !important;
 }
 
 /* 模糊背景图片 */
@@ -537,7 +522,7 @@ watch(() => playerStore.showLyric, async (show) => {
 }
 
 
-/* 右上角倒三角按钮 - 简洁风格 */
+/* 右上角倒三角按钮 - 简洁风格，主题色 */
 .down-arrow-btn-lyric {
   position: absolute;
   top: 20px;
@@ -552,7 +537,8 @@ watch(() => playerStore.showLyric, async (show) => {
   align-items: center;
   justify-content: center;
   
-  color: var(--color-text-secondary);
+  /* 常态就显示主题色 */
+  color: var(--color-primary);
   background: transparent;
   
   /* 去掉边框、阴影、毛玻璃效果 */
@@ -567,12 +553,14 @@ watch(() => playerStore.showLyric, async (show) => {
 }
 
 .down-arrow-btn-lyric:hover {
+  /* hover保持主题色，只是放大效果 */
   color: var(--color-primary);
   transform: scale(1.1);
 }
 
 :global(.dark) .down-arrow-btn-lyric {
-  color: rgba(255, 255, 255, 0.6);
+  /* 深色模式也显示主题色 */
+  color: var(--color-primary);
 }
 
 :global(.dark) .down-arrow-btn-lyric:hover {

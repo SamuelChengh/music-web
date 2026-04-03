@@ -436,6 +436,11 @@ const { isMobile } = useIsMobile();
   opacity: 0;
 }
 
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1); }
+}
+
 @media (min-width: 768px) {
   .playlist-drawer {
     position: fixed;

@@ -182,26 +182,21 @@ export const useQueueStore = defineStore('queue', () => {
       }
     }
     
-    const highPrioritySongs = playlist.value.filter(
-      (item, index) => item.priority === 'high' && index !== currentIndex.value
-    );
+    // 优化查找逻辑:按添加时间排序,最近升级的最优先播放
+    const highPriorityCandidates = playlist.value
+      .map((item, index) => ({ 
+        item, 
+        index, 
+        addedAt: item.addedAt || 0
+      }))
+      .filter(({ item, index }) => 
+        item.priority === 'high' && index !== currentIndex.value
+      )
+      .sort((a, b) => b.addedAt - a.addedAt);
     
-    if (highPrioritySongs.length > 0) {
-      const nextHighPriority = playlist.value.findIndex(
-        (item, index) => item.priority === 'high' && index > currentIndex.value
-      );
-      
-      if (nextHighPriority !== -1) {
-        return { song: playlist.value[nextHighPriority], index: nextHighPriority };
-      }
-      
-      const firstHighPriority = playlist.value.findIndex(
-        (item, index) => item.priority === 'high' && index !== currentIndex.value
-      );
-      
-      if (firstHighPriority !== -1) {
-        return { song: playlist.value[firstHighPriority], index: firstHighPriority };
-      }
+    if (highPriorityCandidates.length > 0) {
+      const target = highPriorityCandidates[0];
+      return { song: target.item, index: target.index };
     }
     
     let nextIndex = currentIndex.value + 1;
@@ -240,6 +235,7 @@ export const useQueueStore = defineStore('queue', () => {
   const upgradePriority = (index: number) => {
     if (index >= 0 && index < playlist.value.length) {
       playlist.value[index].priority = 'high';
+      playlist.value[index].addedAt = Date.now();
       saveToStorage();
     }
   };

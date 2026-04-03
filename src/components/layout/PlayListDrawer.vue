@@ -37,13 +37,13 @@ const upgradeToPriority = (index: number) => {
 };
 
 const pendingDeleteIndex = ref<number | null>(null);
-const deleteTimer = ref<NodeJS.Timeout | null>(null);
+const deleteTimer = ref<number | null>(null);
 
 const pendingUpgradeIndex = ref<number | null>(null);
-const upgradeTimer = ref<NodeJS.Timeout | null>(null);
+const upgradeTimer = ref<number | null>(null);
 
 const pendingDowngradeIndex = ref<number | null>(null);
-const downgradeTimer = ref<NodeJS.Timeout | null>(null);
+const downgradeTimer = ref<number | null>(null);
 
 const handleDeleteClick = (index: number) => {
   if (pendingDeleteIndex.value === index) {
@@ -71,20 +71,14 @@ const clearDeletePending = () => {
 };
 
 const handleUpgradeClick = (index: number) => {
-  if (pendingUpgradeIndex.value === index) {
-    queueStore.upgradePriority(index);
+  // 立即执行升级
+  queueStore.upgradePriority(index);
+  
+  // 短暂视觉反馈
+  pendingUpgradeIndex.value = index;
+  setTimeout(() => {
     clearUpgradePending();
-  } else {
-    pendingUpgradeIndex.value = index;
-    
-    if (upgradeTimer.value) {
-      clearTimeout(upgradeTimer.value);
-    }
-    
-    upgradeTimer.value = setTimeout(() => {
-      clearUpgradePending();
-    }, 3000);
-  }
+  }, 500);
 };
 
 const clearUpgradePending = () => {
@@ -96,20 +90,14 @@ const clearUpgradePending = () => {
 };
 
 const handleDowngradeClick = (index: number) => {
-  if (pendingDowngradeIndex.value === index) {
-    queueStore.downgradePriority(index);
-    clearDowngradePending();
-  } else {
-    pendingDowngradeIndex.value = index;
-    
-    if (downgradeTimer.value) {
-      clearTimeout(downgradeTimer.value);
-    }
-    
-    downgradeTimer.value = setTimeout(() => {
-      clearDowngradePending();
-    }, 3000);
-  }
+  // 立即执行降级
+  queueStore.downgradePriority(index);
+  
+  // 短暂视觉反馈
+  pendingDowngradeIndex.value = index;
+  setTimeout(() => {
+    pendingDowngradeIndex.value = null;
+  }, 500);
 };
 
 const clearDowngradePending = () => {

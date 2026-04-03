@@ -28,7 +28,7 @@ export const usePlayerStore = defineStore('player', () => {
   const currentTime = ref(0);
   const duration = ref(0);
   const volume = ref(0.8);
-  const quality = ref<'exhigh' | 'lossless' | 'hires' | 'standard'>('lossless');
+  const quality = ref<'exhigh' | 'lossless' | 'hires' | 'standard'>('exhigh');
   const showLyric = ref(false);
   const showPlaylist = ref(false);
   const lyric = ref<{ time: string; lineLyric: string }[]>([]);

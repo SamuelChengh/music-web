@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { useQueueStore } from '../stores';
 import LikeButton from './LikeButton.vue';
-import { Add, PlayOne } from '@icon-park/vue-next';
+import { Add } from '@icon-park/vue-next';
+import { createFlyingNote, getElementCenter } from '../utils/flyingAnimation';
+import { ElMessage } from 'element-plus';
 import type { Song } from '../stores/player';
 
 interface Props {
@@ -28,12 +30,31 @@ const handleClick = () => {
 
 const handleAddToQueue = (e: Event) => {
   e.stopPropagation();
-  queueStore.addToQueue(props.song);
-};
 
-const handlePlayNext = (e: Event) => {
-  e.stopPropagation();
-  queueStore.playNext(props.song);
+  const buttonElement = (e.currentTarget as HTMLElement);
+  const buttonCenter = getElementCenter(buttonElement);
+  const playlistButton = document.querySelector('.player-bottom .function-btn:last-child') as HTMLElement;
+  const targetPosition = playlistButton ? getElementCenter(playlistButton) : { x: window.innerWidth / 2, y: window.innerHeight - 100 };
+
+  const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim() || '#00A878';
+
+  createFlyingNote({
+    startX: buttonCenter.x,
+    startY: buttonCenter.y,
+    endX: targetPosition.x,
+    endY: targetPosition.y,
+    duration: 800,
+    color: primaryColor,
+    onComplete: () => {
+      queueStore.addToQueue(props.song);
+      ElMessage({
+        message: '已加入播放列表',
+        type: 'success',
+        duration: 1500,
+        customClass: 'add-to-queue-toast'
+      });
+    }
+  });
 };
 </script>
 
@@ -57,26 +78,19 @@ const handlePlayNext = (e: Event) => {
       <div class="song-artist-mobile">{{ song.artist }}</div>
     </div>
     
-    <!-- 操作按钮：收藏 + 添加队列 + 下一首播放 -->
+    <!-- 操作按钮：收藏 + 添加队列 -->
     <div class="song-actions-mobile">
       <LikeButton
         :song="song"
         size="small"
         :show-tooltip="false"
       />
-      <button 
-        class="action-btn" 
+      <button
+        class="action-btn"
         @click.stop="handleAddToQueue"
         aria-label="添加到播放队列"
       >
         <Add theme="outline" size="20" />
-      </button>
-      <button 
-        class="action-btn play-next" 
-        @click.stop="handlePlayNext"
-        aria-label="下一首播放"
-      >
-        <PlayOne theme="outline" size="20" />
       </button>
     </div>
   </div>
@@ -163,7 +177,7 @@ const handlePlayNext = (e: Event) => {
 .song-actions-mobile {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   flex-shrink: 0;
 }
 
@@ -188,14 +202,6 @@ const handlePlayNext = (e: Event) => {
 
 .action-btn:active {
   transform: scale(0.92);
-}
-
-.action-btn.play-next {
-  color: #f59e0b;
-}
-
-.action-btn.play-next:hover {
-  background: rgba(245, 158, 11, 0.1);
 }
 
 @media (min-width: 768px) {

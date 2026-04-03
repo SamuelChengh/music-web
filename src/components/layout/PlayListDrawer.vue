@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
 import { usePlayerStore, useFavoritesStore, useQueueStore } from '../../stores';
-import { Close, Delete, Music, Down } from '@icon-park/vue-next';
+import { Close, Delete, Music, Down, Up } from '@icon-park/vue-next';
 import { ElTooltip } from 'element-plus';
 import LikeButton from '../LikeButton.vue';
 import { useIsMobile } from '../../composables/useIsMobile';
@@ -30,6 +30,10 @@ const removeSong = (index: number) => {
 
 const downgradeSong = (index: number) => {
   queueStore.downgradePriority(index);
+};
+
+const upgradeToPriority = (index: number) => {
+  queueStore.upgradePriority(index);
 };
 
 const clearAll = () => {
@@ -109,11 +113,12 @@ const { isMobile } = useIsMobile();
 <template>
   <Teleport to="body">
     <Transition name="fade">
-      <div 
-        v-if="playerStore.showPlaylist" 
-        class="drawer-overlay"
-        @click="playerStore.showPlaylist = false"
-      />
+<div 
+  v-if="playerStore.showPlaylist" 
+  class="drawer-overlay"
+  @click="playerStore.showPlaylist = false"
+  @touchmove.prevent
+/>
     </Transition>
     
     <div 
@@ -154,11 +159,6 @@ const { isMobile } = useIsMobile();
               清空全部
             </button>
           </el-tooltip>
-          <el-tooltip content="关闭" placement="top">
-            <button class="close-btn" @click="playerStore.showPlaylist = false">
-              <Close theme="outline" size="18" />
-            </button>
-          </el-tooltip>
         </div>
       </div>
       
@@ -169,41 +169,6 @@ const { isMobile } = useIsMobile();
         </div>
         
         <template v-else>
-          <!-- 当前播放 -->
-          <div v-if="currentSongItem" class="queue-section">
-            <div class="section-label">当前播放</div>
-            <div
-              class="song-item group is-playing"
-              @click="playSong(queueStore.currentIndex)"
-            >
-              <div class="song-cover">
-                <img :src="currentSongItem.pic" class="cover-thumb" />
-              </div>
-              <div class="song-info">
-                <div class="song-name">{{ currentSongItem.name }}</div>
-                <div class="song-artist">{{ currentSongItem.artist }}</div>
-              </div>
-              <div class="song-playing-indicator">
-                <div class="mini-wave-bar"></div>
-                <div class="mini-wave-bar"></div>
-                <div class="mini-wave-bar"></div>
-              </div>
-              <LikeButton
-                :song="currentSongItem"
-                size="small"
-                :show-tooltip="false"
-              />
-              <el-tooltip content="移除" placement="top">
-                <button 
-                  class="remove-btn"
-                  @click.stop="removeSong(queueStore.currentIndex)"
-                >
-                  <Delete theme="outline" size="16" />
-                </button>
-              </el-tooltip>
-            </div>
-          </div>
-
           <!-- 下一首播放 -->
           <div v-if="priorityQueueItems.length > 0" class="queue-section priority-section">
             <div class="section-label priority-label">
@@ -279,8 +244,16 @@ const { isMobile } = useIsMobile();
                 :show-tooltip="false"
                 :class="favoritesStore.isFavorite(song.rid) || isMobile ? '' : 'opacity-0 group-hover:opacity-100'"
               />
+              <el-tooltip content="升级为下一首播放" placement="top">
+                <button
+                  class="upgrade-btn"
+                  @click.stop="upgradeToPriority(song.originalIndex)"
+                >
+                  <Up theme="outline" size="16" />
+                </button>
+              </el-tooltip>
               <el-tooltip content="移除" placement="top">
-                <button 
+                <button
                   class="remove-btn"
                   @click.stop="removeSong(song.originalIndex)"
                 >
@@ -525,6 +498,7 @@ const { isMobile } = useIsMobile();
 .song-info {
   flex: 1;
   min-width: 0;
+  margin-right: auto;
 }
 
 .song-name {
@@ -574,7 +548,23 @@ const { isMobile } = useIsMobile();
 .mini-wave-bar:nth-child(2) { animation-delay: 0.2s; height: 60%; }
 .mini-wave-bar:nth-child(3) { animation-delay: 0.4s; height: 80%; }
 
-.downgrade-btn,
+.upgrade-btn,
+.downgrade-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: var(--color-primary);
+  transition: all 0.2s ease;
+}
+
+.upgrade-btn:hover,
+.downgrade-btn:hover {
+  background: rgba(var(--color-primary-rgb), 0.1);
+}
+
 .remove-btn {
   width: 28px;
   height: 28px;
@@ -587,14 +577,8 @@ const { isMobile } = useIsMobile();
   transition: all 0.2s ease;
 }
 
-.song-item:hover .downgrade-btn,
 .song-item:hover .remove-btn {
   opacity: 1;
-}
-
-.downgrade-btn:hover {
-  color: #f59e0b;
-  background: rgba(245, 158, 11, 0.1);
 }
 
 .remove-btn:hover {

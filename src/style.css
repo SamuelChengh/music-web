@@ -958,3 +958,35 @@ body {
     border-radius: 16px;
   }
 }
+
+/* 添加到播放列表 Toast 样式 */
+.add-to-queue-toast {
+  position: fixed !important;
+  top: auto !important;
+  bottom: calc(85px + env(safe-area-inset-bottom)) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  background: rgba(var(--color-bg-view-rgb), 0.95) !important;
+  color: var(--color-text-main) !important;
+  border: 1px solid rgba(var(--color-primary-rgb), 0.3) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  backdrop-filter: blur(10px) !important;
+  border-radius: 12px !important;
+  padding: 10px 16px !important;
+  font-size: 13px !important;
+  z-index: 9999 !important;
+}
+
+.add-to-queue-toast .el-message__content {
+  color: var(--color-primary) !important;
+  font-weight: 500 !important;
+}
+
+/* Toast fade out 动画 */
+.add-to-queue-toast.el-message--success {
+  transition: opacity 0.5s ease-out !important;
+}
+
+.add-to-queue-toast.el-message--success.el-message--closing {
+  opacity: 0 !important;
+}

@@ -121,7 +121,7 @@ onUnmounted(() => {
             <Transition name="dropdown">
               <div
                 v-if="showMobileThemeMenu"
-                class="theme-menu-glass fixed right-2 top-[76px] z-50"
+                class="theme-menu-glass fixed right-2 top-[72px] z-50"
               >
                 <div class="grid grid-cols-4 gap-3">
                   <button 

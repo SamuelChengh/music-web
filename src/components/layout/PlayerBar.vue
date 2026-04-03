@@ -338,10 +338,7 @@ onUnmounted(() => {
   
   <!-- 移动端播放器 - 悬浮胶囊设计（合并版） -->
   <div class="lg:hidden fixed bottom-4 left-4 right-4 z-50" v-show="!playerStore.showLyric">
-    <div 
-      class="player-capsule-extended"
-      :class="{ 'playing': playerStore.isPlaying }"
-    >
+    <div class="player-capsule-extended">
       <!-- 封面模糊背景（仅歌曲播放时显示） -->
       <img
         v-if="playerStore.currentSong"
@@ -601,16 +598,6 @@ onUnmounted(() => {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* 播放时浮动动画 */
-.player-capsule.playing {
-  animation: float 2s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
-}
-
 /* 封面 - 圆形 */
 .cover-circle {
   width: 40px;
@@ -730,11 +717,6 @@ onUnmounted(() => {
     rgba(30, 30, 30, 0.65) 50%,
     rgba(30, 30, 30, 0.75) 100%
   );
-}
-
-/* 播放时浮动动画 */
-.player-capsule-extended.playing {
-  animation: float 2s ease-in-out infinite;
 }
 
 /* 上层 */

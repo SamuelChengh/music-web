@@ -521,6 +521,7 @@ const handleNavigate = (path: string) => {
   flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 4px;
 }
 

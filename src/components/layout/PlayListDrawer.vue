@@ -133,22 +133,6 @@ const { isMobile } = useIsMobile();
         </div>
       </div>
       
-      <div v-if="playerStore.currentSong" class="current-playing">
-        <div class="playing-cover">
-          <img :src="playerStore.currentSong.pic" class="cover-image" />
-        </div>
-        <div class="playing-info">
-          <div class="playing-name">{{ playerStore.currentSong.name }}</div>
-          <div class="playing-artist">{{ playerStore.currentSong.artist }}</div>
-        </div>
-        <div class="playing-indicator">
-          <div class="wave-bar"></div>
-          <div class="wave-bar"></div>
-          <div class="wave-bar"></div>
-          <div class="wave-bar"></div>
-        </div>
-      </div>
-      
       <div ref="listRef" class="drawer-content">
         <div v-if="playerStore.playlist.length === 0" class="empty-state">
           <Music theme="outline" size="48" class="text-description" />
@@ -316,75 +300,6 @@ const { isMobile } = useIsMobile();
   background: rgba(var(--color-primary-rgb), 0.15);
 }
 
-.current-playing {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  margin: 8px 12px;
-  background: rgba(var(--color-primary-rgb), 0.12);
-  border-radius: 16px;
-  border: 1px solid rgba(var(--color-primary-rgb), 0.35);
-  box-shadow: 0 0 20px rgba(var(--color-primary-rgb), 0.15);
-}
-
-.playing-cover {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.cover-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  animation: rotate-slow 10s linear infinite;
-}
-
-.playing-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.playing-name {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--color-text-main);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.playing-artist {
-  font-size: 12px;
-  color: var(--color-text-secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.playing-indicator {
-  display: flex;
-  align-items: flex-end;
-  gap: 3px;
-  height: 24px;
-  padding: 0 4px;
-}
-
-.wave-bar {
-  width: 4px;
-  height: 100%;
-  background: var(--color-primary);
-  border-radius: 2px;
-  animation: wave 1s ease-in-out infinite;
-}
-
-.wave-bar:nth-child(1) { animation-delay: 0s; height: 50%; }
-.wave-bar:nth-child(2) { animation-delay: 0.2s; height: 70%; }
-.wave-bar:nth-child(3) { animation-delay: 0.4s; height: 40%; }
-.wave-bar:nth-child(4) { animation-delay: 0.6s; height: 90%; }
-
 .drawer-content {
   flex: 1;
   overflow-y: auto;
@@ -519,16 +434,6 @@ const { isMobile } = useIsMobile();
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
-}
-
-@keyframes rotate-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes wave {
-  0%, 100% { transform: scaleY(0.4); }
-  50% { transform: scaleY(1); }
 }
 
 @media (min-width: 768px) {

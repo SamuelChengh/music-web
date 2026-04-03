@@ -131,9 +131,10 @@ export const usePlayerStore = defineStore('player', () => {
     volume.value = Math.max(0, Math.min(1, vol));
   };
 
-  const setQuality = (q: 'exhigh' | 'lossless' | 'hires' | 'standard') => {
-    quality.value = q;
-  };
+const setQuality = (q: 'exhigh' | 'lossless' | 'hires' | 'standard') => {
+  quality.value = q;
+  localStorage.setItem('player-quality', q);
+};
 
   const setLyric = (l: { time: string; lineLyric: string }[]) => {
     lyric.value = l;
@@ -237,55 +238,70 @@ export const usePlayerStore = defineStore('player', () => {
     showPlaylist.value = !showPlaylist.value;
   };
 
-  const togglePlayMode = () => {
-    const modes: PlayMode[] = ['order', 'loop', 'single', 'shuffle'];
-    const currentIdx = modes.indexOf(playMode.value);
-    const nextIdx = (currentIdx + 1) % modes.length;
-    playMode.value = modes[nextIdx];
-    
-    if (playMode.value === 'shuffle') {
-      shufflePlaylist();
-    }
-  };
+const togglePlayMode = () => {
+  const modes: PlayMode[] = ['order', 'loop', 'single', 'shuffle'];
+  const currentIdx = modes.indexOf(playMode.value);
+  const nextIdx = (currentIdx + 1) % modes.length;
+  playMode.value = modes[nextIdx];
+  
+  localStorage.setItem('player-playMode', playMode.value);
+  
+  if (playMode.value === 'shuffle') {
+    shufflePlaylist();
+  }
+};
 
-  const getPlayModeLabel = () => {
-    return playModeLabels[playMode.value];
-  };
+const getPlayModeLabel = () => {
+  return playModeLabels[playMode.value];
+};
 
-  return {
-    currentSong,
-    playlist,
-    currentIndex,
-    isPlaying,
-    currentTime,
-    duration,
-    volume,
-    quality,
-    showLyric,
-    showPlaylist,
-    lyric,
-    currentLyricIndex,
-    progress,
-    playMode,
-    setSong,
-    playSongList,
-    play,
-    pause,
-    toggle,
-    setCurrentTime,
-    setDuration,
-    setVolume,
-    setQuality,
-    setLyric,
-    setCurrentLyricIndex,
-    addToPlaylist,
-    clearPlaylist,
-    removeFromList,
-    playAt,
-    prev,
-    next,
-    togglePlaylist,
-    togglePlayMode,
-    getPlayModeLabel,
-  };
+const init = () => {
+  const savedPlayMode = localStorage.getItem('player-playMode') as PlayMode;
+  if (savedPlayMode && ['order', 'loop', 'single', 'shuffle'].includes(savedPlayMode)) {
+    playMode.value = savedPlayMode;
+  }
+  
+  const savedQuality = localStorage.getItem('player-quality') as 'exhigh' | 'lossless' | 'hires' | 'standard';
+  if (savedQuality && ['exhigh', 'lossless', 'hires', 'standard'].includes(savedQuality)) {
+    quality.value = savedQuality;
+  }
+};
+
+return {
+  currentSong,
+  playlist,
+  currentIndex,
+  isPlaying,
+  currentTime,
+  duration,
+  volume,
+  quality,
+  showLyric,
+  showPlaylist,
+  lyric,
+  currentLyricIndex,
+  progress,
+  playMode,
+  setSong,
+  playSongList,
+  play,
+  pause,
+  toggle,
+  setCurrentTime,
+  setDuration,
+  setVolume,
+  setQuality,
+  setLyric,
+  setCurrentLyricIndex,
+  addToPlaylist,
+  clearPlaylist,
+  removeFromList,
+  playAt,
+  prev,
+  next,
+  togglePlaylist,
+  togglePlayMode,
+  getPlayModeLabel,
+  init,
+};
 });

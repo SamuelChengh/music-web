@@ -111,14 +111,6 @@ watch(() => playerStore.showLyric, async (show) => {
         <!-- 渐变遮罩层 -->
         <div class="lyric-gradient-overlay"></div>
         
-        <!-- 关闭按钮 - 悬浮 -->
-        <button 
-          class="close-btn-floating"
-          @click="playerStore.showLyric = false"
-        >
-          <Close theme="outline" size="18" />
-        </button>
-        
         <!-- 顶部：封面 -->
         <div class="lyric-header-vertical">
           <img
@@ -253,43 +245,6 @@ watch(() => playerStore.showLyric, async (show) => {
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
-}
-
-/* 关闭按钮 - 悬浮（透明化） */
-.close-btn-floating {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: transparent;
-  border: 1px solid rgba(var(--color-border), 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text-main);
-  transition: all 0.3s ease;
-  z-index: 10;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.close-btn-floating:hover {
-  background: rgba(var(--color-primary-rgb), 0.15);
-  border-color: rgba(var(--color-primary-rgb), 0.6);
-  transform: rotate(90deg) scale(1.1);
-  box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.2);
-}
-
-:global(.dark) .close-btn-floating {
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-:global(.dark) .close-btn-floating:hover {
-  background: rgba(var(--color-primary-rgb), 0.2);
-  border-color: rgba(var(--color-primary-rgb), 0.7);
-  box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.3);
 }
 
 /* 歌词头部 - 固定顶部（完全透明） */

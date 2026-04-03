@@ -173,6 +173,15 @@ export const useQueueStore = defineStore('queue', () => {
   const getNextSong = () => {
     if (playlist.value.length === 0) return null;
     
+    // 自动降级当前歌曲的优先级（如果它是高优先级）
+    if (currentIndex.value >= 0 && currentIndex.value < playlist.value.length) {
+      const currentSongItem = playlist.value[currentIndex.value];
+      if (currentSongItem.priority === 'high') {
+        currentSongItem.priority = 'normal';
+        saveToStorage();
+      }
+    }
+    
     const highPrioritySongs = playlist.value.filter(
       (item, index) => item.priority === 'high' && index !== currentIndex.value
     );

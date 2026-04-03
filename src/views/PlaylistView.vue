@@ -71,26 +71,18 @@ const getRankClass = (index: number) => {
       </div>
 
       <template v-else-if="playlistInfo">
-        <div class="playlist-header-light">
-          <img :src="playlistInfo.pic" class="playlist-cover-large" />
-          <div class="flex-1 min-w-0">
-            <h1 class="text-lg md:text-xl font-bold text-main mb-1 line-clamp-2">
+        <div class="playlist-header-compact">
+          <img :src="playlistInfo.pic" class="playlist-cover-compact" />
+          <div class="playlist-info-side flex flex-col justify-between min-h-[100px]">
+            <h1 class="playlist-name-compact line-clamp-2">
               {{ playlistInfo.name }}
             </h1>
-            <p class="text-xs md:text-sm text-secondary line-clamp-2">
-              {{ playlistInfo.desc || '暂无描述' }}
-            </p>
+            <button class="play-all-btn-compact" @click="playAll">
+              <Play theme="outline" size="14" />
+              <span>播放全部</span>
+              <span class="song-count-badge">{{ songs.length }}</span>
+            </button>
           </div>
-        </div>
-
-        <div class="flex justify-end mb-4">
-          <button class="play-all-btn" @click="playAll">
-            <div class="play-icon-wrapper">
-              <Play theme="outline" size="16" />
-            </div>
-            <span class="play-text">播放全部</span>
-            <span class="play-count">{{ songs.length }}</span>
-          </button>
         </div>
 
         <div class="flex flex-col">
@@ -144,93 +136,112 @@ const getRankClass = (index: number) => {
 </template>
 
 <style scoped>
-.play-all-btn {
+.playlist-header-compact {
   display: flex;
+  gap: 16px;
+  padding: 16px 0;
+  margin-bottom: 20px;
+}
+
+.playlist-cover-compact {
+  width: 100px;
+  height: 100px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--color-bg-tertiary);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.playlist-name-compact {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-text-main);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.play-all-btn-compact {
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 20px;
-  margin-bottom: 16px;
-  background: linear-gradient(135deg, var(--color-primary) 0%, rgba(var(--color-primary-rgb), 0.8) 100%);
-  border-radius: 14px;
+  gap: 6px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, rgba(var(--color-primary-rgb), 0.85) 100%);
+  border-radius: 20px;
   border: none;
   color: white;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.3),
-              0 2px 8px rgba(0, 0, 0, 0.1);
-  position: relative;
-  overflow: hidden;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 3px 12px rgba(var(--color-primary-rgb), 0.25);
 }
 
-.play-all-btn::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
+.play-all-btn-compact:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 16px rgba(var(--color-primary-rgb), 0.35);
 }
 
-.play-all-btn:hover::before {
-  opacity: 1;
-}
-
-.play-all-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(var(--color-primary-rgb), 0.4),
-              0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.play-all-btn:active {
+.play-all-btn-compact:active {
   transform: translateY(0);
 }
 
-.play-icon-wrapper {
-  width: 26px;
-  height: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  transition: background 0.3s ease;
-}
-
-.play-all-btn:hover .play-icon-wrapper {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.play-text {
-  flex: 1;
-}
-
-.play-count {
-  font-size: 12px;
+.song-count-badge {
+  font-size: 11px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.85);
   background: rgba(255, 255, 255, 0.15);
   padding: 2px 8px;
-  border-radius: 8px;
+  border-radius: 10px;
+  margin-left: 2px;
 }
 
 @media (max-width: 768px) {
-  .play-all-btn {
-    padding: 8px 14px;
-    border-radius: 12px;
-    font-size: 12px;
-    gap: 6px;
+  .playlist-header-compact {
+    gap: 14px;
+    padding: 14px 0;
+    margin-bottom: 16px;
   }
   
-  .play-icon-wrapper {
-    width: 22px;
-    height: 22px;
+  .playlist-cover-compact {
+    width: 88px;
+    height: 88px;
+    border-radius: 10px;
   }
-
-  .play-count {
+  
+  .playlist-info-side {
+    min-height: 88px;
+  }
+  
+  .playlist-name-compact {
+    font-size: 15px;
+  }
+  
+  .play-all-btn-compact {
+    padding: 6px 14px;
+    font-size: 12px;
+    gap: 5px;
+  }
+  
+  .song-count-badge {
     font-size: 10px;
     padding: 2px 6px;
+  }
+}
+
+@media (max-width: 400px) {
+  .playlist-cover-compact {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+  }
+  
+  .playlist-info-side {
+    min-height: 80px;
+  }
+  
+  .playlist-name-compact {
+    font-size: 14px;
   }
 }
 </style>

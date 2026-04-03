@@ -561,7 +561,6 @@ const { isMobile } = useIsMobile();
 .song-item.is-playing {
   background: rgba(var(--color-primary-rgb), 0.1);
   border: 1px solid rgba(var(--color-primary-rgb), 0.3);
-  box-shadow: 0 0 15px rgba(var(--color-primary-rgb), 0.1);
 }
 
 .song-item.priority-item {

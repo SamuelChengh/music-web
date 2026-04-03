@@ -511,7 +511,6 @@ watch(() => playerStore.showLyric, async (show) => {
   font-size: 18px;
   font-weight: 700;
   color: var(--color-primary);
-  text-shadow: 0 2px 20px rgba(var(--color-primary-rgb), 0.6);
   transform: scale(1.05);
   opacity: 1;
 }
@@ -632,7 +631,6 @@ watch(() => playerStore.showLyric, async (show) => {
 
 :global(.dark) .lyric-line.active {
   color: var(--color-primary);
-  text-shadow: 0 2px 30px rgba(var(--color-primary-rgb), 0.8);
 }
 
 /* 无歌词提示 */

@@ -238,12 +238,10 @@ onUnmounted(() => {
 
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 8px rgba(var(--color-primary-rgb), 0.3),
-                0 0 16px rgba(var(--color-primary-rgb), 0.15);
+    transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 16px rgba(var(--color-primary-rgb), 0.5),
-                0 0 32px rgba(var(--color-primary-rgb), 0.25);
+    transform: scale(1.02);
   }
 }
 
@@ -265,7 +263,6 @@ onUnmounted(() => {
   background: rgba(var(--color-primary-rgb), 0.12);
   border-color: rgba(var(--color-primary-rgb), 0.4);
   color: var(--color-primary);
-  box-shadow: 0 0 12px rgba(var(--color-primary-rgb), 0.2);
 }
 
 .search-glass {
@@ -279,16 +276,11 @@ onUnmounted(() => {
   -webkit-backdrop-filter: blur(12px);
   border-radius: 20px;
   border: 1px solid rgba(var(--color-primary-rgb), 0.25);
-  box-shadow: 0 0 12px rgba(var(--color-primary-rgb), 0.12),
-              inset 0 1px 2px rgba(var(--color-primary-rgb), 0.05);
   transition: all 0.3s ease;
 }
 
 .search-glass:focus-within {
   border-color: rgba(var(--color-primary-rgb), 0.5);
-  box-shadow: 0 0 20px rgba(var(--color-primary-rgb), 0.2),
-              0 0 40px rgba(var(--color-primary-rgb), 0.08),
-              inset 0 1px 2px rgba(var(--color-primary-rgb), 0.08);
 }
 
 .search-icon {
@@ -338,7 +330,6 @@ onUnmounted(() => {
 .btn-glass:hover {
   background: rgba(var(--color-primary-rgb), 0.12);
   border-color: rgba(var(--color-primary-rgb), 0.35);
-  box-shadow: 0 0 16px rgba(var(--color-primary-rgb), 0.18);
   transform: translateY(-1px);
 }
 
@@ -350,8 +341,7 @@ onUnmounted(() => {
   -webkit-backdrop-filter: blur(20px);
   border-radius: 16px;
   border: 1px solid rgba(var(--color-primary-rgb), 0.25);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12),
-              0 0 24px rgba(var(--color-primary-rgb), 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 }
 
 .theme-color-btn {
@@ -370,7 +360,6 @@ onUnmounted(() => {
 .theme-color-btn.active {
   border-color: var(--color-text-main);
   transform: scale(1.1);
-  box-shadow: 0 0 8px rgba(var(--color-primary-rgb), 0.3);
 }
 
 .glow-divider {
@@ -379,16 +368,7 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(var(--color-primary-rgb), 0.3) 10%,
-    rgba(var(--color-primary-rgb), 0.6) 30%,
-    rgba(var(--color-primary-rgb), 0.8) 50%,
-    rgba(var(--color-primary-rgb), 0.6) 70%,
-    rgba(var(--color-primary-rgb), 0.3) 90%,
-    transparent 100%
-  );
+  background: var(--color-border);
 }
 
 .fade-scale-enter-active {

@@ -404,15 +404,12 @@ const handleNavigate = (path: string) => {
   background: rgba(var(--color-bg-tertiary), 0.4);
   transform: translateX(4px);
   border-color: rgba(var(--color-primary-rgb), 0.2);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08),
-              0 0 12px rgba(var(--color-primary-rgb), 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .menu-card.active {
   background: rgba(var(--color-primary-rgb), 0.12);
   border-color: rgba(var(--color-primary-rgb), 0.4);
-  box-shadow: 0 0 20px rgba(var(--color-primary-rgb), 0.15),
-              inset 0 0 30px rgba(var(--color-primary-rgb), 0.05);
 }
 
 .card-icon {
@@ -435,7 +432,6 @@ const handleNavigate = (path: string) => {
 .menu-card.active .card-icon {
   color: var(--color-primary);
   background: rgba(var(--color-primary-rgb), 0.2);
-  box-shadow: 0 0 8px rgba(var(--color-primary-rgb), 0.3);
 }
 
 .card-label {
@@ -463,7 +459,6 @@ const handleNavigate = (path: string) => {
   height: 24px;
   background: var(--color-primary);
   border-radius: 0 4px 4px 0;
-  box-shadow: 0 0 10px var(--color-primary);
 }
 
 .drawer-footer {
@@ -591,7 +586,6 @@ const handleNavigate = (path: string) => {
   50% {
     opacity: 1;
     transform: scale(1.2);
-    box-shadow: 0 0 8px var(--color-primary);
   }
 }
 

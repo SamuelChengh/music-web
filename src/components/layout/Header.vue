@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 import { useThemeStore } from '../../stores/theme';
 import { usePlayerStore } from '../../stores';
 import { searchSongs, getHotSearch } from '../../api';
-import { Left, Right, Search, TShirt, Moon, Sunny, Play } from '@icon-park/vue-next';
+import { Left, Right, Search, TShirt, Moon, Sun, Play } from '@icon-park/vue-next';
 
 const router = useRouter();
 const themeStore = useThemeStore();
@@ -168,7 +168,7 @@ getHotSearch().then(res => {
         @click="themeStore.toggleMode()"
       >
         <Moon v-if="themeStore.mode === 'dark'" theme="filled" size="18" />
-        <Sunny v-else theme="outline" size="18" />
+        <Sun v-else theme="filled" size="18" />
       </button>
       
       <div class="relative">

@@ -7,7 +7,7 @@ import AppHeader from './components/layout/Header.vue';
 import PlayerBar from './components/layout/PlayerBar.vue';
 import PlayListDrawer from './components/layout/PlayListDrawer.vue';
 import MobileSidebar from './components/MobileSidebar.vue';
-import { Music, Moon, Sunny, TShirt, Search, Home, Left } from '@icon-park/vue-next';
+import { Music, Moon, Sun, TShirt, Search, Home, Left } from '@icon-park/vue-next';
 
 const router = useRouter();
 const themeStore = useThemeStore();
@@ -90,7 +90,7 @@ onMounted(() => {
             @click="themeStore.toggleMode()"
           >
             <Moon v-if="themeStore.mode === 'dark'" theme="filled" size="16" />
-            <Sunny v-else theme="outline" size="16" />
+            <Sun v-else theme="filled" size="16" />
           </button>
           
           <div class="relative">

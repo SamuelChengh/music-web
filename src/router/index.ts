@@ -43,16 +43,21 @@ const router = createRouter({
       name: 'dj',
       component: () => import('../views/DjView.vue'),
     },
-    {
-      path: '/favorites',
-      name: 'favorites',
-      component: () => import('../views/FavoritesView.vue'),
-    },
-    {
-      path: '/queue-test',
-      name: 'queue-test',
-      component: () => import('../views/QueueTestView.vue'),
-    },
+{
+  path: '/favorites',
+  name: 'favorites',
+  component: () => import('../views/FavoritesView.vue'),
+},
+{
+  path: '/history',
+  name: 'history',
+  component: () => import('../views/HistoryView.vue'),
+},
+{
+  path: '/queue-test',
+  name: 'queue-test',
+  component: () => import('../views/QueueTestView.vue'),
+},
   ],
 });
 

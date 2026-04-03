@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useScrollLock } from '@vueuse/core';
-import { Home, ChartHistogram, People, Like, Videocamera, Broadcast, Music, Mail, Copy, Send } from '@icon-park/vue-next';
+import { Home, ChartHistogram, People, Like, Videocamera, Broadcast, Music, Mail, Copy, Send, History } from '@icon-park/vue-next';
 
 const emit = defineEmits<{
   (e: 'close'): void;
@@ -93,12 +93,13 @@ const menuGroups = [
       { name: '电台', path: '/dj', icon: Broadcast },
     ]
   },
-  {
-    title: '我的音乐',
-    items: [
-      { name: '我喜欢', path: '/favorites', icon: Like },
-    ]
-  }
+{
+  title: '我的音乐',
+  items: [
+    { name: '我喜欢', path: '/favorites', icon: Like },
+    { name: '播放历史', path: '/history', icon: History },
+  ]
+}
 ];
 
 const isActive = (path: string) => {

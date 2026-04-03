@@ -337,7 +337,7 @@ onUnmounted(() => {
   </div>
   
   <!-- 移动端播放器 - 悬浮胶囊设计（合并版） -->
-  <div class="lg:hidden fixed bottom-4 left-4 right-4 z-50">
+  <div class="lg:hidden fixed bottom-4 left-4 right-4 z-50" v-show="!playerStore.showLyric">
     <div 
       class="player-capsule-extended"
       :class="{ 'playing': playerStore.isPlaying }"

@@ -120,8 +120,17 @@ watch(() => playerStore.showLyric, async (show) => {
         <!-- 渐变遮罩层 -->
         <div class="lyric-gradient-overlay"></div>
         
-        <!-- 顶部：封面 -->
+        <!-- 顶部：封面 + 关闭按钮 -->
         <div class="lyric-header-vertical">
+          <!-- 关闭按钮 - 右上角 -->
+          <button 
+            class="close-btn-lyric"
+            @click="playerStore.showLyric = false"
+          >
+            <Close theme="outline" size="20" />
+          </button>
+          
+          <!-- 封面 -->
           <img
             v-if="playerStore.currentSong"
             :src="playerStore.currentSong.pic"
@@ -148,8 +157,9 @@ watch(() => playerStore.showLyric, async (show) => {
           </div>
         </div>
         
-        <!-- 底部迷你播放器 - 只保留控制 -->
+        <!-- 底部迷你播放器 - 控制按钮 + 进度条 -->
         <div class="mini-player">
+          <!-- 控制按钮 -->
           <div class="mini-controls">
             <button class="mini-btn" @click="playerStore.prev()">
               <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
@@ -167,6 +177,13 @@ watch(() => playerStore.showLyric, async (show) => {
                 <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
               </svg>
             </button>
+          </div>
+          
+          <!-- 进度条 -->
+          <div class="mini-progress">
+            <span class="mini-time">{{ formatTime(playerStore.currentTime) }}</span>
+            <PlayerSlider class="mini-slider" />
+            <span class="mini-time">{{ formatTime(playerStore.duration) }}</span>
           </div>
         </div>
       </div>
@@ -453,5 +470,57 @@ watch(() => playerStore.showLyric, async (show) => {
   background: rgba(var(--color-primary-rgb), 0.2);
 }
 
+
+/* 关闭按钮 - 透明圆形 */
+.close-btn-lyric {
+  position: absolute;
+  top: 20px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-main);
+  background: rgba(var(--color-bg-view-rgb), 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.close-btn-lyric:hover {
+  color: var(--color-primary);
+  background: rgba(var(--color-primary-rgb), 0.2);
+  transform: scale(1.1);
+}
+
+:global(.dark) .close-btn-lyric {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+:global(.dark) .close-btn-lyric:hover {
+  background: rgba(var(--color-primary-rgb), 0.2);
+}
+
+/* 进度条区域 */
+.mini-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.mini-time {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  min-width: 32px;
+}
+
+.mini-slider {
+  flex: 1;
+}
 
 </style>

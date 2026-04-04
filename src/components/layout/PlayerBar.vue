@@ -914,6 +914,7 @@ watch(showQualityMenu, (show) => {
   width: calc(100% + 20px);
   height: calc(100% + 20px);
   object-fit: cover;
+  transform: scale(1.05);
   filter: blur(30px) saturate(150%);
   -webkit-filter: blur(30px) saturate(150%);
   opacity: 0.7;

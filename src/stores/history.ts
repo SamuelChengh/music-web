@@ -7,7 +7,7 @@ export interface HistoryItem extends Song {
   playDuration: number;
 }
 
-const MAX_HISTORY_COUNT = 100;
+const MAX_HISTORY_COUNT = 500;
 const MIN_PLAY_DURATION = 10;
 
 export const useHistoryStore = defineStore('history', () => {

@@ -129,7 +129,7 @@ const tooltipContent = computed(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 4px;
+  padding: 0;
   background: transparent;
   border: none;
   cursor: pointer;

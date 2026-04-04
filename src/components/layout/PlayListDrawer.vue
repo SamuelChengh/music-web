@@ -229,11 +229,9 @@ const { isMobile } = useIsMobile();
               清空优先
             </button>
           </el-tooltip>
-          <el-tooltip v-if="queueStore.totalCount > 0" content="清空全部队列" placement="top">
-            <button class="action-btn" @click="clearAll">
+          <button v-if="queueStore.totalCount > 0" class="action-btn" @click="clearAll">
               清空全部
             </button>
-          </el-tooltip>
         </div>
       </div>
       
@@ -625,7 +623,7 @@ const { isMobile } = useIsMobile();
 .downgrade-btn {
   min-width: 28px;
   height: 28px;
-  padding: 0 8px;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -648,7 +646,7 @@ const { isMobile } = useIsMobile();
 .remove-btn {
   min-width: 28px;
   height: 28px;
-  padding: 0 8px;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;

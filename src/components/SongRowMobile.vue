@@ -112,7 +112,7 @@ const handleAddToQueue = (e: Event) => {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
+  padding: 12px 0;
   background: rgba(var(--color-bg-view-rgb), 0.98);
   cursor: pointer;
   transition: background 0.2s ease;

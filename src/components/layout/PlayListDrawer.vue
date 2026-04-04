@@ -4,6 +4,7 @@ import { usePlayerStore, useFavoritesStore, useQueueStore } from '../../stores';
 import { Close, Delete, Music, Down, Up } from '@icon-park/vue-next';
 import { ElTooltip, ElMessageBox } from 'element-plus';
 import LikeButton from '../LikeButton.vue';
+import ConfirmActionSheet from '../ConfirmActionSheet.vue';
 import { useIsMobile } from '../../composables/useIsMobile';
 import { useScrollLock } from '@vueuse/core';
 
@@ -19,6 +20,7 @@ const isClosing = ref(false);
 
 const bodyRef = ref(document.body);
 const isLocked = useScrollLock(bodyRef);
+const showConfirmSheet = ref(false);
 
 const playSong = (index: number) => {
   playerStore.playAt(index);
@@ -85,17 +87,30 @@ const clearDowngradePending = () => {
 };
 
 const clearAll = () => {
-  ElMessageBox.confirm(
-    '确定要清空播放列表吗？',
-    '提示',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    }
-  ).then(() => {
-    playerStore.clearPlaylist();
-  }).catch(() => {});
+  if (isMobile.value) {
+    showConfirmSheet.value = true;
+  } else {
+    ElMessageBox.confirm(
+      '确定要清空播放列表吗？',
+      '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    ).then(() => {
+      playerStore.clearPlaylist();
+    }).catch(() => {});
+  }
+};
+
+const handleConfirmClear = () => {
+  playerStore.clearPlaylist();
+  showConfirmSheet.value = false;
+};
+
+const handleCancelClear = () => {
+  showConfirmSheet.value = false;
 };
 
 const clearPriority = () => {
@@ -337,6 +352,16 @@ const { isMobile } = useIsMobile();
         </template>
       </div>
     </div>
+    
+    <ConfirmActionSheet
+      :visible="showConfirmSheet"
+      title="清空播放列表？"
+      message="将清除所有播放队列"
+      confirm-text="清空"
+      cancel-text="取消"
+      @confirm="handleConfirmClear"
+      @cancel="handleCancelClear"
+    />
   </Teleport>
 </template>
 

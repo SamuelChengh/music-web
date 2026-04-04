@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { useHistoryStore, usePlayerStore, useQueueStore } from '../stores';
 import { Play, Delete, Close } from '@icon-park/vue-next';
 import SongRowMobile from '../components/SongRowMobile.vue';
 import LikeButton from '../components/LikeButton.vue';
+import ConfirmActionSheet from '../components/ConfirmActionSheet.vue';
+import { useIsMobile } from '../composables/useIsMobile';
 
 interface Song {
   rid: number;
@@ -16,9 +18,11 @@ interface Song {
 const historyStore = useHistoryStore();
 const playerStore = usePlayerStore();
 const queueStore = useQueueStore();
+const { isMobile } = useIsMobile();
 
 const recentHistory = computed(() => historyStore.recentHistory);
 const totalCount = computed(() => historyStore.totalCount);
+const showConfirmSheet = ref(false);
 
 const playSong = (song: Song) => {
   if (!queueStore.playlist.find(s => s.rid === song.rid)) {
@@ -29,17 +33,30 @@ const playSong = (song: Song) => {
 };
 
 const clearAllHistory = () => {
-  ElMessageBox.confirm(
-    '确定要清空所有播放历史吗？',
-    '提示',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    }
-  ).then(() => {
-    historyStore.clearHistory();
-  }).catch(() => {});
+  if (isMobile.value) {
+    showConfirmSheet.value = true;
+  } else {
+    ElMessageBox.confirm(
+      '确定要清空所有播放历史吗？',
+      '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    ).then(() => {
+      historyStore.clearHistory();
+    }).catch(() => {});
+  }
+};
+
+const handleConfirmClear = () => {
+  historyStore.clearHistory();
+  showConfirmSheet.value = false;
+};
+
+const handleCancelClear = () => {
+  showConfirmSheet.value = false;
 };
 
 const removeSong = (rid: number) => {
@@ -282,6 +299,16 @@ const formatDuration = (seconds: number) => {
       </div>
     </div>
   </div>
+  
+  <ConfirmActionSheet
+    :visible="showConfirmSheet"
+    title="清空播放历史？"
+    message="将清除所有播放历史记录"
+    confirm-text="清空"
+    cancel-text="取消"
+    @confirm="handleConfirmClear"
+    @cancel="handleCancelClear"
+  />
 </template>
 
 <style scoped>

@@ -950,7 +950,7 @@ watch(showQualityMenu, (show) => {
   display: flex;
   align-items: center;
   gap: 12px;
-  height: 40px;
+  height: 50px;
   z-index: 2;
 }
 
@@ -960,7 +960,7 @@ watch(showQualityMenu, (show) => {
   display: flex;
   align-items: center;
   justify-content: space-around;
-  height: 32px;
+  height: 30px;
   margin-top: 4px;
   z-index: 2;
 }

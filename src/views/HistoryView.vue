@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { ElMessageBox } from 'element-plus';
 import { useHistoryStore, usePlayerStore, useQueueStore } from '../stores';
 import { Play, Delete, Close } from '@icon-park/vue-next';
 import SongRowMobile from '../components/SongRowMobile.vue';
@@ -28,9 +29,17 @@ const playSong = (song: Song) => {
 };
 
 const clearAllHistory = () => {
-  if (confirm('确定要清空所有播放历史吗？')) {
+  ElMessageBox.confirm(
+    '确定要清空所有播放历史吗？',
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }
+  ).then(() => {
     historyStore.clearHistory();
-  }
+  }).catch(() => {});
 };
 
 const removeSong = (rid: number) => {

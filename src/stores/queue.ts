@@ -49,7 +49,7 @@ export const useQueueStore = defineStore('queue', () => {
       if (stored) {
         const data = JSON.parse(stored);
         playlist.value = data.playlist || [];
-        currentIndex.value = data.currentIndex || -1;
+        currentIndex.value = data.currentIndex ?? -1;
       }
     } catch (e) {
       console.error('Failed to load queue:', e);

@@ -2,7 +2,7 @@
 import { ref, watch, computed } from 'vue';
 import { usePlayerStore, useFavoritesStore, useQueueStore } from '../../stores';
 import { Close, Delete, Music, Down, Up } from '@icon-park/vue-next';
-import { ElTooltip } from 'element-plus';
+import { ElTooltip, ElMessageBox } from 'element-plus';
 import LikeButton from '../LikeButton.vue';
 import { useIsMobile } from '../../composables/useIsMobile';
 import { useScrollLock } from '@vueuse/core';
@@ -36,9 +36,6 @@ const upgradeToPriority = (index: number) => {
   queueStore.upgradePriority(index);
 };
 
-const pendingDeleteIndex = ref<number | null>(null);
-const deleteTimer = ref<number | null>(null);
-
 const pendingUpgradeIndex = ref<number | null>(null);
 const upgradeTimer = ref<number | null>(null);
 
@@ -46,28 +43,7 @@ const pendingDowngradeIndex = ref<number | null>(null);
 const downgradeTimer = ref<number | null>(null);
 
 const handleDeleteClick = (index: number) => {
-  if (pendingDeleteIndex.value === index) {
-    removeSong(index);
-    clearDeletePending();
-  } else {
-    pendingDeleteIndex.value = index;
-    
-    if (deleteTimer.value) {
-      clearTimeout(deleteTimer.value);
-    }
-    
-    deleteTimer.value = setTimeout(() => {
-      clearDeletePending();
-    }, 3000);
-  }
-};
-
-const clearDeletePending = () => {
-  pendingDeleteIndex.value = null;
-  if (deleteTimer.value) {
-    clearTimeout(deleteTimer.value);
-    deleteTimer.value = null;
-  }
+  removeSong(index);
 };
 
 const handleUpgradeClick = (index: number) => {
@@ -109,7 +85,17 @@ const clearDowngradePending = () => {
 };
 
 const clearAll = () => {
-  playerStore.clearPlaylist();
+  ElMessageBox.confirm(
+    '确定要清空播放列表吗？',
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }
+  ).then(() => {
+    playerStore.clearPlaylist();
+  }).catch(() => {});
 };
 
 const clearPriority = () => {
@@ -296,11 +282,9 @@ const { isMobile } = useIsMobile();
               </button>
               <button
                 class="remove-btn"
-                :class="{ 'pending-delete': pendingDeleteIndex === song.originalIndex }"
                 @click.stop="handleDeleteClick(song.originalIndex)"
               >
                 <Delete theme="outline" size="16" />
-                <span v-if="pendingDeleteIndex === song.originalIndex" class="delete-text">删除</span>
               </button>
             </div>
           </div>
@@ -346,11 +330,9 @@ const { isMobile } = useIsMobile();
               </button>
               <button
                 class="remove-btn"
-                :class="{ 'pending-delete': pendingDeleteIndex === song.originalIndex }"
                 @click.stop="handleDeleteClick(song.originalIndex)"
               >
                 <Delete theme="outline" size="16" />
-                <span v-if="pendingDeleteIndex === song.originalIndex" class="delete-text">删除</span>
               </button>
             </div>
           </div>
@@ -672,18 +654,12 @@ const { isMobile } = useIsMobile();
   justify-content: center;
   gap: 4px;
   border-radius: 8px;
-  color: var(--color-text-secondary);
+  color: #e74c3c;
   transition: all 0.2s ease;
 }
 
-.remove-btn.pending-delete {
-  color: #ff4757;
-  background: rgba(255, 71, 87, 0.1);
-}
-
-.delete-text {
-  font-size: 11px;
-  font-weight: 500;
+.remove-btn:hover {
+  background: rgba(231, 76, 60, 0.1);
 }
 
 .drawer-overlay {

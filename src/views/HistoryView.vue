@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useHistoryStore, usePlayerStore, useQueueStore } from '../stores';
-import { Play, Delete } from '@icon-park/vue-next';
+import { Play, Delete, Close } from '@icon-park/vue-next';
 import SongRowMobile from '../components/SongRowMobile.vue';
 import LikeButton from '../components/LikeButton.vue';
 
@@ -31,6 +31,10 @@ const clearAllHistory = () => {
   if (confirm('确定要清空所有播放历史吗？')) {
     historyStore.clearHistory();
   }
+};
+
+const removeSong = (rid: number) => {
+  historyStore.removeFromHistory(rid);
 };
 
 const formatPlayTime = (timestamp: number) => {
@@ -98,41 +102,50 @@ const formatDuration = (seconds: number) => {
             v-for="item in recentHistory.today"
             :key="item.rid"
             :song="item"
+            show-delete
             @play="playSong"
+            @delete="removeSong"
           />
         </div>
         
-        <!-- PC端 -->
-        <div class="hidden md:flex flex-col">
-          <div
-            v-for="item in recentHistory.today"
-            :key="item.rid"
-            class="song-row-simple group"
-            @click="playSong(item)"
-          >
-            <img 
-              :src="item.pic" 
-              class="song-cover-simple"
-              @error="($event.target as HTMLImageElement).style.display = 'none'"
-            />
-            <div class="flex-1 min-w-0">
-              <div class="text-base md:text-lg font-medium text-main truncate">
-                {{ item.name }}
+<!-- PC端 -->
+          <div class="hidden md:flex flex-col">
+            <div
+              v-for="item in recentHistory.today"
+              :key="item.rid"
+              class="song-row-simple group"
+              @click="playSong(item)"
+            >
+              <img 
+                :src="item.pic" 
+                class="song-cover-simple"
+                @error="($event.target as HTMLImageElement).style.display = 'none'"
+              />
+              <div class="flex-1 min-w-0">
+                <div class="text-base md:text-lg font-medium text-main truncate">
+                  {{ item.name }}
+                </div>
+                <div class="text-sm md:text-base text-secondary truncate mt-0.5">
+                  {{ item.artist }}
+                </div>
+                <div class="text-xs text-tertiary mt-1">
+                  {{ formatPlayTime(item.playedAt) }} · 播放 {{ formatDuration(item.playDuration) }}
+                </div>
               </div>
-              <div class="text-sm md:text-base text-secondary truncate mt-0.5">
-                {{ item.artist }}
-              </div>
-              <div class="text-xs text-tertiary mt-1">
-                {{ formatPlayTime(item.playedAt) }} · 播放 {{ formatDuration(item.playDuration) }}
-              </div>
+              <LikeButton
+                :song="item"
+                size="small"
+                :show-tooltip="false"
+              />
+              <button
+                class="delete-btn-pc"
+                @click.stop="removeSong(item.rid)"
+                aria-label="从历史中删除"
+              >
+                <Delete theme="outline" size="18" />
+              </button>
             </div>
-            <LikeButton
-              :song="item"
-              size="small"
-              :show-tooltip="false"
-            />
           </div>
-        </div>
       </div>
       
       <!-- 本周 -->
@@ -149,41 +162,50 @@ const formatDuration = (seconds: number) => {
             v-for="item in recentHistory.thisWeek"
             :key="item.rid"
             :song="item"
+            show-delete
             @play="playSong"
+            @delete="removeSong"
           />
         </div>
         
-        <!-- PC端 -->
-        <div class="hidden md:flex flex-col">
-          <div
-            v-for="item in recentHistory.thisWeek"
-            :key="item.rid"
-            class="song-row-simple group"
-            @click="playSong(item)"
-          >
-            <img 
-              :src="item.pic" 
-              class="song-cover-simple"
-              @error="($event.target as HTMLImageElement).style.display = 'none'"
-            />
-            <div class="flex-1 min-w-0">
-              <div class="text-base md:text-lg font-medium text-main truncate">
-                {{ item.name }}
+<!-- PC端 -->
+          <div class="hidden md:flex flex-col">
+            <div
+              v-for="item in recentHistory.thisWeek"
+              :key="item.rid"
+              class="song-row-simple group"
+              @click="playSong(item)"
+            >
+              <img 
+                :src="item.pic" 
+                class="song-cover-simple"
+                @error="($event.target as HTMLImageElement).style.display = 'none'"
+              />
+              <div class="flex-1 min-w-0">
+                <div class="text-base md:text-lg font-medium text-main truncate">
+                  {{ item.name }}
+                </div>
+                <div class="text-sm md:text-base text-secondary truncate mt-0.5">
+                  {{ item.artist }}
+                </div>
+                <div class="text-xs text-tertiary mt-1">
+                  {{ formatPlayTime(item.playedAt) }} · 播放 {{ formatDuration(item.playDuration) }}
+                </div>
               </div>
-              <div class="text-sm md:text-base text-secondary truncate mt-0.5">
-                {{ item.artist }}
-              </div>
-              <div class="text-xs text-tertiary mt-1">
-                {{ formatPlayTime(item.playedAt) }} · 播放 {{ formatDuration(item.playDuration) }}
-              </div>
+              <LikeButton
+                :song="item"
+                size="small"
+                :show-tooltip="false"
+              />
+              <button
+                class="delete-btn-pc"
+                @click.stop="removeSong(item.rid)"
+                aria-label="从历史中删除"
+              >
+                <Delete theme="outline" size="18" />
+              </button>
             </div>
-            <LikeButton
-              :song="item"
-              size="small"
-              :show-tooltip="false"
-            />
           </div>
-        </div>
       </div>
       
       <!-- 更早 -->
@@ -200,41 +222,50 @@ const formatDuration = (seconds: number) => {
             v-for="item in recentHistory.older"
             :key="item.rid"
             :song="item"
+            show-delete
             @play="playSong"
+            @delete="removeSong"
           />
         </div>
         
-        <!-- PC端 -->
-        <div class="hidden md:flex flex-col">
-          <div
-            v-for="item in recentHistory.older"
-            :key="item.rid"
-            class="song-row-simple group"
-            @click="playSong(item)"
-          >
-            <img 
-              :src="item.pic" 
-              class="song-cover-simple"
-              @error="($event.target as HTMLImageElement).style.display = 'none'"
-            />
-            <div class="flex-1 min-w-0">
-              <div class="text-base md:text-lg font-medium text-main truncate">
-                {{ item.name }}
+<!-- PC端 -->
+          <div class="hidden md:flex flex-col">
+            <div
+              v-for="item in recentHistory.older"
+              :key="item.rid"
+              class="song-row-simple group"
+              @click="playSong(item)"
+            >
+              <img 
+                :src="item.pic" 
+                class="song-cover-simple"
+                @error="($event.target as HTMLImageElement).style.display = 'none'"
+              />
+              <div class="flex-1 min-w-0">
+                <div class="text-base md:text-lg font-medium text-main truncate">
+                  {{ item.name }}
+                </div>
+                <div class="text-sm md:text-base text-secondary truncate mt-0.5">
+                  {{ item.artist }}
+                </div>
+                <div class="text-xs text-tertiary mt-1">
+                  {{ formatPlayTime(item.playedAt) }} · 播放 {{ formatDuration(item.playDuration) }}
+                </div>
               </div>
-              <div class="text-sm md:text-base text-secondary truncate mt-0.5">
-                {{ item.artist }}
-              </div>
-              <div class="text-xs text-tertiary mt-1">
-                {{ formatPlayTime(item.playedAt) }} · 播放 {{ formatDuration(item.playDuration) }}
-              </div>
+              <LikeButton
+                :song="item"
+                size="small"
+                :show-tooltip="false"
+              />
+              <button
+                class="delete-btn-pc"
+                @click.stop="removeSong(item.rid)"
+                aria-label="从历史中删除"
+              >
+                <Delete theme="outline" size="18" />
+              </button>
             </div>
-            <LikeButton
-              :song="item"
-              size="small"
-              :show-tooltip="false"
-            />
           </div>
-        </div>
       </div>
       
       <div v-if="totalCount === 0" class="empty-state-simple">
@@ -243,3 +274,33 @@ const formatDuration = (seconds: number) => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.delete-btn-pc {
+  width: 32px;
+  height: 32px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: transparent;
+  color: #e74c3c;
+  border: none;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+.song-row-simple:hover .delete-btn-pc {
+  opacity: 1;
+}
+
+.delete-btn-pc:hover {
+  background: rgba(231, 76, 60, 0.1);
+}
+
+.delete-btn-pc:active {
+  transform: scale(0.92);
+}
+</style>

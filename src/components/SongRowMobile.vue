@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useQueueStore } from '../stores';
 import LikeButton from './LikeButton.vue';
-import { Add } from '@icon-park/vue-next';
+import { Add, Delete } from '@icon-park/vue-next';
 import { createFlyingNote, getElementCenter } from '../utils/flyingAnimation';
 import { ElMessage } from 'element-plus';
 import type { Song } from '../stores/player';
@@ -11,15 +11,18 @@ interface Props {
   rank?: number;
   showRank?: boolean;
   rankClass?: string;
+  showDelete?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   showRank: false,
-  rankClass: ''
+  rankClass: '',
+  showDelete: false
 });
 
 const emit = defineEmits<{
   play: [song: Song];
+  delete: [rid: number];
 }>();
 
 const queueStore = useQueueStore();
@@ -78,7 +81,7 @@ const handleAddToQueue = (e: Event) => {
       <div class="song-artist-mobile">{{ song.artist }}</div>
     </div>
     
-    <!-- 操作按钮：收藏 + 添加队列 -->
+    <!-- 操作按钮：收藏 + 添加队列 + 删除 -->
     <div class="song-actions-mobile">
       <LikeButton
         :song="song"
@@ -91,6 +94,14 @@ const handleAddToQueue = (e: Event) => {
         aria-label="添加到播放队列"
       >
         <Add theme="outline" size="20" />
+      </button>
+      <button
+        v-if="showDelete"
+        class="action-btn delete-btn"
+        @click.stop="emit('delete', song.rid)"
+        aria-label="从历史中删除"
+      >
+        <Delete theme="outline" size="20" />
       </button>
     </div>
   </div>
@@ -202,6 +213,14 @@ const handleAddToQueue = (e: Event) => {
 
 .action-btn:active {
   transform: scale(0.92);
+}
+
+.action-btn.delete-btn {
+  color: #e74c3c;
+}
+
+.action-btn.delete-btn:hover {
+  background: rgba(231, 76, 60, 0.1);
 }
 
 @media (min-width: 768px) {

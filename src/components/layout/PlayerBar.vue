@@ -120,10 +120,11 @@ const formatTime = (seconds: number) => {
 };
 
 const handleTimeUpdate = () => {
-  if (audioRef.value) {
-    playerStore.setCurrentTime(audioRef.value.currentTime);
-  }
-};
+    if (audioRef.value) {
+      playerStore.setCurrentTime(audioRef.value.currentTime);
+      playerStore.checkAndRecordHistory(audioRef.value.currentTime);
+    }
+  };
 
 const handleDurationChange = () => {
   if (audioRef.value && audioRef.value.duration) {

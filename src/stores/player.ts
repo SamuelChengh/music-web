@@ -40,8 +40,7 @@ export const usePlayerStore = defineStore('player', () => {
   const shuffledIndices = ref<number[]>([]);
   const shuffleIndex = ref(-1);
 
-  const playStartTime = ref<number>(0);
-  const songStartRid = ref<number>(0);
+  const historyRecordedForSong = ref<number>(0);
 
   const playlist = computed(() => queueStore.playlist);
   const currentIndex = computed(() => queueStore.currentIndex);
@@ -60,8 +59,6 @@ export const usePlayerStore = defineStore('player', () => {
     if (!isSameSong) {
       currentTime.value = 0;
       duration.value = song.duration || 0;
-      playStartTime.value = Date.now();
-      songStartRid.value = song.rid;
     }
 
     if (!queueStore.playlist.find(s => s.rid === song.rid)) {
@@ -86,8 +83,6 @@ export const usePlayerStore = defineStore('player', () => {
     if (!isSameSong) {
       currentTime.value = 0;
       duration.value = targetSong.duration || 0;
-      playStartTime.value = Date.now();
-      songStartRid.value = targetSong.rid;
     }
   };
 
@@ -192,8 +187,6 @@ export const usePlayerStore = defineStore('player', () => {
       if (!isSameSong) {
         currentTime.value = 0;
         duration.value = targetSong.duration || 0;
-        playStartTime.value = Date.now();
-        songStartRid.value = targetSong.rid;
       }
     }
   };
@@ -260,22 +253,20 @@ export const usePlayerStore = defineStore('player', () => {
     return playModeLabels[playMode.value];
   };
 
-  const recordPlayHistory = () => {
-    if (currentSong.value && songStartRid.value === currentSong.value.rid) {
-      const playDuration = (Date.now() - playStartTime.value) / 1000;
-      historyStore.recordHistory(currentSong.value, playDuration);
+  const MIN_HISTORY_DURATION = 10;
+
+  const checkAndRecordHistory = (currentTime: number) => {
+    if (currentSong.value && 
+        currentTime >= MIN_HISTORY_DURATION && 
+        historyRecordedForSong.value !== currentSong.value.rid) {
+      historyStore.recordHistory(currentSong.value, currentTime);
+      historyRecordedForSong.value = currentSong.value.rid;
     }
   };
 
-  watch(currentSong, (newSong, oldSong) => {
-    if (oldSong && oldSong.rid !== newSong?.rid) {
-      recordPlayHistory();
-    }
-  });
-
-  watch(isPlaying, (playing) => {
-    if (!playing && currentSong.value) {
-      recordPlayHistory();
+  watch(currentSong, (newSong) => {
+    if (newSong) {
+      historyRecordedForSong.value = 0;
     }
   });
 
@@ -334,6 +325,7 @@ export const usePlayerStore = defineStore('player', () => {
     togglePlaylist,
     togglePlayMode,
     getPlayModeLabel,
+    checkAndRecordHistory,
     init,
   };
 });

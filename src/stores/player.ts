@@ -36,7 +36,7 @@ export const usePlayerStore = defineStore('player', () => {
   const showPlaylist = ref(false);
   const lyric = ref<{ time: string; lineLyric: string }[]>([]);
   const currentLyricIndex = ref(0);
-  const playMode = ref<PlayMode>('order');
+  const playMode = ref<PlayMode>('loop');
   const shuffledIndices = ref<number[]>([]);
   const shuffleIndex = ref(-1);
 

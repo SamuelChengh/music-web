@@ -107,34 +107,13 @@ onUnmounted(() => {
             <Sun v-else theme="filled" size="16" />
           </button>
           
-          <div class="relative">
+          <div>
             <button
               class="btn-glass"
               @click="showMobileThemeMenu = !showMobileThemeMenu"
             >
               <TShirt theme="outline" size="16" />
             </button>
-            
-            <Transition name="dropdown">
-              <div v-if="showMobileThemeMenu" class="fixed inset-0 z-40" @click="showMobileThemeMenu = false"></div>
-            </Transition>
-            <Transition name="dropdown">
-              <div
-                v-if="showMobileThemeMenu"
-                class="theme-menu-glass fixed right-2 top-[72px] z-50"
-              >
-                <div class="grid grid-cols-4 gap-3">
-                  <button 
-                    v-for="c in themeColors" 
-                    :key="c.value"
-                    class="theme-color-btn"
-                    :style="{ backgroundColor: c.hex }"
-                    :class="themeStore.color === c.value ? 'active' : ''"
-                    @click="themeStore.setColor(c.value as any); showMobileThemeMenu = false"
-                  />
-                </div>
-              </div>
-            </Transition>
           </div>
         </div>
         
@@ -155,6 +134,39 @@ onUnmounted(() => {
     <PlayListDrawer />
     
     <MobileSidebar v-if="showMobileSidebar" @close="showMobileSidebar = false" />
+    
+    <!-- 主题选择遮罩层 - Teleport到body以避开backdrop-filter限制 -->
+    <Teleport to="body">
+      <Transition name="fade">
+        <div 
+          v-if="showMobileThemeMenu" 
+          class="fixed inset-0 bg-black/30 z-[9998]" 
+          @click="showMobileThemeMenu = false"
+        ></div>
+      </Transition>
+    </Teleport>
+    
+    <!-- 主题选择菜单 - Teleport到body以避开backdrop-filter限制 -->
+    <Teleport to="body">
+      <Transition name="dropdown">
+        <div 
+          v-if="showMobileThemeMenu"
+          class="theme-menu-glass fixed right-2 top-[72px] z-[9999]"
+          @click.stop
+        >
+          <div class="grid grid-cols-4 gap-3">
+            <button 
+              v-for="c in themeColors" 
+              :key="c.value"
+              class="theme-color-btn"
+              :style="{ backgroundColor: c.hex }"
+              :class="themeStore.color === c.value ? 'active' : ''"
+              @click.stop="themeStore.setColor(c.value as any); showMobileThemeMenu = false"
+            />
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -333,35 +345,6 @@ onUnmounted(() => {
   transform: translateY(-1px);
 }
 
-.theme-menu-glass {
-  width: 160px;
-  padding: 12px;
-  background: rgba(var(--color-bg-view-rgb), 0.92);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 16px;
-  border: 1px solid rgba(var(--color-primary-rgb), 0.25);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-}
-
-.theme-color-btn {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 2px solid transparent;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.theme-color-btn:hover {
-  transform: scale(1.15);
-}
-
-.theme-color-btn.active {
-  border-color: var(--color-text-main);
-  transform: scale(1.1);
-}
-
 .glow-divider {
   position: absolute;
   bottom: 0;
@@ -387,6 +370,54 @@ onUnmounted(() => {
 .fade-scale-leave-to {
   opacity: 0;
   transform: scale(0.8);
+}
+</style>
+
+<!-- Teleport元素样式（不能使用scoped，因为Teleport元素会被移到body） -->
+<style>
+.theme-menu-glass {
+  width: 160px;
+  padding: 12px;
+  background: rgba(var(--color-bg-view-rgb), 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px;
+  border: 1px solid rgba(var(--color-primary-rgb), 0.25);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.theme-color-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.theme-color-btn:hover {
+  transform: scale(1.15);
+}
+
+.theme-color-btn:active {
+  transform: scale(0.9);
+}
+
+.theme-color-btn.active {
+  border-color: var(--color-text-main);
+  transform: scale(1.1);
+  box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.3);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 
 .dropdown-enter-active,

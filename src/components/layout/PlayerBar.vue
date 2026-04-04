@@ -355,8 +355,7 @@ watch(showQualityMenu, (show) => {
           </span>
           {{ currentQualityLabel }}
         </button>
-        <Transition name="fade">
-          <div v-show="showQualityMenu" class="absolute bottom-full mb-2 right-0 bg-view border border-default rounded-xl shadow-xl p-2 px-sm py-sm min-w-quality-menu min-h-quality-menu z-50">
+        <div v-show="showQualityMenu" class="absolute bottom-full mb-2 right-0 bg-view border border-default rounded-xl shadow-xl p-2 px-sm py-sm min-w-quality-menu min-h-quality-menu z-50">
             <div class="text-xs text-secondary px-3 py-2 font-bold mb-sm">音质选择</div>
             <div
               v-for="q in qualities"
@@ -377,7 +376,6 @@ watch(showQualityMenu, (show) => {
               </span>
             </div>
           </div>
-        </Transition>
       </div>
       
       <el-tooltip content="歌词" placement="top">

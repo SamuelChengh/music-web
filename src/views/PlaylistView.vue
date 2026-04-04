@@ -167,6 +167,7 @@ const getRankClass = (index: number) => {
 }
 
 .play-all-btn {
+  width: fit-content;
   display: flex;
   align-items: center;
   gap: 6px;

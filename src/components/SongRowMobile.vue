@@ -93,7 +93,7 @@ const handleAddToQueue = (e: Event) => {
         @click.stop="handleAddToQueue"
         aria-label="添加到播放队列"
       >
-        <Add theme="outline" size="20" />
+        <Add theme="outline" size="16" />
       </button>
       <button
         v-if="showDelete"
@@ -101,7 +101,7 @@ const handleAddToQueue = (e: Event) => {
         @click.stop="emit('delete', song.rid)"
         aria-label="从历史中删除"
       >
-        <Delete theme="outline" size="20" />
+        <Delete theme="outline" size="16" />
       </button>
     </div>
   </div>
@@ -188,18 +188,18 @@ const handleAddToQueue = (e: Event) => {
 .song-actions-mobile {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 12px;
   flex-shrink: 0;
 }
 
 .action-btn {
-  width: 36px;
-  height: 36px;
-  padding: 4px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  border-radius: 8px;
   background: transparent;
   color: var(--color-primary);
   border: none;

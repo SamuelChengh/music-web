@@ -16,6 +16,13 @@ const queueStore = useQueueStore();
 const audioRef = ref<HTMLAudioElement | null>(null);
 const showQualityMenu = ref(false);
 const qualityMenuRef = ref<HTMLElement | null>(null);
+const pcQualityButtonRef = ref<HTMLElement | null>(null);
+const pcDropdownRef = ref<HTMLElement | null>(null);
+
+const isDesktop = ref(false);
+const checkScreenSize = () => {
+  isDesktop.value = window.innerWidth >= 1024;
+};
 
 // 音质选择框下拉手势状态
 const touchStartY = ref(0);
@@ -49,6 +56,18 @@ const currentQualityLabel = computed(() => {
   return qualities.find(q => q.value === playerStore.quality)?.label || '高音质';
 });
 
+const pcDropdownStyle = computed(() => {
+  if (pcQualityButtonRef.value && isDesktop.value) {
+    const rect = pcQualityButtonRef.value.getBoundingClientRect();
+    return {
+      position: 'fixed' as const,
+      bottom: `${window.innerHeight - rect.top + 8}px`,
+      right: `${window.innerWidth - rect.right}px`
+    };
+  }
+  return {};
+});
+
 const nextSong = computed(() => {
   const next = queueStore.getNextSong();
   return next ? next.song : null;
@@ -62,8 +81,15 @@ const hasNextPrioritySong = computed(() => {
 });
 
 const closeQualityMenu = (e: MouseEvent) => {
-  if (qualityMenuRef.value && !qualityMenuRef.value.contains(e.target as Node)) {
-    showQualityMenu.value = false;
+  if (isDesktop.value) {
+    if (pcDropdownRef.value && !pcDropdownRef.value.contains(e.target as Node) &&
+        pcQualityButtonRef.value && !pcQualityButtonRef.value.contains(e.target as Node)) {
+      showQualityMenu.value = false;
+    }
+  } else {
+    if (qualityMenuRef.value && !qualityMenuRef.value.contains(e.target as Node)) {
+      showQualityMenu.value = false;
+    }
   }
 };
 
@@ -219,10 +245,13 @@ const downloadSong = async () => {
 };
 
 onMounted(() => {
+  checkScreenSize();
+  window.addEventListener('resize', checkScreenSize);
   document.addEventListener('click', closeQualityMenu);
 });
 
 onUnmounted(() => {
+  window.removeEventListener('resize', checkScreenSize);
   document.removeEventListener('click', closeQualityMenu);
 });
 
@@ -346,8 +375,9 @@ watch(showQualityMenu, (show) => {
     </div>
 
     <div class="flex items-center gap-md w-64 justify-end hidden lg:flex" @click.self="showQualityMenu = !showQualityMenu">
-      <div class="relative" ref="qualityMenuRef">
+      <div class="relative">
         <button
+          ref="pcQualityButtonRef"
           class="text-xs px-sm py-1.5 rounded-full border border-default text-secondary hover:text-primary hover:border-primary transition-colors flex items-center gap-1.5"
           @click="showQualityMenu = !showQualityMenu"
         >
@@ -356,27 +386,6 @@ watch(showQualityMenu, (show) => {
           </span>
           {{ currentQualityLabel }}
         </button>
-        <div v-show="showQualityMenu" class="absolute bottom-full mb-2 right-0 bg-view border border-default rounded-xl shadow-xl p-2 px-sm py-sm min-w-quality-menu min-h-quality-menu z-50">
-            <div class="text-xs text-secondary px-3 py-2 font-bold mb-sm">音质选择</div>
-            <div
-              v-for="q in qualities"
-              :key="q.value"
-              class="flex items-center gap-3 px-3 py-4 cursor-pointer hover:bg-tertiary rounded-lg transition-colors group mb-sm"
-              :class="{ 'bg-tertiary/50': playerStore.quality === q.value }"
-              @click="selectQuality(q)"
-            >
-              <span :class="q.color" class="text-xs font-bold min-w-[40px]">{{ q.icon }}</span>
-              <span class="flex-1 text-sm font-bold" :class="playerStore.quality === q.value ? 'text-primary' : 'text-secondary group-hover:text-main'">
-                {{ q.label }}
-              </span>
-              <span class="text-xs text-tertiary">{{ q.bitrate }}</span>
-              <span v-if="playerStore.quality === q.value" class="text-primary">
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
-                </svg>
-              </span>
-            </div>
-          </div>
       </div>
       
       <el-tooltip content="歌词" placement="top">
@@ -545,17 +554,49 @@ watch(showQualityMenu, (show) => {
   </div>
   
   <Teleport to="body">
+    <!-- PC端音质下拉菜单 -->
+    <Transition name="fade-scale">
+      <div 
+        v-if="showQualityMenu && isDesktop"
+        ref="pcDropdownRef"
+        class="quality-dropdown-pc"
+        :style="pcDropdownStyle"
+      >
+        <div class="text-xs text-secondary px-3 py-2 font-bold mb-sm">音质选择</div>
+        <div
+          v-for="q in qualities"
+          :key="q.value"
+          class="flex items-center gap-3 px-3 py-4 cursor-pointer hover:bg-tertiary rounded-lg transition-colors group mb-sm"
+          :class="{ 'bg-tertiary/50': playerStore.quality === q.value }"
+          @click="selectQuality(q)"
+        >
+          <span :class="q.color" class="text-xs font-bold min-w-[40px]">{{ q.icon }}</span>
+          <span class="flex-1 text-sm font-bold" :class="playerStore.quality === q.value ? 'text-primary' : 'text-secondary group-hover:text-main'">
+            {{ q.label }}
+          </span>
+          <span class="text-xs text-tertiary">{{ q.bitrate }}</span>
+          <span v-if="playerStore.quality === q.value" class="text-primary">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+    </Transition>
+    
+    <!-- 移动端遮罩层 -->
     <Transition name="fade">
       <div 
-        v-if="showQualityMenu"
+        v-if="showQualityMenu && !isDesktop"
         class="quality-overlay"
         @click="showQualityMenu = false"
         @touchmove.prevent
       />
     </Transition>
     
+    <!-- 移动端抽屉 -->
 <div 
-  v-if="showQualityMenu"
+  v-if="showQualityMenu && !isDesktop"
   ref="qualityMenuRef"
   class="quality-drawer"
   :class="{ 'is-dragging': isDragging, 'is-closing': isClosing }"
@@ -658,6 +699,16 @@ watch(showQualityMenu, (show) => {
 
 .safe-area-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.quality-dropdown-pc {
+  background: var(--color-bg-view);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+  min-width: 240px;
+  z-index: 100;
 }
 
 .quality-overlay {

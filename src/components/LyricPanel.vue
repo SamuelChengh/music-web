@@ -309,6 +309,7 @@ watch(() => playerStore.showLyric, async (show) => {
             v-if="playerStore.currentSong"
             :src="playerStore.currentSong.pic"
             class="cover-small"
+            :class="{ 'rotating': playerStore.isPlaying }"
           />
           <div v-else class="cover-small bg-tertiary" />
           
@@ -491,6 +492,15 @@ watch(() => playerStore.showLyric, async (show) => {
 .cover-small:hover {
   transform: scale(1.05);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.cover-small.rotating {
+  animation: rotate-cover 12s linear infinite;
+}
+
+@keyframes rotate-cover {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 :global(.dark) .cover-small {
@@ -822,12 +832,13 @@ watch(() => playerStore.showLyric, async (show) => {
 
 .song-artist-lyric {
   font-size: 13px;
-  color: var(--color-text-secondary);
+  color: var(--color-text-main);
   text-align: center;
   max-width: 280px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  opacity: 0.7;
 }
 
 :global(.dark) .song-name-lyric {
@@ -835,7 +846,7 @@ watch(() => playerStore.showLyric, async (show) => {
 }
 
 :global(.dark) .song-artist-lyric {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 /* 进度条区域 */

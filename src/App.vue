@@ -72,7 +72,7 @@ onUnmounted(() => {
             class="logo-icon-glow"
             @click="showMobileSidebar = true"
           >
-            <Music theme="filled" size="18" />
+            <Music theme="filled" size="16" />
           </div>
           
           <Transition name="fade-scale">
@@ -198,8 +198,8 @@ onUnmounted(() => {
   }
   
   .logo-icon-glow {
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
   }
   
   .back-btn-glass {
@@ -233,8 +233,8 @@ onUnmounted(() => {
 }
 
 .logo-icon-glow {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -330,8 +330,8 @@ onUnmounted(() => {
 }
 
 .btn-glass {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;

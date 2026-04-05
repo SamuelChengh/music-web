@@ -49,10 +49,8 @@ const handleDeleteClick = (index: number) => {
 };
 
 const handleUpgradeClick = (index: number) => {
-  // 立即执行升级
   queueStore.upgradePriority(index);
   
-  // 短暂视觉反馈
   pendingUpgradeIndex.value = index;
   setTimeout(() => {
     clearUpgradePending();
@@ -339,7 +337,6 @@ const { isMobile } = useIsMobile();
                 @click.stop="handleUpgradeClick(song.originalIndex)"
               >
                 <Up theme="outline" size="16" />
-                <span v-if="pendingUpgradeIndex === song.originalIndex" class="action-text">升级</span>
               </button>
               <button
                 class="remove-btn"

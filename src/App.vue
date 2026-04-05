@@ -72,7 +72,7 @@ onUnmounted(() => {
             class="logo-icon-glow"
             @click="showMobileSidebar = true"
           >
-            <Music theme="filled" size="16" />
+            <Music theme="filled" size="18" />
           </div>
           
           <Transition name="fade-scale">
@@ -103,8 +103,8 @@ onUnmounted(() => {
             class="btn-glass"
             @click="themeStore.toggleMode()"
           >
-            <Moon v-if="themeStore.mode === 'dark'" theme="filled" size="16" />
-            <Sun v-else theme="filled" size="16" />
+            <Moon v-if="themeStore.mode === 'dark'" theme="filled" size="18" />
+            <Sun v-else theme="filled" size="18" />
           </button>
           
           <div>
@@ -112,7 +112,7 @@ onUnmounted(() => {
               class="btn-glass"
               @click="showMobileThemeMenu = !showMobileThemeMenu"
             >
-              <TShirt theme="outline" size="16" />
+              <TShirt theme="outline" size="18" />
             </button>
           </div>
         </div>
@@ -198,8 +198,8 @@ onUnmounted(() => {
   }
   
   .logo-icon-glow {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
   }
   
   .back-btn-glass {
@@ -208,8 +208,8 @@ onUnmounted(() => {
   }
   
   .btn-glass {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     border-radius: 8px;
   }
   
@@ -233,8 +233,8 @@ onUnmounted(() => {
 }
 
 .logo-icon-glow {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -330,8 +330,8 @@ onUnmounted(() => {
 }
 
 .btn-glass {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;

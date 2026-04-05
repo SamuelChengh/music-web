@@ -243,7 +243,7 @@ const handleNavigate = (path: string) => {
 .sidebar-drawer {
   position: relative;
   height: 100%;
-  width: 220px;
+  width: 200px;
   max-width: 75%;
   background: rgba(var(--color-bg-view-rgb), 0.88);
   backdrop-filter: blur(40px);
@@ -361,7 +361,7 @@ const handleNavigate = (path: string) => {
 }
 
 .menu-group {
-  margin-bottom: 24px;
+  margin-bottom: 10px;
 }
 
 .group-title {

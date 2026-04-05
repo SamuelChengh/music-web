@@ -88,7 +88,7 @@ onUnmounted(() => {
         </div>
         
         <div class="search-glass">
-          <Search class="search-icon" theme="outline" size="14" />
+          <Search class="search-icon" theme="outline" size="16" />
           <input
             v-model="searchKeyword"
             type="text"
@@ -312,7 +312,7 @@ onUnmounted(() => {
   flex: 1;
   height: 100%;
   background: transparent;
-  font-size: 14px;
+  font-size: 16px;
   color: var(--color-text-main);
   padding-left: 8px;
   border: none;

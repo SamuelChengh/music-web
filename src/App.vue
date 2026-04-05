@@ -191,7 +191,7 @@ onUnmounted(() => {
   }
 }
 
-@media (max-width: 410px) {
+@media (max-width: 430px) {
   .mobile-header {
     padding: 0 8px;
     gap: 6px;

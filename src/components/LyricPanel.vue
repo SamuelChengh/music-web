@@ -483,7 +483,7 @@ watch(() => playerStore.showLyric, async (show) => {
 .cover-small {
   width: 72px;
   height: 72px;
-  border-radius: 10px;
+  border-radius: 50%;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   object-fit: cover;
   transition: transform 0.3s ease, box-shadow 0.3s ease;

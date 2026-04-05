@@ -332,6 +332,7 @@ const { isMobile } = useIsMobile();
                 :class="favoritesStore.isFavorite(song.rid) || isMobile ? '' : 'opacity-0 group-hover:opacity-100'"
               />
               <button
+                v-if="queueStore.currentIndex !== song.originalIndex"
                 class="upgrade-btn"
                 :class="{ 'pending-action': pendingUpgradeIndex === song.originalIndex }"
                 @click.stop="handleUpgradeClick(song.originalIndex)"

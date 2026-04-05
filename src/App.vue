@@ -198,8 +198,8 @@ onUnmounted(() => {
   }
   
   .logo-icon-glow {
-    width: 30px;
-    height: 30px;
+    width: 35px;
+    height: 35px;
   }
   
   .back-btn-glass {
@@ -207,11 +207,11 @@ onUnmounted(() => {
     height: 24px;
   }
   
-  .btn-glass {
-    width: 30px;
-    height: 30px;
-    border-radius: 8px;
-  }
+.btn-glass {
+  width: 35px;
+  height: 35px;
+  border-radius: 8px;
+}
   
   .header-left {
     gap: 5px;
@@ -233,8 +233,8 @@ onUnmounted(() => {
 }
 
 .logo-icon-glow {
-  width: 30px;
-  height: 30px;
+  width: 35px;
+  height: 35px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -285,7 +285,7 @@ onUnmounted(() => {
   flex: 1;
   display: flex;
   align-items: center;
-  height: 40px;
+  height: 35px;
   padding: 0 14px;
   background: rgba(var(--color-bg-view-rgb), 0.6);
   backdrop-filter: blur(12px);
@@ -330,8 +330,8 @@ onUnmounted(() => {
 }
 
 .btn-glass {
-  width: 30px;
-  height: 30px;
+  width: 35px;
+  height: 35px;
   display: flex;
   align-items: center;
   justify-content: center;

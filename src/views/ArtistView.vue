@@ -39,7 +39,7 @@ const goToArtistDetail = (id: number) => {
 </script>
 
 <template>
-  <div class="h-full overflow-y-auto bg-view">
+  <div class="h-full overflow-y-auto overflow-x-hidden bg-view">
     <div class="px-md py-md md:px-lg md:py-lg">
       <div class="flex items-center gap-md mb-md md:mb-lg">
         <div class="w-1 h-5 md:h-6 gradient-bg rounded-full"></div>
@@ -64,25 +64,26 @@ const goToArtistDetail = (id: number) => {
         加载中...
       </div>
 
-      <div v-else class="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-md md:gap-lg">
+      <div v-else class="artist-grid">
         <div
           v-for="artist in artists"
           :key="artist.id"
-          class="cursor-pointer group"
+          class="artist-card"
           @click="goToArtistDetail(artist.id)"
         >
-          <div class="relative aspect-square">
+          <div class="artist-avatar-wrapper">
             <img 
               :src="artist.pic" 
-              class="w-full h-full object-cover rounded-full shadow-md group-hover:shadow-lg transition-all group-hover:scale-105" 
+              class="artist-avatar"
+              alt=""
             />
-            <div class="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center">
-              <el-tooltip content="播放" placement="top">
-                <Play theme="filled" size="24" class="text-white opacity-0 group-hover:opacity-100 transition-all cursor-pointer" />
-              </el-tooltip>
+            <div class="play-overlay">
+              <Play theme="filled" size="20" class="play-icon" />
             </div>
           </div>
-          <div class="mt-2 md:mt-3 text-center text-sm md:text-sm font-medium text-main truncate group-hover:text-primary transition-colors">{{ artist.name }}</div>
+          <div class="artist-info">
+            <div class="artist-name">{{ artist.name }}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -96,5 +97,177 @@ const goToArtistDetail = (id: number) => {
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* 移动端歌手列表优化 - 3列毛玻璃卡片 */
+@media (max-width: 767px) {
+  .artist-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 0 2px;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .artist-card {
+    background: rgba(var(--color-bg-view-rgb), 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 14px;
+    padding: 6px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08),
+                0 0 20px rgba(var(--color-primary-rgb), 0.04);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .artist-card:active {
+    transform: scale(0.96);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  }
+
+  .artist-avatar-wrapper {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 6px;
+  }
+
+  .artist-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: transform 0.25s ease;
+  }
+
+  .artist-card:active .artist-avatar {
+    transform: scale(1.05);
+  }
+
+  .play-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    opacity: 0;
+  }
+
+  .artist-card:active .play-overlay {
+    background: rgba(0, 0, 0, 0.3);
+    opacity: 1;
+  }
+
+  .play-icon {
+    color: white;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  }
+
+  .artist-info {
+    text-align: center;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .artist-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.2s ease;
+    max-width: 100%;
+  }
+
+  .artist-card:active .artist-name {
+    color: var(--color-primary);
+  }
+}
+
+/* PC端保持原样式 */
+@media (min-width: 768px) {
+  .artist-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 24px;
+  }
+
+  .artist-card {
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .artist-avatar-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    margin-bottom: 12px;
+  }
+
+  .artist-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+  }
+
+  .artist-card:hover .artist-avatar {
+    transform: scale(1.05);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .play-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    opacity: 0;
+  }
+
+  .artist-card:hover .play-overlay {
+    background: rgba(0, 0, 0, 0.2);
+    opacity: 1;
+  }
+
+  .play-icon {
+    color: white;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  }
+
+  .artist-info {
+    text-align: center;
+  }
+
+  .artist-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.2s ease;
+  }
+
+  .artist-card:hover .artist-name {
+    color: var(--color-primary);
+  }
 }
 </style>

@@ -14,7 +14,7 @@ interface Artist {
 const router = useRouter();
 const artists = ref<Artist[]>([]);
 const loading = ref(false);
-const category = ref('全部');
+const category = ref('华语男');
 const page = ref(1);
 
 const categories = ['全部', '华语男', '华语女', '华语组合', '日韩男', '日韩女', '日韩组合', '欧美男', '欧美女', '欧美组合'];

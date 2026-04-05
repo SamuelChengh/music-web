@@ -15,6 +15,11 @@ const touchStartY = ref(0);
 const touchDeltaY = ref(0);
 const isDragging = ref(false);
 
+// 点击歌词行显示时间提示的状态
+const clickedLyricIndex = ref<number | null>(null);
+// 用户主动 seek 后跳过自动滚动的标志
+const isSeeking = ref(false);
+
 // 用户手动滚动检测（防止自动滚动冲突）
 const isUserScrolling = ref(false);
 let scrollTimeout: number | null = null;
@@ -66,6 +71,11 @@ const handleLyricClick = (index: number, event: MouseEvent | TouchEvent) => {
   
   const timeInSeconds = parseLyricTime(lyricItem.time);
   seekToTime(timeInSeconds);
+  
+  // 设置点击的歌词行索引，显示时间提示
+  clickedLyricIndex.value = index;
+  // 设置 seeking 标志，跳过自动滚动
+  isSeeking.value = true;
   
   // 创建涟漪效果（移动端和PC端）
   createRipple(event, index);
@@ -151,6 +161,17 @@ const formatTime = (seconds: number) => {
 };
 
 watch(() => playerStore.currentLyricIndex, async (index) => {
+  // 如果用户点击了其他行歌词，清除时间提示
+  if (clickedLyricIndex.value !== null && clickedLyricIndex.value !== index) {
+    clickedLyricIndex.value = null;
+  }
+  
+  // 如果是用户主动 seek，跳过自动滚动，但重置标志
+  if (isSeeking.value) {
+    isSeeking.value = false;
+    return;
+  }
+  
   // 如果用户正在手动滚动，则不触发自动滚动
   if (isUserScrolling.value) return;
   
@@ -311,7 +332,7 @@ watch(() => playerStore.showLyric, async (show) => {
               class="lyric-line-wrapper-mobile"
               @click="handleLyricClick(index, $event)"
             >
-              <span class="lyric-time-hint-mobile">{{ formatTime(parseLyricTime(item.time)) }}</span>
+              <span class="lyric-time-hint-mobile" :class="{ visible: clickedLyricIndex === index }">{{ formatTime(parseLyricTime(item.time)) }}</span>
               <div
                 class="lyric-line"
                 :class="{ active: index === playerStore.currentLyricIndex }"
@@ -525,7 +546,7 @@ watch(() => playerStore.showLyric, async (show) => {
 /* 移动端时间戳提示 */
 .lyric-time-hint-mobile {
   position: absolute;
-  left: -50px;
+  right: 0;
   top: 50%;
   transform: translateY(-50%);
   font-size: 11px;
@@ -536,7 +557,7 @@ watch(() => playerStore.showLyric, async (show) => {
   white-space: nowrap;
 }
 
-.lyric-line-wrapper-mobile:hover .lyric-time-hint-mobile {
+.lyric-time-hint-mobile.visible {
   opacity: 1;
 }
 

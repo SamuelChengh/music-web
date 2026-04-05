@@ -191,34 +191,38 @@ onUnmounted(() => {
   }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 410px) {
   .mobile-header {
-    padding: 0 10px;
-    gap: 8px;
+    padding: 0 8px;
+    gap: 6px;
   }
   
   .logo-icon-glow {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
   }
   
   .back-btn-glass {
-    width: 26px;
-    height: 26px;
+    width: 24px;
+    height: 24px;
   }
   
   .btn-glass {
-    width: 32px;
-    height: 32px;
-    border-radius: 10px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
   }
   
   .header-left {
-    gap: 6px;
+    gap: 5px;
   }
   
   .header-right {
-    gap: 6px;
+    gap: 5px;
+  }
+  
+  .search-glass {
+    min-width: 100px;
   }
 }
 

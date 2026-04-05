@@ -260,7 +260,7 @@ const handleNavigate = (path: string) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
+  padding: 16px 12px;
   border-bottom: 1px solid rgba(var(--color-border), 0.4);
   background: rgba(var(--color-primary-rgb), 0.05);
 }
@@ -462,7 +462,7 @@ const handleNavigate = (path: string) => {
 }
 
 .drawer-footer {
-  padding: 16px 20px;
+  padding: 16px 12px;
   border-top: 1px solid rgba(var(--color-border), 0.4);
   background: rgba(var(--color-bg-view-rgb), 0.5);
 }
